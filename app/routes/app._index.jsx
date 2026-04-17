@@ -1,33 +1,40 @@
 import { useLoaderData } from "react-router";
 import { authenticate } from "../shopify.server";
 
-const COLOURS = ["BLACK", "RED", "BLUE", "GREEN", "WHITE"];
-const PRODUCT_TYPES = ["JACKET", "HOODY", "COAT", "GLOVES", "CAP", "HAT", "SOCKS"];
+const genders = ["SNR", "JNR"];
+const colours = ["BLACK", "RED", "BLUE", "GREEN", "WHITE"];
+const types = [
+  "JACKET",
+  "COAT",
+  "HOODY",
+  "HOODIE",
+  "GLOVES",
+  "CAP",
+  "HAT",
+  "SOCKS",
+  "BACKPACK",
+  "RUCKSACK",
+  "BENCHCOAT",
+];
 
 function parseProductTitle(title) {
   const words = title.split(/\s+/).filter(Boolean);
   const upperWords = words.map((word) => word.toUpperCase());
 
-  const typeIndex = upperWords.findIndex((word) => PRODUCT_TYPES.includes(word));
-  const colourIndex = upperWords.findIndex((word) => COLOURS.includes(word));
+  const genderIndex = upperWords.findIndex((word) => genders.includes(word));
+  const modelIndex = genderIndex !== -1 ? genderIndex + 1 : -1;
 
-  const modelIndex =
-    typeIndex !== -1
-      ? upperWords.findIndex(
-          (word, index) =>
-            index > typeIndex && !PRODUCT_TYPES.includes(word) && !COLOURS.includes(word),
-        )
-      : -1;
+  const clubWords = genderIndex > 0 ? words.slice(0, genderIndex) : [];
+  const club = clubWords.length > 0 ? clubWords.join(" ") : null;
+  const model = modelIndex !== -1 && modelIndex < words.length ? words[modelIndex] : null;
 
-  const club =
-    modelIndex > 0
-      ? words.slice(0, modelIndex).join(" ")
-      : typeIndex > 0
-        ? words.slice(0, typeIndex).join(" ")
-        : "N/A";
-  const model = modelIndex !== -1 ? words[modelIndex] : "N/A";
-  const type = typeIndex !== -1 ? words[typeIndex] : "N/A";
-  const colour = colourIndex !== -1 ? words[colourIndex] : "N/A";
+  const wordsAfterModel =
+    modelIndex !== -1 && modelIndex + 1 < words.length ? upperWords.slice(modelIndex + 1) : [];
+  const detectedType = wordsAfterModel.find((word) => types.includes(word));
+  const detectedColour = upperWords.find((word) => colours.includes(word));
+
+  const type = detectedType ?? null;
+  const colour = detectedColour ?? null;
 
   return { club, model, type, colour };
 }
@@ -96,10 +103,10 @@ export default function Index() {
                     {product.handle}
                   </p>
                   <div style={{ marginTop: "0.25rem", fontSize: "0.875rem", color: "#303030" }}>
-                    <p style={{ margin: 0 }}>→ Club: {parsed.club}</p>
-                    <p style={{ margin: 0 }}>→ Model: {parsed.model}</p>
-                    <p style={{ margin: 0 }}>→ Type: {parsed.type}</p>
-                    <p style={{ margin: 0 }}>→ Colour: {parsed.colour}</p>
+                    {parsed.club ? <p style={{ margin: 0 }}>→ Club: {parsed.club}</p> : null}
+                    {parsed.model ? <p style={{ margin: 0 }}>→ Model: {parsed.model}</p> : null}
+                    {parsed.type ? <p style={{ margin: 0 }}>→ Type: {parsed.type}</p> : null}
+                    {parsed.colour ? <p style={{ margin: 0 }}>→ Colour: {parsed.colour}</p> : null}
                   </div>
                 </div>
               );
