@@ -6,6 +6,8 @@ const colours = ["BLACK", "RED", "BLUE", "GREEN", "WHITE"];
 const types = [
   "JACKET",
   "COAT",
+  "BENCHCOAT",
+  "SHOWERJACKET",
   "HOODY",
   "HOODIE",
   "GLOVES",
@@ -14,7 +16,8 @@ const types = [
   "SOCKS",
   "BACKPACK",
   "RUCKSACK",
-  "BENCHCOAT",
+  "POM",
+  "POM POM",
 ];
 
 function parseProductTitle(title) {
@@ -30,10 +33,13 @@ function parseProductTitle(title) {
 
   const wordsAfterModel =
     modelIndex !== -1 && modelIndex + 1 < words.length ? upperWords.slice(modelIndex + 1) : [];
-  const detectedType = wordsAfterModel.find((word) => types.includes(word));
+  const typeSegment = wordsAfterModel.join(" ").trim();
+
+  const sortedTypes = [...types].sort((a, b) => b.length - a.length);
+  const detectedType = sortedTypes.find((candidateType) => typeSegment.includes(candidateType));
   const detectedColour = upperWords.find((word) => colours.includes(word));
 
-  const type = detectedType ?? null;
+  const type = detectedType ?? (typeSegment || null);
   const colour = detectedColour ?? null;
 
   return { club, model, type, colour };
@@ -105,7 +111,7 @@ export default function Index() {
                   <div style={{ marginTop: "0.25rem", fontSize: "0.875rem", color: "#303030" }}>
                     {parsed.club ? <p style={{ margin: 0 }}>→ Club: {parsed.club}</p> : null}
                     {parsed.model ? <p style={{ margin: 0 }}>→ Model: {parsed.model}</p> : null}
-                    {parsed.type ? <p style={{ margin: 0 }}>→ Type: {parsed.type}</p> : null}
+                    <p style={{ margin: 0 }}>→ Type: {parsed.type ?? ""}</p>
                     {parsed.colour ? <p style={{ margin: 0 }}>→ Colour: {parsed.colour}</p> : null}
                   </div>
                 </div>
