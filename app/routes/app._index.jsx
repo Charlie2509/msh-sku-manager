@@ -23,12 +23,13 @@ const types = [
   "TRAVEL RUCKSACK",
   "BASEBALL CAP",
   "BOBBLE HAT",
+  "BOBBLE",
   "MATCH SOCKS",
   "NECKWARMER",
   "TARGET SOCK",
   "SOCK",
 ];
-const modelStopWords = ["WINTER", "GAME", "DAY", "TARGET", "3D", "EMBROIDERED", "LONG"];
+const modelStopWords = ["WINTER", "BOBBLE", "GAME", "DAY", "TARGET", "3D", "EMBROIDERED", "LONG"];
 const removableWords = [
   "FC",
   "AFC",
@@ -75,18 +76,25 @@ function detectType(words) {
     for (let index = 0; index <= upperWords.length - typeWords.length; index += 1) {
       const matchesType = typeWords.every((typeWord, offset) => upperWords[index + offset] === typeWord);
       if (matchesType) {
-        return { type: candidateType, typeWords };
+        const typeWordIndices = typeWords.map((_, offset) => index + offset);
+        return { type: candidateType, typeWords, typeWordIndices };
       }
     }
   }
 
-  return { type: null, typeWords: [] };
+  return { type: null, typeWords: [], typeWordIndices: [] };
 }
 
-function parseFallbackProductTitle(words) {
+function parseFallbackProductTitle(words, typeInfo = null) {
   const upperWords = words.map((word) => word.toUpperCase());
   const detectedColour = upperWords.find((word) => colours.includes(word)) ?? null;
-  const { type: detectedType, typeWords } = detectType(words);
+  const {
+    type: detectedType,
+    typeWords,
+    typeWordIndices,
+  } = typeInfo ?? detectType(words);
+  const typeWordIndexSet = new Set(typeWordIndices);
+  const hasBobbleAndSnow = upperWords.includes("BOBBLE") && upperWords.includes("SNOW");
 
   const removableWordsSet = new Set([
     ...removableWords,
@@ -97,17 +105,21 @@ function parseFallbackProductTitle(words) {
   ]);
 
   const model =
-    words.find((word) => {
+    words.find((word, index) => {
       const upperWord = word.toUpperCase();
+      if (typeWordIndexSet.has(index)) return false;
       return isStrongModelWord(word) && !removableWordsSet.has(upperWord);
     }) ?? null;
+  const preferredWinterModel = hasBobbleAndSnow ? words.find((word) => word.toUpperCase() === "SNOW") : null;
+  const resolvedModel = preferredWinterModel ?? model;
+  const resolvedType = detectedType ?? (upperWords.includes("BOBBLE") ? "BOBBLE HAT" : null);
 
   return {
     club: null,
-    model,
-    type: detectedType,
+    model: resolvedModel,
+    type: resolvedType,
     colour: detectedColour,
-    status: deriveStatus({ model, type: detectedType, colour: detectedColour }),
+    status: deriveStatus({ model: resolvedModel, type: resolvedType, colour: detectedColour }),
   };
 }
 
@@ -117,6 +129,8 @@ function parseProductTitle(title) {
 
   const genderIndex = upperWords.findIndex((word) => genders.includes(word));
   const modelIndex = genderIndex !== -1 ? genderIndex + 1 : -1;
+  const typeInfo = detectType(words);
+  const typeWordIndexSet = new Set(typeInfo.typeWordIndices);
 
   const clubWords = genderIndex > 0 ? words.slice(0, genderIndex) : [];
   const club = clubWords.length > 0 ? clubWords.join(" ") : null;
@@ -125,6 +139,7 @@ function parseProductTitle(title) {
   const model =
     directModelCandidate &&
     isStrongModelWord(directModelCandidate) &&
+    !typeWordIndexSet.has(modelIndex) &&
     directModelUpper &&
     !modelStopWords.includes(directModelUpper)
       ? directModelCandidate
@@ -135,7 +150,7 @@ function parseProductTitle(title) {
   const typeSegment = wordsAfterModel.join(" ").trim();
 
   const sortedTypes = [...types].sort((a, b) => b.length - a.length);
-  const detectedType = sortedTypes.find((candidateType) => typeSegment.includes(candidateType));
+  const detectedType = typeInfo.type ?? sortedTypes.find((candidateType) => typeSegment.includes(candidateType));
   const detectedColour = upperWords.find((word) => colours.includes(word));
 
   const type = detectedType ?? (typeSegment || null);
@@ -145,7 +160,7 @@ function parseProductTitle(title) {
     return { club, model, type, colour, status: deriveStatus({ model, type, colour }) };
   }
 
-  return parseFallbackProductTitle(words);
+  return parseFallbackProductTitle(words, typeInfo);
 }
 
 function normaliseSkuPart(value, fallback = "na") {
