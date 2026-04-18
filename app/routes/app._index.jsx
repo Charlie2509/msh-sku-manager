@@ -1,5 +1,6 @@
 import { useLoaderData } from "react-router";
 import { authenticate } from "../shopify.server";
+import { macronReferenceMap } from "../data/macronReference";
 
 const genders = ["SNR", "JNR"];
 const colours = [
@@ -61,79 +62,6 @@ const removableWords = [
   "ROW",
 ];
 const suspiciousModelWords = new Set(["3D"]);
-const modelReferenceMap = {
-  elbrus: {
-    modelSlug: "elbrus",
-    displayName: "Elbrus",
-    allowedColours: ["black", "navy", "red"],
-  },
-  gyor: {
-    modelSlug: "gyor",
-    displayName: "Gyor",
-    allowedColours: ["black", "navy", "green"],
-  },
-  horn: {
-    modelSlug: "horn",
-    displayName: "Horn",
-    allowedColours: ["black", "red", "royal"],
-  },
-  northland: {
-    modelSlug: "northland",
-    displayName: "Northland",
-    allowedColours: ["black", "navy", "maroon"],
-  },
-  pepper: {
-    modelSlug: "pepper",
-    displayName: "Pepper",
-    allowedColours: ["black", "white", "red"],
-  },
-  snow: {
-    modelSlug: "snow",
-    displayName: "Snow",
-    allowedColours: ["black", "navy", "sky"],
-  },
-  turvey: {
-    modelSlug: "turvey",
-    displayName: "Turvey",
-    allowedColours: ["black", "navy", "orange"],
-  },
-  rookie: {
-    modelSlug: "rookie",
-    displayName: "Rookie",
-    allowedColours: ["black", "red", "yellow"],
-  },
-  aulos: {
-    modelSlug: "aulos",
-    displayName: "Aulos",
-    allowedColours: ["black", "white", "purple"],
-  },
-  coldmire: {
-    modelSlug: "coldmire",
-    displayName: "Coldmire",
-    allowedColours: ["black", "navy", "grey"],
-  },
-  dance: {
-    modelSlug: "dance",
-    displayName: "Dance",
-    allowedColours: ["black", "pink", "purple"],
-  },
-  barrier: {
-    modelSlug: "barrier",
-    displayName: "Barrier",
-    allowedColours: ["black", "navy", "green"],
-  },
-  anvik: {
-    modelSlug: "anvik",
-    displayName: "Anvik",
-    allowedColours: ["black", "grey", "red"],
-  },
-  round: {
-    modelSlug: "round",
-    displayName: "Round",
-    allowedColours: ["black", "white", "navy"],
-  },
-};
-
 function isStrongModelWord(word) {
   const trimmedWord = word?.trim();
   if (!trimmedWord) return false;
@@ -159,7 +87,7 @@ function detectColour(words, handle = "") {
 
 function getModelReference(model) {
   if (!model) return null;
-  return modelReferenceMap[model.toLowerCase()] ?? null;
+  return macronReferenceMap[model.toLowerCase()] ?? null;
 }
 
 function attachModelReference(parsedResult) {
@@ -171,6 +99,18 @@ function attachModelReference(parsedResult) {
     modelReference,
     allowedColours: modelReference?.allowedColours ?? null,
   };
+}
+
+function getAllowedColoursMessage(parsedResult) {
+  if (!parsedResult.modelReference) {
+    return "unknown";
+  }
+
+  if (!parsedResult.allowedColours || parsedResult.allowedColours.length === 0) {
+    return "pending catalogue import";
+  }
+
+  return parsedResult.allowedColours.join(", ");
 }
 
 function deriveParseMeta({ model, type, colour }) {
@@ -463,7 +403,7 @@ export default function Index() {
                     ) : null}
                     {parsed.status === "partial" && parsed.partialReason === "missing colour" ? (
                       <p style={{ margin: 0 }}>
-                        → Allowed colours: {parsed.allowedColours ? parsed.allowedColours.join(", ") : "unknown"}
+                        → Allowed colours: {getAllowedColoursMessage(parsed)}
                       </p>
                     ) : null}
                   </div>
