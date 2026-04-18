@@ -45,6 +45,20 @@ function parseProductTitle(title) {
   return { club, model, type, colour };
 }
 
+function normaliseSkuPart(value, fallback = "na") {
+  if (!value) return fallback;
+  const cleaned = value.toString().trim().toLowerCase().replace(/\s+/g, "");
+  return cleaned || fallback;
+}
+
+function generateVariantSku({ model, colour, size }) {
+  const modelPart = normaliseSkuPart(model);
+  const colourPart = normaliseSkuPart(colour);
+  const sizePart = normaliseSkuPart(size);
+
+  return `${modelPart}-${colourPart}-${sizePart}`;
+}
+
 export const loader = async ({ request }) => {
   const { admin } = await authenticate.admin(request);
 
@@ -57,6 +71,15 @@ export const loader = async ({ request }) => {
             id
             title
             handle
+            variants(first: 10) {
+              edges {
+                node {
+                  id
+                  title
+                  sku
+                }
+              }
+            }
           }
         }
       }
@@ -113,6 +136,22 @@ export default function Index() {
                     {parsed.model ? <p style={{ margin: 0 }}>→ Model: {parsed.model}</p> : null}
                     <p style={{ margin: 0 }}>→ Type: {parsed.type ?? ""}</p>
                     {parsed.colour ? <p style={{ margin: 0 }}>→ Colour: {parsed.colour}</p> : null}
+                  </div>
+                  <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", color: "#303030" }}>
+                    <p style={{ margin: 0, fontWeight: 600 }}>Variants:</p>
+                    {product.variants.edges.map(({ node: variant }) => {
+                      const generatedSku = generateVariantSku({
+                        model: parsed.model,
+                        colour: parsed.colour,
+                        size: variant.title,
+                      });
+
+                      return (
+                        <p key={variant.id} style={{ margin: 0 }}>
+                          - Size: {variant.title} → SKU: {generatedSku}
+                        </p>
+                      );
+                    })}
                   </div>
                 </div>
               );
