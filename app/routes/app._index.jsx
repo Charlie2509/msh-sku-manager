@@ -51,10 +51,63 @@ function normaliseSkuPart(value, fallback = "na") {
   return cleaned || fallback;
 }
 
+function normalizeSize(sizeValue) {
+  if (!sizeValue) return "na";
+
+  const rawSize = sizeValue.toString().trim();
+  if (!rawSize) return "na";
+
+  const normalizedKey = rawSize.toLowerCase().replace(/\s+/g, " ").trim();
+  const directMap = {
+    small: "s",
+    s: "s",
+    medium: "m",
+    m: "m",
+    large: "l",
+    l: "l",
+    xl: "xl",
+    "2xl": "2xl",
+    "3xl": "3xl",
+    "4xl": "4xl",
+    "5xl": "5xl",
+    default: "one",
+    jnr: "jnr",
+    snr: "snr",
+  };
+
+  if (directMap[normalizedKey]) {
+    return directMap[normalizedKey];
+  }
+
+  // Handle sock/number-range values (e.g. "MEDIUM 5-8 UK", "XS UK 10.5-2")
+  // by converting named sizes and cleaning the rest for SKU safety.
+  let working = normalizedKey;
+  const prefixMap = [
+    { from: "small", to: "s" },
+    { from: "medium", to: "m" },
+    { from: "large", to: "l" },
+  ];
+
+  prefixMap.forEach(({ from, to }) => {
+    const prefixRegex = new RegExp(`\\b${from}\\b`, "g");
+    working = working.replace(prefixRegex, to);
+  });
+
+  working = working
+    .replace(/\buk\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/\./g, "_")
+    .replace(/-+/g, "-");
+
+  return working || "na";
+}
+
 function generateVariantSku({ model, colour, size }) {
   const modelPart = normaliseSkuPart(model);
   const colourPart = normaliseSkuPart(colour);
-  const sizePart = normaliseSkuPart(size);
+  const sizePart = normalizeSize(size);
 
   return `${modelPart}-${colourPart}-${sizePart}`;
 }
