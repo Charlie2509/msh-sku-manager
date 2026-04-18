@@ -24,7 +24,11 @@ const types = [
   "BASEBALL CAP",
   "BOBBLE HAT",
   "MATCH SOCKS",
+  "NECKWARMER",
+  "TARGET SOCK",
+  "SOCK",
 ];
+const modelStopWords = ["WINTER", "GAME", "DAY", "TARGET", "3D", "EMBROIDERED", "LONG"];
 const removableWords = [
   "FC",
   "AFC",
@@ -39,6 +43,28 @@ const removableWords = [
   "FOREST",
   "ROW",
 ];
+const suspiciousModelWords = new Set(["3D"]);
+
+function isStrongModelWord(word) {
+  const trimmedWord = word?.trim();
+  if (!trimmedWord) return false;
+  return /[A-Z]/i.test(trimmedWord) && /^[A-Z0-9-]+$/i.test(trimmedWord);
+}
+
+function deriveStatus({ model, type, colour }) {
+  const upperModel = model?.toUpperCase() ?? null;
+  const isSuspiciousModel = upperModel ? suspiciousModelWords.has(upperModel) : false;
+
+  if (!model || isSuspiciousModel) {
+    return "review";
+  }
+
+  if (type && colour) {
+    return "matched";
+  }
+
+  return "partial";
+}
 
 function detectType(words) {
   const upperWords = words.map((word) => word.toUpperCase());
@@ -67,16 +93,22 @@ function parseFallbackProductTitle(words) {
     ...genders,
     ...(detectedColour ? [detectedColour] : []),
     ...typeWords,
+    ...modelStopWords,
   ]);
 
   const model =
     words.find((word) => {
       const upperWord = word.toUpperCase();
-      const hasLetter = /[A-Z]/i.test(word);
-      return hasLetter && !removableWordsSet.has(upperWord);
+      return isStrongModelWord(word) && !removableWordsSet.has(upperWord);
     }) ?? null;
 
-  return { club: null, model, type: detectedType, colour: detectedColour };
+  return {
+    club: null,
+    model,
+    type: detectedType,
+    colour: detectedColour,
+    status: deriveStatus({ model, type: detectedType, colour: detectedColour }),
+  };
 }
 
 function parseProductTitle(title) {
@@ -88,7 +120,15 @@ function parseProductTitle(title) {
 
   const clubWords = genderIndex > 0 ? words.slice(0, genderIndex) : [];
   const club = clubWords.length > 0 ? clubWords.join(" ") : null;
-  const model = modelIndex !== -1 && modelIndex < words.length ? words[modelIndex] : null;
+  const directModelCandidate = modelIndex !== -1 && modelIndex < words.length ? words[modelIndex] : null;
+  const directModelUpper = directModelCandidate?.toUpperCase() ?? null;
+  const model =
+    directModelCandidate &&
+    isStrongModelWord(directModelCandidate) &&
+    directModelUpper &&
+    !modelStopWords.includes(directModelUpper)
+      ? directModelCandidate
+      : null;
 
   const wordsAfterModel =
     modelIndex !== -1 && modelIndex + 1 < words.length ? upperWords.slice(modelIndex + 1) : [];
@@ -102,7 +142,7 @@ function parseProductTitle(title) {
   const colour = detectedColour ?? null;
 
   if (model) {
-    return { club, model, type, colour };
+    return { club, model, type, colour, status: deriveStatus({ model, type, colour }) };
   }
 
   return parseFallbackProductTitle(words);
@@ -259,6 +299,7 @@ export default function Index() {
                     {parsed.model ? <p style={{ margin: 0 }}>→ Model: {parsed.model}</p> : null}
                     <p style={{ margin: 0 }}>→ Type: {parsed.type ?? ""}</p>
                     {parsed.colour ? <p style={{ margin: 0 }}>→ Colour: {parsed.colour}</p> : null}
+                    <p style={{ margin: 0 }}>→ Status: {parsed.status}</p>
                   </div>
                   <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", color: "#303030" }}>
                     <p style={{ margin: 0, fontWeight: 600 }}>Variants:</p>
