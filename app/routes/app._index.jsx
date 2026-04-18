@@ -120,7 +120,14 @@ export default function Index() {
       </div>
 
       <div style={{ marginTop: "1rem", maxWidth: "640px" }}>
-        <s-card>
+        <div
+          style={{
+            background: "white",
+            border: "1px solid #dfe3e8",
+            borderRadius: "12px",
+            padding: "1rem",
+          }}
+        >
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             {products.map((product) => {
               const parsed = parseProductTitle(product.title);
@@ -157,7 +164,7 @@ export default function Index() {
               );
             })}
           </div>
-        </s-card>
+        </div>
       </div>
     </div>
   );
