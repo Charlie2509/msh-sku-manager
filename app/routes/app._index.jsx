@@ -18,7 +18,66 @@ const types = [
   "RUCKSACK",
   "POM",
   "POM POM",
+  "POLO SHIRT",
+  "BODY WARMER",
+  "TRAVEL RUCKSACK",
+  "BASEBALL CAP",
+  "BOBBLE HAT",
+  "MATCH SOCKS",
 ];
+const removableWords = [
+  "FC",
+  "AFC",
+  "UNITED",
+  "COACHES",
+  "PLAYERS",
+  "GIRLS",
+  "CONNECT",
+  "PIRATES",
+  "EASTBOURNE",
+  "HASTINGS",
+  "FOREST",
+  "ROW",
+];
+
+function detectType(words) {
+  const upperWords = words.map((word) => word.toUpperCase());
+  const sortedTypes = [...types].sort((a, b) => b.length - a.length);
+
+  for (const candidateType of sortedTypes) {
+    const typeWords = candidateType.split(/\s+/);
+    for (let index = 0; index <= upperWords.length - typeWords.length; index += 1) {
+      const matchesType = typeWords.every((typeWord, offset) => upperWords[index + offset] === typeWord);
+      if (matchesType) {
+        return { type: candidateType, typeWords };
+      }
+    }
+  }
+
+  return { type: null, typeWords: [] };
+}
+
+function parseFallbackProductTitle(words) {
+  const upperWords = words.map((word) => word.toUpperCase());
+  const detectedColour = upperWords.find((word) => colours.includes(word)) ?? null;
+  const { type: detectedType, typeWords } = detectType(words);
+
+  const removableWordsSet = new Set([
+    ...removableWords,
+    ...genders,
+    ...(detectedColour ? [detectedColour] : []),
+    ...typeWords,
+  ]);
+
+  const model =
+    words.find((word) => {
+      const upperWord = word.toUpperCase();
+      const hasLetter = /[A-Z]/i.test(word);
+      return hasLetter && !removableWordsSet.has(upperWord);
+    }) ?? null;
+
+  return { club: null, model, type: detectedType, colour: detectedColour };
+}
 
 function parseProductTitle(title) {
   const words = title.split(/\s+/).filter(Boolean);
@@ -42,7 +101,11 @@ function parseProductTitle(title) {
   const type = detectedType ?? (typeSegment || null);
   const colour = detectedColour ?? null;
 
-  return { club, model, type, colour };
+  if (model) {
+    return { club, model, type, colour };
+  }
+
+  return parseFallbackProductTitle(words);
 }
 
 function normaliseSkuPart(value, fallback = "na") {
