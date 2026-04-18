@@ -61,6 +61,78 @@ const removableWords = [
   "ROW",
 ];
 const suspiciousModelWords = new Set(["3D"]);
+const modelReferenceMap = {
+  elbrus: {
+    modelSlug: "elbrus",
+    displayName: "Elbrus",
+    allowedColours: ["black", "navy", "red"],
+  },
+  gyor: {
+    modelSlug: "gyor",
+    displayName: "Gyor",
+    allowedColours: ["black", "navy", "green"],
+  },
+  horn: {
+    modelSlug: "horn",
+    displayName: "Horn",
+    allowedColours: ["black", "red", "royal"],
+  },
+  northland: {
+    modelSlug: "northland",
+    displayName: "Northland",
+    allowedColours: ["black", "navy", "maroon"],
+  },
+  pepper: {
+    modelSlug: "pepper",
+    displayName: "Pepper",
+    allowedColours: ["black", "white", "red"],
+  },
+  snow: {
+    modelSlug: "snow",
+    displayName: "Snow",
+    allowedColours: ["black", "navy", "sky"],
+  },
+  turvey: {
+    modelSlug: "turvey",
+    displayName: "Turvey",
+    allowedColours: ["black", "navy", "orange"],
+  },
+  rookie: {
+    modelSlug: "rookie",
+    displayName: "Rookie",
+    allowedColours: ["black", "red", "yellow"],
+  },
+  aulos: {
+    modelSlug: "aulos",
+    displayName: "Aulos",
+    allowedColours: ["black", "white", "purple"],
+  },
+  coldmire: {
+    modelSlug: "coldmire",
+    displayName: "Coldmire",
+    allowedColours: ["black", "navy", "grey"],
+  },
+  dance: {
+    modelSlug: "dance",
+    displayName: "Dance",
+    allowedColours: ["black", "pink", "purple"],
+  },
+  barrier: {
+    modelSlug: "barrier",
+    displayName: "Barrier",
+    allowedColours: ["black", "navy", "green"],
+  },
+  anvik: {
+    modelSlug: "anvik",
+    displayName: "Anvik",
+    allowedColours: ["black", "grey", "red"],
+  },
+  round: {
+    modelSlug: "round",
+    displayName: "Round",
+    allowedColours: ["black", "white", "navy"],
+  },
+};
 
 function isStrongModelWord(word) {
   const trimmedWord = word?.trim();
@@ -83,6 +155,22 @@ function detectColour(words, handle = "") {
     .filter(Boolean);
   const colourFromHandle = handleParts.find((part) => colours.includes(part));
   return colourFromHandle ?? null;
+}
+
+function getModelReference(model) {
+  if (!model) return null;
+  return modelReferenceMap[model.toLowerCase()] ?? null;
+}
+
+function attachModelReference(parsedResult) {
+  if (!parsedResult.model) return parsedResult;
+
+  const modelReference = getModelReference(parsedResult.model);
+  return {
+    ...parsedResult,
+    modelReference,
+    allowedColours: modelReference?.allowedColours ?? null,
+  };
 }
 
 function deriveParseMeta({ model, type, colour }) {
@@ -160,14 +248,14 @@ function parseFallbackProductTitle(words, handle = "", typeInfo = null) {
     colour: detectedColour,
   });
 
-  return {
+  return attachModelReference({
     club: null,
     model: resolvedModel,
     type: resolvedType,
     colour: detectedColour,
     status: parseMeta.status,
     partialReason: parseMeta.partialReason,
-  };
+  });
 }
 
 function parseProductTitle(title, handle = "") {
@@ -205,14 +293,14 @@ function parseProductTitle(title, handle = "") {
   const parseMeta = deriveParseMeta({ model, type, colour });
 
   if (model) {
-    return {
+    return attachModelReference({
       club,
       model,
       type,
       colour,
       status: parseMeta.status,
       partialReason: parseMeta.partialReason,
-    };
+    });
   }
 
   return parseFallbackProductTitle(words, handle, typeInfo);
@@ -372,6 +460,11 @@ export default function Index() {
                     <p style={{ margin: 0 }}>→ Status: {parsed.status}</p>
                     {["partial", "review"].includes(parsed.status) && parsed.partialReason ? (
                       <p style={{ margin: 0 }}>→ Reason: {parsed.partialReason}</p>
+                    ) : null}
+                    {parsed.status === "partial" && parsed.partialReason === "missing colour" ? (
+                      <p style={{ margin: 0 }}>
+                        → Allowed colours: {parsed.allowedColours ? parsed.allowedColours.join(", ") : "unknown"}
+                      </p>
                     ) : null}
                   </div>
                   <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", color: "#303030" }}>
