@@ -2,7 +2,23 @@ import { useLoaderData } from "react-router";
 import { authenticate } from "../shopify.server";
 
 const genders = ["SNR", "JNR"];
-const colours = ["BLACK", "RED", "BLUE", "GREEN", "WHITE"];
+const colours = [
+  "BLACK",
+  "WHITE",
+  "RED",
+  "GREEN",
+  "BLUE",
+  "NAVY",
+  "ROYAL",
+  "SKY",
+  "YELLOW",
+  "ORANGE",
+  "MAROON",
+  "PINK",
+  "PURPLE",
+  "GREY",
+  "GRAY",
+];
 const types = [
   "JACKET",
   "COAT",
@@ -52,19 +68,44 @@ function isStrongModelWord(word) {
   return /[A-Z]/i.test(trimmedWord) && /^[A-Z0-9-]+$/i.test(trimmedWord);
 }
 
-function deriveStatus({ model, type, colour }) {
+function toComparableToken(value) {
+  return value?.toUpperCase().replace(/[^A-Z0-9]/g, "") ?? "";
+}
+
+function detectColour(words, handle = "") {
+  const upperTitleWords = words.map((word) => toComparableToken(word));
+  const colourFromTitle = upperTitleWords.find((word) => colours.includes(word));
+  if (colourFromTitle) return colourFromTitle;
+
+  const handleParts = handle
+    .split("-")
+    .map((part) => toComparableToken(part))
+    .filter(Boolean);
+  const colourFromHandle = handleParts.find((part) => colours.includes(part));
+  return colourFromHandle ?? null;
+}
+
+function deriveParseMeta({ model, type, colour }) {
   const upperModel = model?.toUpperCase() ?? null;
   const isSuspiciousModel = upperModel ? suspiciousModelWords.has(upperModel) : false;
 
-  if (!model || isSuspiciousModel) {
-    return "review";
+  if (!model) {
+    return { status: "review", partialReason: "missing model" };
+  }
+
+  if (isSuspiciousModel) {
+    return { status: "review", partialReason: "generic/review item" };
   }
 
   if (type && colour) {
-    return "matched";
+    return { status: "matched", partialReason: null };
   }
 
-  return "partial";
+  if (type && !colour) {
+    return { status: "partial", partialReason: "missing colour" };
+  }
+
+  return { status: "partial", partialReason: null };
 }
 
 function detectType(words) {
@@ -85,9 +126,9 @@ function detectType(words) {
   return { type: null, typeWords: [], typeWordIndices: [] };
 }
 
-function parseFallbackProductTitle(words, typeInfo = null) {
-  const upperWords = words.map((word) => word.toUpperCase());
-  const detectedColour = upperWords.find((word) => colours.includes(word)) ?? null;
+function parseFallbackProductTitle(words, handle = "", typeInfo = null) {
+  const upperWords = words.map((word) => toComparableToken(word));
+  const detectedColour = detectColour(words, handle);
   const {
     type: detectedType,
     typeWords,
@@ -113,17 +154,23 @@ function parseFallbackProductTitle(words, typeInfo = null) {
   const preferredWinterModel = hasBobbleAndSnow ? words.find((word) => word.toUpperCase() === "SNOW") : null;
   const resolvedModel = preferredWinterModel ?? model;
   const resolvedType = detectedType ?? (upperWords.includes("BOBBLE") ? "BOBBLE HAT" : null);
+  const parseMeta = deriveParseMeta({
+    model: resolvedModel,
+    type: resolvedType,
+    colour: detectedColour,
+  });
 
   return {
     club: null,
     model: resolvedModel,
     type: resolvedType,
     colour: detectedColour,
-    status: deriveStatus({ model: resolvedModel, type: resolvedType, colour: detectedColour }),
+    status: parseMeta.status,
+    partialReason: parseMeta.partialReason,
   };
 }
 
-function parseProductTitle(title) {
+function parseProductTitle(title, handle = "") {
   const words = title.split(/\s+/).filter(Boolean);
   const upperWords = words.map((word) => word.toUpperCase());
 
@@ -151,16 +198,24 @@ function parseProductTitle(title) {
 
   const sortedTypes = [...types].sort((a, b) => b.length - a.length);
   const detectedType = typeInfo.type ?? sortedTypes.find((candidateType) => typeSegment.includes(candidateType));
-  const detectedColour = upperWords.find((word) => colours.includes(word));
+  const detectedColour = detectColour(words, handle);
 
   const type = detectedType ?? (typeSegment || null);
   const colour = detectedColour ?? null;
+  const parseMeta = deriveParseMeta({ model, type, colour });
 
   if (model) {
-    return { club, model, type, colour, status: deriveStatus({ model, type, colour }) };
+    return {
+      club,
+      model,
+      type,
+      colour,
+      status: parseMeta.status,
+      partialReason: parseMeta.partialReason,
+    };
   }
 
-  return parseFallbackProductTitle(words, typeInfo);
+  return parseFallbackProductTitle(words, handle, typeInfo);
 }
 
 function normaliseSkuPart(value, fallback = "na") {
@@ -301,7 +356,7 @@ export default function Index() {
         >
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             {products.map((product) => {
-              const parsed = parseProductTitle(product.title);
+              const parsed = parseProductTitle(product.title, product.handle);
 
               return (
                 <div key={product.id}>
@@ -315,6 +370,9 @@ export default function Index() {
                     <p style={{ margin: 0 }}>→ Type: {parsed.type ?? ""}</p>
                     {parsed.colour ? <p style={{ margin: 0 }}>→ Colour: {parsed.colour}</p> : null}
                     <p style={{ margin: 0 }}>→ Status: {parsed.status}</p>
+                    {["partial", "review"].includes(parsed.status) && parsed.partialReason ? (
+                      <p style={{ margin: 0 }}>→ Reason: {parsed.partialReason}</p>
+                    ) : null}
                   </div>
                   <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", color: "#303030" }}>
                     <p style={{ margin: 0, fontWeight: 600 }}>Variants:</p>
