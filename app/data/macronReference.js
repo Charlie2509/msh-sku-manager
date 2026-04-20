@@ -5,6 +5,7 @@ export const macronReferenceData = {
     garmentType: "showerjacket",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
   gyor: {
     slug: "gyor",
@@ -12,6 +13,7 @@ export const macronReferenceData = {
     garmentType: "unknown",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
   horn: {
     slug: "horn",
@@ -19,6 +21,7 @@ export const macronReferenceData = {
     garmentType: "unknown",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
   northland: {
     slug: "northland",
@@ -26,6 +29,7 @@ export const macronReferenceData = {
     garmentType: "unknown",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
   pepper: {
     slug: "pepper",
@@ -33,6 +37,7 @@ export const macronReferenceData = {
     garmentType: "unknown",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
   snow: {
     slug: "snow",
@@ -40,6 +45,7 @@ export const macronReferenceData = {
     garmentType: "unknown",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
   turvey: {
     slug: "turvey",
@@ -47,6 +53,7 @@ export const macronReferenceData = {
     garmentType: "unknown",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
   rookie: {
     slug: "rookie",
@@ -54,6 +61,7 @@ export const macronReferenceData = {
     garmentType: "unknown",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
   barrier: {
     slug: "barrier",
@@ -61,6 +69,7 @@ export const macronReferenceData = {
     garmentType: "unknown",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
   anvik: {
     slug: "anvik",
@@ -68,6 +77,7 @@ export const macronReferenceData = {
     garmentType: "unknown",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
   round: {
     slug: "round",
@@ -75,6 +85,7 @@ export const macronReferenceData = {
     garmentType: "unknown",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
   aulos: {
     slug: "aulos",
@@ -82,6 +93,7 @@ export const macronReferenceData = {
     garmentType: "unknown",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
   coldmire: {
     slug: "coldmire",
@@ -89,6 +101,7 @@ export const macronReferenceData = {
     garmentType: "unknown",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
   dance: {
     slug: "dance",
@@ -96,6 +109,7 @@ export const macronReferenceData = {
     garmentType: "hoodie",
     allowedColours: [],
     aliases: [],
+    source: "catalogue-pending",
   },
 };
 
