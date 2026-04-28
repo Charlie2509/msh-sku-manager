@@ -1,0 +1,53 @@
+name: Macron Product Asset Job
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Run mode"
+        required: true
+        default: diagnose
+        type: choice
+        options:
+          - diagnose
+          - extract
+
+jobs:
+  macron-assets:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Run extractor
+        if: ${{ inputs.mode == 'extract' }}
+        run: npm run extract
+
+      - name: Run diagnostics
+        if: ${{ inputs.mode == 'diagnose' }}
+        env:
+          DIAGNOSE_MAX_LINKS: "5"
+        run: npm run diagnose
+
+      - name: Upload extracted assets artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extracted-assets-${{ inputs.mode }}
+          path: extracted_assets/
+          if-no-files-found: warn
