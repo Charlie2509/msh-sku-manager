@@ -3,9 +3,18 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { chromium } from "playwright";
 
-const DEFAULT_LINKS_FILE = process.env.PRODUCT_LINKS_FILE ?? "extracted_assets/product_links.json";
 const DEFAULT_MAX_LINKS = Number.parseInt(process.env.DIAGNOSE_MAX_LINKS ?? "5", 10);
-const DIAGNOSTICS_DIR = "extracted_assets/diagnostics";
+const ASSETS_DIR = "extracted_assets";
+const DIAGNOSTICS_DIR = path.join(ASSETS_DIR, "diagnostics");
+const INPUT_SUMMARY_PATH = path.join(ASSETS_DIR, "input_summary.json");
+
+const INPUT_CANDIDATES = [
+  path.join(ASSETS_DIR, "product_links.json"),
+  path.join(ASSETS_DIR, "pdf_links.json"),
+  "pdf_links.json",
+  path.join(ASSETS_DIR, "all_product_links.txt"),
+  "all_product_links.txt",
+];
 
 const isValidHttpUrl = (value) => {
   if (typeof value !== "string") {
@@ -17,6 +26,23 @@ const isValidHttpUrl = (value) => {
     return parsed.protocol === "http:" || parsed.protocol === "https:";
   } catch {
     return false;
+  }
+};
+
+const normalizeUrl = (value) => {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const cleaned = value.trim().replace(/[)>\]}'",;]+$/g, "");
+  if (!cleaned) {
+    return null;
+  }
+
+  try {
+    return new URL(cleaned).toString();
+  } catch {
+    return null;
   }
 };
 
@@ -61,19 +87,159 @@ const extractLinks = (input) => {
   return [];
 };
 
+const parseJoinedLinksFromText = (contents) => {
+  const candidateUrls = [];
+
+  for (const line of contents.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      continue;
+    }
+
+    const matches = trimmed.match(/https?:\/\/[\w\d\-._~:/?#\[\]@!$&'()*+,;=%]+/g);
+    if (matches && matches.length > 0) {
+      candidateUrls.push(...matches);
+    }
+  }
+
+  return candidateUrls;
+};
+
+const dedupeLinks = (links, sourceAttribution = new Map()) => {
+  const seen = new Set();
+  const unique = [];
+
+  for (const link of links) {
+    const normalized = normalizeUrl(link);
+    if (!normalized || !isValidHttpUrl(normalized) || seen.has(normalized)) {
+      continue;
+    }
+
+    seen.add(normalized);
+    unique.push(normalized);
+  }
+
+  return {
+    unique,
+    sourceAttribution,
+  };
+};
+
+const fileExists = async (filePath) => {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const loadFromProductLinksJson = async (filePath) => {
+  const fileContents = await fs.readFile(filePath, "utf8");
+  const parsed = JSON.parse(fileContents);
+  const links = extractLinks(parsed);
+  return { links, source: path.basename(filePath), sourceAttribution: new Map() };
+};
+
+const loadFromPdfLinksJson = async (filePath) => {
+  const fileContents = await fs.readFile(filePath, "utf8");
+  const parsed = JSON.parse(fileContents);
+
+  const flattened = [];
+  const sourceAttribution = new Map();
+
+  if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+    for (const [catalogue, urls] of Object.entries(parsed)) {
+      if (!Array.isArray(urls)) {
+        continue;
+      }
+
+      for (const url of urls) {
+        flattened.push(url);
+        if (typeof url === "string") {
+          const normalized = normalizeUrl(url);
+          if (normalized) {
+            const current = sourceAttribution.get(normalized) ?? new Set();
+            current.add(catalogue);
+            sourceAttribution.set(normalized, current);
+          }
+        }
+      }
+    }
+  }
+
+  return { links: flattened, source: path.basename(filePath), sourceAttribution };
+};
+
+const loadFromAllProductLinksTxt = async (filePath) => {
+  const fileContents = await fs.readFile(filePath, "utf8");
+  const links = parseJoinedLinksFromText(fileContents);
+  return { links, source: path.basename(filePath), sourceAttribution: new Map() };
+};
+
 const loadProductLinks = async () => {
   const linksFromEnv = process.env.PRODUCT_LINKS;
 
   if (linksFromEnv) {
-    return linksFromEnv
+    const envLinks = linksFromEnv
       .split(",")
       .map((item) => item.trim())
       .filter(Boolean);
+
+    return {
+      source: "PRODUCT_LINKS env",
+      rawLinks: envLinks,
+      uniqueLinks: dedupeLinks(envLinks).unique,
+      sourceAttribution: new Map(),
+    };
   }
 
-  const fileContents = await fs.readFile(DEFAULT_LINKS_FILE, "utf8");
-  const parsed = JSON.parse(fileContents);
-  return extractLinks(parsed);
+  for (const candidate of INPUT_CANDIDATES) {
+    if (!(await fileExists(candidate))) {
+      continue;
+    }
+
+    const loader = candidate.endsWith("product_links.json")
+      ? loadFromProductLinksJson
+      : candidate.endsWith("pdf_links.json")
+        ? loadFromPdfLinksJson
+        : loadFromAllProductLinksTxt;
+
+    const loaded = await loader(candidate);
+    const deduped = dedupeLinks(loaded.links, loaded.sourceAttribution);
+
+    return {
+      source: loaded.source,
+      rawLinks: loaded.links,
+      uniqueLinks: deduped.unique,
+      sourceAttribution: deduped.sourceAttribution,
+    };
+  }
+
+  return {
+    source: "none",
+    rawLinks: [],
+    uniqueLinks: [],
+    sourceAttribution: new Map(),
+  };
+};
+
+const writeInputSummary = async ({ source, rawLinks, uniqueLinks, sourceAttribution }) => {
+  const sampleLinks = uniqueLinks.slice(0, 5);
+  const sourceSamples = sampleLinks.map((link) => ({
+    link,
+    catalogues: sourceAttribution.get(link) ? Array.from(sourceAttribution.get(link)).sort() : [],
+  }));
+
+  const summary = {
+    input_source: source,
+    raw_count: rawLinks.length,
+    unique_count: uniqueLinks.length,
+    sample_links: sampleLinks,
+    sample_sources: sourceSamples,
+  };
+
+  await fs.writeFile(INPUT_SUMMARY_PATH, JSON.stringify(summary, null, 2), "utf8");
 };
 
 const logHeader = (message) => {
@@ -83,20 +249,25 @@ const logHeader = (message) => {
 };
 
 const run = async () => {
+  await fs.mkdir(ASSETS_DIR, { recursive: true });
   await fs.mkdir(DIAGNOSTICS_DIR, { recursive: true });
 
-  const loadedLinks = await loadProductLinks();
-  const validLinks = loadedLinks.filter(isValidHttpUrl).slice(0, DEFAULT_MAX_LINKS);
+  const loaded = await loadProductLinks();
+  await writeInputSummary(loaded);
+
+  const validLinks = loaded.uniqueLinks.slice(0, DEFAULT_MAX_LINKS);
 
   if (validLinks.length === 0) {
     console.error(
-      `No valid links found. Expected ${DEFAULT_LINKS_FILE} or PRODUCT_LINKS env var with HTTP/HTTPS URLs.`,
+      `No valid links found. Checked: ${INPUT_CANDIDATES.join(", ")} (or PRODUCT_LINKS env var with HTTP/HTTPS URLs).`,
     );
     process.exitCode = 1;
     return;
   }
 
-  console.log(`Loaded ${loadedLinks.length} links. Running diagnostics for ${validLinks.length} links.`);
+  console.log(
+    `Loaded ${loaded.rawLinks.length} raw links (${loaded.uniqueLinks.length} unique) from ${loaded.source}. Running diagnostics for ${validLinks.length} links.`,
+  );
 
   const browser = await chromium.launch({ headless: true });
 
@@ -182,7 +353,9 @@ const run = async () => {
 
     console.log(`[saved.screenshot] ${screenshotPath}`);
     console.log(`[saved.html] ${htmlPath}`);
-    console.log(`[summary] consoleErrors=${consoleErrors.length} failedRequests=${failedRequests.length} imageResponses=${imageResponses.length} apiResponses=${apiResponses.length}`);
+    console.log(
+      `[summary] consoleErrors=${consoleErrors.length} failedRequests=${failedRequests.length} imageResponses=${imageResponses.length} apiResponses=${apiResponses.length}`,
+    );
 
     await page.close();
   }

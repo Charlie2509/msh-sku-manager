@@ -49,5 +49,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: extracted-assets-${{ inputs.mode }}
-          path: extracted_assets/
+          path: extracted_assets/**
           if-no-files-found: warn
