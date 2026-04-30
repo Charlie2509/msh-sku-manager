@@ -645,52 +645,6 @@ export default function Index() {
           </div>
         </div>
       </div>
-                              defaultValue={product.suggestion?.colour ?? product.assignedColour ?? ""}
-                              style={{ marginLeft: "0.5rem", padding: "0.25rem" }}
-                            >
-                              <option value="">— pick —</option>
-                              {parsed.allowedColours.map((c) => (
-                                <option key={c} value={c}>{c}</option>
-                              ))}
-                            </select>
-                          </label>
-                          <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>
-                            Save
-                          </button>
-                        </Form>
-                      </div>
-                    ) : null}
-                  </div>
-                  <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", color: "#303030" }}>
-                    <p style={{ margin: 0, fontWeight: 600 }}>Variants:</p>
-                    {(() => {
-                      const seen = new Set();
-                      return product.variants.edges.map(({ node: variant }) => {
-                        const variantColour = detectColourFromVariant(variant, parsed.allowedColours);
-                        const variantSize = detectSizeFromVariant(variant);
-                        const finalColour = variantColour ?? effectiveColour;
-                        const generatedSku = generateVariantSku({
-                          model: parsed.model,
-                          colour: finalColour,
-                          size: variantSize,
-                        });
-                        const dedupeKey = generatedSku;
-                        const isDuplicate = seen.has(dedupeKey);
-                        seen.add(dedupeKey);
-                        return (
-                          <p key={variant.id} style={{ margin: 0, opacity: isDuplicate ? 0.45 : 1 }}>
-                            - Size: {variantSize}{variantColour ? ` · Colour: ${variantColour}` : ""} → SKU: {generatedSku}{isDuplicate ? " (dup)" : ""}
-                          </p>
-                        );
-                      });
-                    })()}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
