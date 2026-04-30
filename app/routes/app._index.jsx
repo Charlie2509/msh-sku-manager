@@ -3,7 +3,7 @@ import { authenticate } from "../shopify.server";
 import { suggestColourFromImage } from "../lib/imageMatcher.server";
 import { isVisionLlmEnabled, classifyColourWithVision } from "../lib/visionLlm.server";
 import { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, writeAssignedColour } from "../lib/assignedColour.server";
-import { detectColour, detectColourFromVariant, detectSizeFromVariant, getAllowedColoursMessage, normalizeColourDisplay, parseProductTitle } from "../lib/skuParser";
+import { detectColour, detectColourFromVariant, detectSizeFromVariant, formatSizeLabel, getAllowedColoursMessage, normalizeColourDisplay, parseProductTitle } from "../lib/skuParser";
 import { generateVariantSku } from "../lib/skuGenerator";
 
 // dHash distance threshold (out of 64 bits). Below this we trust the suggestion enough
@@ -398,7 +398,7 @@ export default function Index() {
                         seen.add(row.generatedSku);
                         return (
                           <p key={row.id} style={{ margin: 0, opacity: isDuplicate ? 0.45 : 1 }}>
-                            - Size: {row.variantSize}{row.variantColour ? ` · Colour: ${row.variantColour}` : ""} → SKU: {row.generatedSku}{isDuplicate ? " (dup)" : ""}
+                            - Size: {formatSizeLabel(row.variantSize)}{row.variantColour ? ` · Colour: ${row.variantColour}` : ""} → SKU: {row.generatedSku}{isDuplicate ? " (dup)" : ""}
                           </p>
                         );
                       });
