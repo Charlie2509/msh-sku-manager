@@ -1,9 +1,13 @@
 import { Form, useLoaderData, useFetcher } from "react-router";
 import { authenticate } from "../shopify.server";
 import { macronReferenceMap } from "../data/macronReference";
+import { suggestColourFromImage } from "../lib/imageMatcher.server";
 
 const ASSIGNED_COLOUR_NAMESPACE = "msh";
 const ASSIGNED_COLOUR_KEY = "assigned_colour";
+// dHash distance threshold (out of 64 bits). Below this we trust the suggestion enough
+// to display it boldly; above, we mark it low-confidence.
+const STRONG_MATCH_DISTANCE = 12;
 
 const genders = ["SNR", "JNR"];
 const colours = [
@@ -405,6 +409,33 @@ export const loader = async ({ request }) => {
     assignedColour: node.assignedColour?.value ?? null,
   }));
 
+  // For each product, auto-run dHash visual matching against the PIM image library.
+  // Runs in parallel; gracefully no-ops if the index isn't built yet.
+  await Promise.all(
+    products.map(async (p) => {
+      if (p.assignedColour) return; // already assigned by user — nothing to do
+      const parsed = parseProductTitle(p.title, p.handle);
+      if (!parsed.model || !parsed.allowedColours?.length) return;
+      // Only auto-match for products that look like they need a colour assigned
+      const hasColorOption = (p.options ?? []).some((o) =>
+        ["color", "colour"].includes((o.name || "").toLowerCase()),
+      );
+      const titleColour = detectColour(p.title.split(/\s+/), p.handle);
+      if (titleColour || hasColorOption) return;
+      const imageUrl = p.featuredImage?.url;
+      if (!imageUrl) return;
+      const suggestion = await suggestColourFromImage(
+        imageUrl,
+        parsed.modelReference?.slug ?? null,
+        parsed.allowedColours,
+      );
+      if (suggestion) {
+        p.suggestion = suggestion;
+        p.suggestion.isStrong = suggestion.distance <= STRONG_MATCH_DISTANCE;
+      }
+    }),
+  );
+
   return { products };
 };
 
@@ -544,25 +575,41 @@ export default function Index() {
                     ) : null}
 
                     {effectiveStatus === "needs-colour" && parsed.allowedColours?.length > 0 ? (
-                      <Form method="post" style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                        <input type="hidden" name="productId" value={product.id} />
-                        <label style={{ fontSize: "0.875rem", color: "#303030" }}>
-                          Assign colour:
-                          <select
-                            name="colour"
-                            defaultValue={product.assignedColour ?? ""}
-                            style={{ marginLeft: "0.5rem", padding: "0.25rem" }}
-                          >
-                            <option value="">— pick —</option>
-                            {parsed.allowedColours.map((c) => (
-                              <option key={c} value={c}>{c}</option>
-                            ))}
-                          </select>
-                        </label>
-                        <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>
-                          Save
-                        </button>
-                      </Form>
+                      <div style={{ marginTop: "0.5rem", padding: "0.5rem", background: "#f6f6f6", borderRadius: "6px" }}>
+                        {product.suggestion ? (
+                          <p style={{ margin: 0, fontSize: "0.875rem" }}>
+                            🔍 Auto-detected from image:{" "}
+                            <strong>{product.suggestion.colour}</strong>{" "}
+                            <span style={{ color: product.suggestion.isStrong ? "#1f8a4c" : "#a06600" }}>
+                              ({Math.round(product.suggestion.confidence * 100)}% confidence
+                              {product.suggestion.scopedToExpectedProduct ? "" : ", different model"})
+                            </span>
+                          </p>
+                        ) : (
+                          <p style={{ margin: 0, fontSize: "0.875rem", color: "#a06600" }}>
+                            ⚠ No image suggestion (run scripts/index-pim-images.mjs first, or no featured image on product)
+                          </p>
+                        )}
+                        <Form method="post" style={{ marginTop: "0.4rem", display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                          <input type="hidden" name="productId" value={product.id} />
+                          <label style={{ fontSize: "0.875rem", color: "#303030" }}>
+                            {product.suggestion ? "Accept or override:" : "Assign colour:"}
+                            <select
+                              name="colour"
+                              defaultValue={product.suggestion?.colour ?? product.assignedColour ?? ""}
+                              style={{ marginLeft: "0.5rem", padding: "0.25rem" }}
+                            >
+                              <option value="">— pick —</option>
+                              {parsed.allowedColours.map((c) => (
+                                <option key={c} value={c}>{c}</option>
+                              ))}
+                            </select>
+                          </label>
+                          <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>
+                            Save
+                          </button>
+                        </Form>
+                      </div>
                     ) : null}
                   </div>
                   <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", color: "#303030" }}>
@@ -598,6 +645,74 @@ export default function Index() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+                              defaultValue={product.suggestion?.colour ?? product.assignedColour ?? ""}
+                              style={{ marginLeft: "0.5rem", padding: "0.25rem" }}
+                            >
+                              <option value="">— pick —</option>
+                              {parsed.allowedColours.map((c) => (
+                                <option key={c} value={c}>{c}</option>
+                              ))}
+                            </select>
+                          </label>
+                          <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>
+                            Save
+                          </button>
+                        </Form>
+                      </div>
+                    ) : null}
+                  </div>
+                  <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", color: "#303030" }}>
+                    <p style={{ margin: 0, fontWeight: 600 }}>Variants:</p>
+                    {(() => {
+                      const seen = new Set();
+                      return product.variants.edges.map(({ node: variant }) => {
+                        const variantColour = detectColourFromVariant(variant, parsed.allowedColours);
+                        const variantSize = detectSizeFromVariant(variant);
+                        const finalColour = variantColour ?? effectiveColour;
+                        const generatedSku = generateVariantSku({
+                          model: parsed.model,
+                          colour: finalColour,
+                          size: variantSize,
+                        });
+                        const dedupeKey = generatedSku;
+                        const isDuplicate = seen.has(dedupeKey);
+                        seen.add(dedupeKey);
+                        return (
+                          <p key={variant.id} style={{ margin: 0, opacity: isDuplicate ? 0.45 : 1 }}>
+                            - Size: {variantSize}{variantColour ? ` · Colour: ${variantColour}` : ""} → SKU: {generatedSku}{isDuplicate ? " (dup)" : ""}
+                          </p>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+KU: {generatedSku}{isDuplicate ? " (dup)" : ""}
+                          </p>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+div>
     </div>
   );
 }
