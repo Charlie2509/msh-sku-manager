@@ -1,390 +1,14 @@
 import { Form, useLoaderData, useFetcher } from "react-router";
 import { authenticate } from "../shopify.server";
-import { macronReferenceMap } from "../data/macronReference";
 import { suggestColourFromImage } from "../lib/imageMatcher.server";
-import { classifyColourWithClaude, isVisionLlmEnabled } from "../lib/visionLlm.server";
+import { isVisionLlmEnabled, classifyColourWithVision } from "../lib/visionLlm.server";
+import { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, writeAssignedColour } from "../lib/assignedColour.server";
+import { detectColour, detectColourFromVariant, detectSizeFromVariant, getAllowedColoursMessage, parseProductTitle } from "../lib/skuParser";
+import { generateVariantSku } from "../lib/skuGenerator";
 
-const ASSIGNED_COLOUR_NAMESPACE = "msh";
-const ASSIGNED_COLOUR_KEY = "assigned_colour";
 // dHash distance threshold (out of 64 bits). Below this we trust the suggestion enough
 // to display it boldly; above, we mark it low-confidence.
 const STRONG_MATCH_DISTANCE = 12;
-
-const genders = ["SNR", "JNR"];
-const colours = [
-  "BLACK",
-  "WHITE",
-  "RED",
-  "GREEN",
-  "BLUE",
-  "NAVY",
-  "ROYAL",
-  "SKY",
-  "YELLOW",
-  "ORANGE",
-  "MAROON",
-  "PINK",
-  "PURPLE",
-  "GREY",
-  "GRAY",
-];
-const types = [
-  "JACKET","PADDED JACKET","WINTER THERMAL JACKET","TRAINING JACKET","RAIN JACKET","SHOWER JACKET",
-  "COAT","WINTER COAT","LONG COAT","BENCHCOAT","BENCH COAT","LONG BENCHCOAT","SHOWERJACKET",
-  "HOODY","HOODIE","HOODED TRACKSUIT TOP",
-  "GLOVES",
-  "CAP","BASEBALL CAP","TRUCKER CAP",
-  "HAT","BOBBLE HAT","WINTER BOBBLE HAT","BOBBLE","BUCKET HAT",
-  "SOCKS","MATCH SOCKS","SHORT SOCKS","TRAINING SOCKS","ANKLE SOCK","FIXED ANKLE SOCK","TARGET SOCK","SOCK",
-  "BACKPACK","RUCKSACK","TRAVEL RUCKSACK","HOLDALL","GYM KIT BAG","KIT BAG","SHOULDER BAG","BAG",
-  "POM","POM POM","NECKWARMER","BEANIE",
-  "POLO SHIRT","SHIRT","TEE","T-SHIRT","COTTON TEE","TRAINING TEE","TRAINING SWEATER",
-  "BODY WARMER","BODYWARMER","GILET",
-  "TRAINING SHORTS","TRAINING TOP","TRAINING PANTS","TRAINING BOTTOMS","SHORTS",
-  "TRACKSUIT","TRACKSUIT TOP","TRACKSUIT BOTTOMS","TRACKSUIT BOTTOM","TRACK PANTS","TROUSERS","PANTS",
-  "WATER BOTTLE","BOTTLE",
-  "1/4 ZIP TOP","FULL ZIP TOP","SWEATSHIRT","SWEATER",
-  "TOP","BOTTOMS",
-];
-const modelStopWords = ["WINTER", "BOBBLE", "GAME", "DAY", "TARGET", "3D", "EMBROIDERED", "LONG"];
-const removableWords = [
-  "FC",
-  "AFC",
-  "UNITED",
-  "COACHES",
-  "PLAYERS",
-  "GIRLS",
-  "CONNECT",
-  "PIRATES",
-  "EASTBOURNE",
-  "HASTINGS",
-  "FOREST",
-  "ROW",
-];
-const suspiciousModelWords = new Set(["3D"]);
-function isStrongModelWord(word) {
-  const trimmedWord = word?.trim();
-  if (!trimmedWord) return false;
-  return /[A-Z]/i.test(trimmedWord) && /^[A-Z0-9-]+$/i.test(trimmedWord);
-}
-
-function toComparableToken(value) {
-  return value?.toUpperCase().replace(/[^A-Z0-9]/g, "") ?? "";
-}
-
-function detectColour(words, handle = "") {
-  const upperTitleWords = words.map((word) => toComparableToken(word));
-  const colourFromTitle = upperTitleWords.find((word) => colours.includes(word));
-  if (colourFromTitle) return colourFromTitle;
-
-  const handleParts = handle
-    .split("-")
-    .map((part) => toComparableToken(part))
-    .filter(Boolean);
-  const colourFromHandle = handleParts.find((part) => colours.includes(part));
-  return colourFromHandle ?? null;
-}
-
-function getModelReference(model) {
-  if (!model) return null;
-  return macronReferenceMap[model.toLowerCase()] ?? null;
-}
-
-// Words that are club/venue/team names — never a Macron model even if they
-// happen to collide with one in the reference. Extends the parser's
-// `removableWords` list with locally-known clubs.
-const NEVER_A_MODEL_LOCAL = new Set(
-  [
-    ...["FC", "AFC", "UNITED", "COACHES", "PLAYERS", "GIRLS", "CONNECT",
-        "PIRATES", "EASTBOURNE", "HASTINGS", "FOREST", "ROW",
-        "HILLCREST", "WESTHILL", "BC", "ABC", "CLUB", "GAME", "DAY",
-        "WATER", "BOTTLE"], // club words + ambiguous product-type words
-  ].map((w) => w.toLowerCase()),
-);
-
-// Try to find a multi-word Macron model in the title (e.g. "ROUND EVO", "RIGEL HERO")
-function detectMacronModelFromTitle(words) {
-  if (!words || words.length === 0) return null;
-  const lowerTokens = words.map((w) => w.toLowerCase().replace(/[^a-z0-9]/g, ""));
-  // Try 3-, 2-, then 1-word slices, prefer longer matches
-  for (const span of [3, 2, 1]) {
-    for (let i = 0; i <= lowerTokens.length - span; i += 1) {
-      const slice = lowerTokens.slice(i, i + span).filter(Boolean);
-      if (slice.length === 0) continue;
-      // Reject candidates whose tokens are all club/team words
-      if (slice.every((t) => NEVER_A_MODEL_LOCAL.has(t))) continue;
-      // Reject single-word candidates that ARE a club/team word
-      if (span === 1 && NEVER_A_MODEL_LOCAL.has(slice[0])) continue;
-      const candidates = [
-        slice.join("-"),
-        slice.join(" "),
-        slice.join(""),
-      ];
-      for (const candidate of candidates) {
-        const ref = macronReferenceMap[candidate];
-        if (ref) {
-          const original = words.slice(i, i + span).join(" ");
-          return { model: original, modelIndices: Array.from({ length: span }, (_, k) => i + k), reference: ref };
-        }
-      }
-    }
-  }
-  return null;
-}
-
-// Pull colour from Shopify variant selectedOptions (any option named like 'color' / 'colour')
-function detectColourFromVariant(variant, allowedColours) {
-  if (!variant?.selectedOptions) return null;
-  for (const opt of variant.selectedOptions) {
-    const optName = (opt.name || "").toLowerCase();
-    if (optName.includes("color") || optName.includes("colour")) {
-      const value = (opt.value || "").trim().toUpperCase();
-      if (!value) continue;
-      // Validate against allowedColours if provided
-      if (allowedColours && allowedColours.length > 0) {
-        const match = allowedColours.find((c) => c.toUpperCase() === value || value.includes(c.toUpperCase()));
-        if (match) return match;
-      }
-      return value;
-    }
-  }
-  return null;
-}
-
-// Pull size from variant — prefer selectedOptions named 'size'
-function detectSizeFromVariant(variant) {
-  if (variant?.selectedOptions) {
-    for (const opt of variant.selectedOptions) {
-      if ((opt.name || "").toLowerCase() === "size" && opt.value) return opt.value;
-    }
-  }
-  return variant?.title ?? null;
-}
-
-function attachModelReference(parsedResult) {
-  if (!parsedResult.model) return parsedResult;
-
-  const modelReference = getModelReference(parsedResult.model);
-  return {
-    ...parsedResult,
-    modelReference,
-    allowedColours: modelReference?.allowedColours ?? null,
-  };
-}
-
-function getAllowedColoursMessage(parsedResult) {
-  if (!parsedResult.modelReference) {
-    return "unknown";
-  }
-
-  if (!parsedResult.allowedColours || parsedResult.allowedColours.length === 0) {
-    return "pending catalogue import";
-  }
-
-  return parsedResult.allowedColours.join(", ");
-}
-
-function deriveParseMeta({ model, type, colour }) {
-  const upperModel = model?.toUpperCase() ?? null;
-  const isSuspiciousModel = upperModel ? suspiciousModelWords.has(upperModel) : false;
-
-  if (!model) {
-    return { status: "review", partialReason: "missing model" };
-  }
-
-  if (isSuspiciousModel) {
-    return { status: "review", partialReason: "generic/review item" };
-  }
-
-  if (type && colour) {
-    return { status: "matched", partialReason: null };
-  }
-
-  if (type && !colour) {
-    return { status: "partial", partialReason: "missing colour" };
-  }
-
-  return { status: "partial", partialReason: null };
-}
-
-function detectType(words) {
-  const upperWords = words.map((word) => word.toUpperCase());
-  const sortedTypes = [...types].sort((a, b) => b.length - a.length);
-
-  for (const candidateType of sortedTypes) {
-    const typeWords = candidateType.split(/\s+/);
-    for (let index = 0; index <= upperWords.length - typeWords.length; index += 1) {
-      const matchesType = typeWords.every((typeWord, offset) => upperWords[index + offset] === typeWord);
-      if (matchesType) {
-        const typeWordIndices = typeWords.map((_, offset) => index + offset);
-        return { type: candidateType, typeWords, typeWordIndices };
-      }
-    }
-  }
-
-  return { type: null, typeWords: [], typeWordIndices: [] };
-}
-
-function parseFallbackProductTitle(words, handle = "", typeInfo = null) {
-  const upperWords = words.map((word) => toComparableToken(word));
-  const detectedColour = detectColour(words, handle);
-  const {
-    type: detectedType,
-    typeWords,
-    typeWordIndices,
-  } = typeInfo ?? detectType(words);
-  const typeWordIndexSet = new Set(typeWordIndices);
-  const hasBobbleAndSnow = upperWords.includes("BOBBLE") && upperWords.includes("SNOW");
-
-  const removableWordsSet = new Set([
-    ...removableWords,
-    ...genders,
-    ...(detectedColour ? [detectedColour] : []),
-    ...typeWords,
-    ...modelStopWords,
-  ]);
-
-  const model =
-    words.find((word, index) => {
-      const upperWord = word.toUpperCase();
-      if (typeWordIndexSet.has(index)) return false;
-      return isStrongModelWord(word) && !removableWordsSet.has(upperWord);
-    }) ?? null;
-  const preferredWinterModel = hasBobbleAndSnow ? words.find((word) => word.toUpperCase() === "SNOW") : null;
-  const resolvedModel = preferredWinterModel ?? model;
-  const resolvedType = detectedType ?? (upperWords.includes("BOBBLE") ? "BOBBLE HAT" : null);
-  const parseMeta = deriveParseMeta({
-    model: resolvedModel,
-    type: resolvedType,
-    colour: detectedColour,
-  });
-
-  return attachModelReference({
-    club: null,
-    model: resolvedModel,
-    type: resolvedType,
-    colour: detectedColour,
-    status: parseMeta.status,
-    partialReason: parseMeta.partialReason,
-  });
-}
-
-function parseProductTitle(title, handle = "") {
-  const words = title.split(/\s+/).filter(Boolean);
-  const upperWords = words.map((word) => word.toUpperCase());
-
-  const genderIndex = upperWords.findIndex((word) => genders.includes(word));
-  const modelIndex = genderIndex !== -1 ? genderIndex + 1 : -1;
-  const typeInfo = detectType(words);
-  const typeWordIndexSet = new Set(typeInfo.typeWordIndices);
-
-  const clubWords = genderIndex > 0 ? words.slice(0, genderIndex) : [];
-  const club = clubWords.length > 0 ? clubWords.join(" ") : null;
-
-  // First try to find a known Macron model (multi-word aware) anywhere in the title
-  const macronHit = detectMacronModelFromTitle(words);
-  const directModelCandidate = modelIndex !== -1 && modelIndex < words.length ? words[modelIndex] : null;
-  const directModelUpper = directModelCandidate?.toUpperCase() ?? null;
-  const directModelOK =
-    directModelCandidate &&
-    isStrongModelWord(directModelCandidate) &&
-    !typeWordIndexSet.has(modelIndex) &&
-    directModelUpper &&
-    !modelStopWords.includes(directModelUpper);
-  const model = macronHit?.model ?? (directModelOK ? directModelCandidate : null);
-
-  const wordsAfterModel =
-    modelIndex !== -1 && modelIndex + 1 < words.length ? upperWords.slice(modelIndex + 1) : [];
-  const typeSegment = wordsAfterModel.join(" ").trim();
-
-  const sortedTypes = [...types].sort((a, b) => b.length - a.length);
-  const detectedType = typeInfo.type ?? sortedTypes.find((candidateType) => typeSegment.includes(candidateType));
-  const detectedColour = detectColour(words, handle);
-
-  const type = detectedType ?? (typeSegment || null);
-  const colour = detectedColour ?? null;
-  const parseMeta = deriveParseMeta({ model, type, colour });
-
-  if (model) {
-    return attachModelReference({
-      club,
-      model,
-      type,
-      colour,
-      status: parseMeta.status,
-      partialReason: parseMeta.partialReason,
-    });
-  }
-
-  return parseFallbackProductTitle(words, handle, typeInfo);
-}
-
-function normaliseSkuPart(value, fallback = "na") {
-  if (!value) return fallback;
-  const cleaned = value.toString().trim().toLowerCase().replace(/\s+/g, "");
-  return cleaned || fallback;
-}
-
-function normalizeSize(sizeValue) {
-  if (!sizeValue) return "na";
-
-  const rawSize = sizeValue.toString().trim();
-  if (!rawSize) return "na";
-
-  const normalizedKey = rawSize.toLowerCase().replace(/\s+/g, " ").trim();
-  const directMap = {
-    small: "s",
-    s: "s",
-    medium: "m",
-    m: "m",
-    large: "l",
-    l: "l",
-    xl: "xl",
-    "2xl": "2xl",
-    "3xl": "3xl",
-    "4xl": "4xl",
-    "5xl": "5xl",
-    default: "one",
-    jnr: "jnr",
-    snr: "snr",
-  };
-
-  if (directMap[normalizedKey]) {
-    return directMap[normalizedKey];
-  }
-
-  // Handle sock/number-range values (e.g. "MEDIUM 5-8 UK", "XS UK 10.5-2")
-  // by converting named sizes and cleaning the rest for SKU safety.
-  let working = normalizedKey;
-  const prefixMap = [
-    { from: "small", to: "s" },
-    { from: "medium", to: "m" },
-    { from: "large", to: "l" },
-  ];
-
-  prefixMap.forEach(({ from, to }) => {
-    const prefixRegex = new RegExp(`\\b${from}\\b`, "g");
-    working = working.replace(prefixRegex, to);
-  });
-
-  working = working
-    .replace(/\buk\b/g, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/\./g, "_")
-    .replace(/-+/g, "-");
-
-  return working || "na";
-}
-
-function generateVariantSku({ model, colour, size }) {
-  const modelPart = normaliseSkuPart(model);
-  const colourPart = normaliseSkuPart(colour);
-  const sizePart = normalizeSize(size);
-
-  return `${modelPart}-${colourPart}-${sizePart}`;
-}
 
 export const loader = async ({ request }) => {
   const { admin } = await authenticate.admin(request);
@@ -454,39 +78,6 @@ export const loader = async ({ request }) => {
 
   return { products };
 };
-
-/**
- * Helper: write a single product's assigned-colour metafield.
- */
-async function writeAssignedColour(admin, productId, colour) {
-  const response = await admin.graphql(
-    `#graphql
-    mutation SetAssignedColour($metafields: [MetafieldsSetInput!]!) {
-      metafieldsSet(metafields: $metafields) {
-        userErrors { field message }
-        metafields { id namespace key value }
-      }
-    }`,
-    {
-      variables: {
-        metafields: [
-          {
-            ownerId: productId,
-            namespace: ASSIGNED_COLOUR_NAMESPACE,
-            key: ASSIGNED_COLOUR_KEY,
-            type: "single_line_text_field",
-            value: colour,
-          },
-        ],
-      },
-    },
-  );
-  const json = await response.json();
-  const errors = json?.data?.metafieldsSet?.userErrors ?? [];
-  return errors.length > 0
-    ? { ok: false, error: errors.map((e) => e.message).join("; ") }
-    : { ok: true };
-}
 
 /**
  * Helper: re-fetch every product (id, title, handle, image, allowed colours,
@@ -561,19 +152,19 @@ export const action = async ({ request }) => {
   // ─── BULK: vision-LLM second-stage pass for low-confidence items ──────────
   if (bulk === "visionPass") {
     if (!isVisionLlmEnabled()) {
-      return { ok: false, error: "ANTHROPIC_API_KEY not set in environment" };
+      return { ok: false, error: "OPENAI_API_KEY not set in environment" };
     }
     const products = await fetchAllProductsForBulk(admin);
     let saved = 0;
     let unknown = 0;
     let skipped = 0;
-    // Run sequentially — Claude calls are slow and we want polite rate
+    // Run sequentially — OpenAI calls are slow and we want polite rate
     for (const p of products) {
       if (p.assignedColour) { skipped += 1; continue; }
       const parsed = parseProductTitle(p.title, p.handle);
       if (!parsed.model || !parsed.allowedColours?.length) { skipped += 1; continue; }
       if (!p.featuredImage?.url) { skipped += 1; continue; }
-      const llmColour = await classifyColourWithClaude(
+      const llmColour = await classifyColourWithVision(
         p.featuredImage.url,
         parsed.allowedColours,
         parsed.model,
@@ -651,8 +242,8 @@ export default function Index() {
             <input type="hidden" name="bulk" value="visionPass" />
             <button type="submit" disabled={bulkFetcher.state !== "idle"} style={{ padding: "0.5rem 1rem" }}>
               {bulkFetcher.state !== "idle" && bulkFetcher.formData?.get("bulk") === "visionPass"
-                ? "Asking Claude…"
-                : "Run vision pass (Claude)"}
+                ? "Asking OpenAI…"
+                : "Run vision pass (OpenAI)"}
             </button>
           </bulkFetcher.Form>
         </div>
@@ -664,7 +255,7 @@ export default function Index() {
         {bulkFetcher.data?.bulk === "visionPass" ? (
           <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: bulkFetcher.data.ok ? "#1f8a4c" : "#a00" }}>
             {bulkFetcher.data.ok
-              ? `✓ Claude assigned ${bulkFetcher.data.saved} (${bulkFetcher.data.unknown} unknown, ${bulkFetcher.data.skipped} skipped)`
+              ? `✓ OpenAI assigned ${bulkFetcher.data.saved} (${bulkFetcher.data.unknown} unknown, ${bulkFetcher.data.skipped} skipped)`
               : `✗ ${bulkFetcher.data.error}`}
           </p>
         ) : null}
