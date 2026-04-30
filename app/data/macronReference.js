@@ -4833,7 +4833,8 @@ export const NEVER_A_MODEL = new Set([
   "long","short","winter","summer","snr","jnr","sr","jr","size",
   "large","medium","small","xl","3d","set","kit","plain",
   "embroidered","printed","black","white","red","green","blue",
-  "navy","yellow","orange","purple","pink","grey","gray","royal",
+  "navy","yellow","orange","purple","pink","grey","gray","royal","one",
+  "one size",
 ]);
 
 export const macronReferenceMap = (() => {
