@@ -272,7 +272,10 @@ export const action = async ({ request }) => {
 
       const variants = presentation.variantRows
         .filter((row) => row.existingSku !== row.generatedSku)
-        .map((row) => ({ id: row.id, sku: row.generatedSku }));
+        .map((row) => ({
+          id: row.id,
+          inventoryItem: { sku: row.generatedSku },
+        }));
 
       const unchangedCount = presentation.variantRows.length - variants.length;
       skipped += unchangedCount;
@@ -281,46 +284,66 @@ export const action = async ({ request }) => {
         continue;
       }
 
-      const resp = await admin.graphql(
-        `#graphql
-        mutation productVariantsBulkUpdate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
-          productVariantsBulkUpdate(productId: $productId, variants: $variants) {
-            product {
-              id
-            }
-            productVariants {
-              id
-              sku
-            }
-            userErrors {
-              field
-              message
+      try {
+        const resp = await admin.graphql(
+          `#graphql
+          mutation productVariantsBulkUpdate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
+            productVariantsBulkUpdate(productId: $productId, variants: $variants) {
+              product {
+                id
+              }
+              productVariants {
+                id
+                sku
+                inventoryItem {
+                  id
+                  sku
+                }
+              }
+              userErrors {
+                field
+                message
+              }
             }
           }
-        }
-        `,
-        {
-          variables: {
-            productId: product.id,
-            variants,
+          `,
+          {
+            variables: {
+              productId: product.id,
+              variants,
+            },
           },
-        },
-      );
+        );
 
-      const json = await resp.json();
-      const result = json?.data?.productVariantsBulkUpdate;
-      const errors = result?.userErrors ?? [];
+        const json = await resp.json();
 
-      if (errors.length) {
+        if (json?.errors?.length) {
+          failedProducts += 1;
+          failed += variants.length;
+          userErrorMessages.push(
+            ...json.errors.slice(0, 3).map((e) => `${product.title}: ${e.message}`),
+          );
+          continue;
+        }
+
+        const result = json?.data?.productVariantsBulkUpdate;
+        const errors = result?.userErrors ?? [];
+
+        if (errors.length) {
+          failedProducts += 1;
+          failed += variants.length;
+          userErrorMessages.push(
+            ...errors.slice(0, 3).map((e) => `${product.title}: ${e.message}`),
+          );
+          continue;
+        }
+
+        updated += result?.productVariants?.length ?? variants.length;
+      } catch (error) {
         failedProducts += 1;
         failed += variants.length;
-        userErrorMessages.push(
-          ...errors.slice(0, 3).map((e) => `${product.title}: ${e.message}`),
-        );
-        continue;
+        userErrorMessages.push(`${product.title}: ${error?.message ?? "Unknown GraphQL error"}`);
       }
-
-      updated += result?.productVariants?.length ?? variants.length;
     }
 
     return {
