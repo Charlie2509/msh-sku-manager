@@ -8,6 +8,7 @@
  */
 import fs from "node:fs/promises";
 import path from "node:path";
+import { normalizeAllowedColours, normalizeColourDisplay } from "./skuParser";
 
 const HASH_W = 9;
 const HASH_H = 8;
@@ -127,10 +128,11 @@ function resolveColourFromSlug(colourSlug, allowedColours) {
   const uniqueParts = [...new Set(deduped)];
   const cleanedSlug = uniqueParts.join("-");
 
-  if (allowedColours?.length) {
-    const allowedSlugs = allowedColours.map((c) => ({
+  const normalizedAllowedColours = normalizeAllowedColours(allowedColours ?? []);
+  if (normalizedAllowedColours.length) {
+    const allowedSlugs = normalizedAllowedColours.map((c) => ({
       raw: c,
-      slug: c.toLowerCase().replace(/\s+/g, "-"),
+      slug: c.toLowerCase().replace(/[\/\s]+/g, "-"),
     }));
     // 1) Exact slug match (cleaned)
     let hit = allowedSlugs.find((a) => a.slug === cleanedSlug);
@@ -148,11 +150,13 @@ function resolveColourFromSlug(colourSlug, allowedColours) {
   }
 
   // No allowedColour match — return the cleaned slug, capitalised, but mark unvalidated
-  const display = cleanedSlug
+  const display = normalizeColourDisplay(
+    cleanedSlug
     .split("-")
     .filter(Boolean)
     .map((w) => w.toUpperCase())
-    .join(" ");
+    .join(" "),
+  );
   return { colour: display, validatedAgainstAllowed: false };
 }
 

@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
+import { normalizeAllowedColours } from "./skuParser";
 
 const CACHE_PATH = path.join(process.cwd(), "app", "data", "visionCache.json");
 const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
@@ -15,9 +16,10 @@ export function isVisionLlmEnabled() { return Boolean(process.env.OPENAI_API_KEY
 
 export async function classifyColourWithVision(imageUrl, allowedColours, productName = null) {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey || !imageUrl || !allowedColours?.length) return null;
+  const normalizedAllowedColours = normalizeAllowedColours(allowedColours ?? []);
+  if (!apiKey || !imageUrl || !normalizedAllowedColours.length) return null;
   await loadCache();
-  const key = cacheKey(imageUrl, allowedColours);
+  const key = cacheKey(imageUrl, normalizedAllowedColours);
   if (Object.hasOwn(cache, key)) return cache[key];
 
   let imageDataUrl;
@@ -33,7 +35,7 @@ export async function classifyColourWithVision(imageUrl, allowedColours, product
   }
 
   const productLine = productName ? `Product context: Macron ${productName}.` : "";
-  const prompt = `${productLine}\nLook at the garment colour only. Ignore club badges, sponsors, player numbers, embroidery, logos, and personalisation overlays. Choose exactly one colour from the allowed list. If unsure, return UNKNOWN.\nAllowed colours:\n${allowedColours.map((c) => `- ${c}`).join("\n")}\n\nRespond with exactly one allowed colour name or UNKNOWN. No explanation.`;
+  const prompt = `${productLine}\nLook at the garment colour only. Ignore club badges, sponsors, player numbers, embroidery, logos, and personalisation overlays. Choose exactly one colour from the allowed list. If unsure, return UNKNOWN.\nAllowed colours:\n${normalizedAllowedColours.map((c) => `- ${c}`).join("\n")}\n\nRespond with exactly one allowed colour name or UNKNOWN. No explanation.`;
 
   try {
     const r = await fetch(OPENAI_API_URL, {
@@ -55,8 +57,8 @@ export async function classifyColourWithVision(imageUrl, allowedColours, product
     const text = (body?.choices?.[0]?.message?.content || "").trim();
     const upper = text.toUpperCase();
     if (!text || upper === "UNKNOWN") { cache[key] = null; await saveCache(); return null; }
-    const exact = allowedColours.find((c) => c.toUpperCase() === upper);
-    const partial = exact || allowedColours.find((c) => upper.includes(c.toUpperCase())) || allowedColours.find((c) => c.toUpperCase().includes(upper));
+    const exact = normalizedAllowedColours.find((c) => c.toUpperCase() === upper);
+    const partial = exact || normalizedAllowedColours.find((c) => upper.includes(c.toUpperCase())) || normalizedAllowedColours.find((c) => c.toUpperCase().includes(upper));
     const result = partial || null;
     cache[key] = result;
     await saveCache();
