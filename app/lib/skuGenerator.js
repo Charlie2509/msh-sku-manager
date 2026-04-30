@@ -1,6 +1,12 @@
 export function normaliseSkuPart(value, fallback = "na") {
   if (!value) return fallback;
-  const cleaned = value.toString().trim().toLowerCase().replace(/\s+/g, "");
+  const cleaned = value
+    .toString()
+    .trim()
+    .toLowerCase()
+    // SKU parts must be URL/file-safe and slash-free.
+    // e.g. WHITE/SILVER -> whitesilver, BLACK/ANTHRACITE -> blackanthracite
+    .replace(/[^a-z0-9]+/g, "");
   return cleaned || fallback;
 }
 
