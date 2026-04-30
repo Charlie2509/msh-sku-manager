@@ -1,6 +1,9 @@
-import { useLoaderData } from "react-router";
+import { Form, useLoaderData, useFetcher } from "react-router";
 import { authenticate } from "../shopify.server";
 import { macronReferenceMap } from "../data/macronReference";
+
+const ASSIGNED_COLOUR_NAMESPACE = "msh";
+const ASSIGNED_COLOUR_KEY = "assigned_colour";
 
 const genders = ["SNR", "JNR"];
 const colours = [
@@ -375,7 +378,11 @@ export const loader = async ({ request }) => {
             id
             title
             handle
+            featuredImage { url altText }
             options { name values }
+            assignedColour: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_COLOUR_KEY}") {
+              value
+            }
             variants(first: 50) {
               edges {
                 node {
@@ -393,9 +400,53 @@ export const loader = async ({ request }) => {
   `);
 
   const responseJson = await response.json();
-  const products = responseJson.data.products.edges.map(({ node }) => node);
+  const products = responseJson.data.products.edges.map(({ node }) => ({
+    ...node,
+    assignedColour: node.assignedColour?.value ?? null,
+  }));
 
   return { products };
+};
+
+export const action = async ({ request }) => {
+  const { admin } = await authenticate.admin(request);
+  const formData = await request.formData();
+  const productId = formData.get("productId");
+  const colour = (formData.get("colour") ?? "").toString().trim();
+
+  if (!productId || !colour) {
+    return { ok: false, error: "Missing productId or colour" };
+  }
+
+  const response = await admin.graphql(
+    `#graphql
+    mutation SetAssignedColour($metafields: [MetafieldsSetInput!]!) {
+      metafieldsSet(metafields: $metafields) {
+        userErrors { field message }
+        metafields { id namespace key value }
+      }
+    }`,
+    {
+      variables: {
+        metafields: [
+          {
+            ownerId: productId,
+            namespace: ASSIGNED_COLOUR_NAMESPACE,
+            key: ASSIGNED_COLOUR_KEY,
+            type: "single_line_text_field",
+            value: colour,
+          },
+        ],
+      },
+    },
+  );
+
+  const json = await response.json();
+  const errors = json?.data?.metafieldsSet?.userErrors ?? [];
+  if (errors.length > 0) {
+    return { ok: false, error: errors.map((e) => e.message).join("; ") };
+  }
+  return { ok: true, productId, colour };
 };
 
 export default function Index() {
@@ -442,7 +493,16 @@ export default function Index() {
               const variantColours = (product.variants?.edges ?? [])
                 .map(({ node }) => detectColourFromVariant(node, parsed.allowedColours))
                 .filter(Boolean);
-              const effectiveColour = parsed.colour ?? variantColours[0] ?? null;
+              // Priority: title-detected colour > variant Color option > assigned-colour metafield
+              const effectiveColour =
+                parsed.colour ?? variantColours[0] ?? product.assignedColour ?? null;
+              const colourSource = parsed.colour
+                ? "title"
+                : variantColours.length
+                  ? "variant"
+                  : product.assignedColour
+                    ? "assigned"
+                    : null;
               // Detect whether the product has a Color option at all (not just per variant)
               const hasColorOption = (product.options ?? []).some((o) =>
                 ["color", "colour"].includes((o.name || "").toLowerCase()),
@@ -453,7 +513,6 @@ export default function Index() {
                 effectiveStatus = "matched";
                 effectiveReason = null;
               } else if (parsed.model && parsed.type && !effectiveColour && !hasColorOption) {
-                // Single-colour club product — colour needs to be manually assigned
                 effectiveStatus = "needs-colour";
                 effectiveReason = "single-colour product, assign colour manually";
               }
@@ -468,7 +527,12 @@ export default function Index() {
                     {parsed.club ? <p style={{ margin: 0 }}>→ Club: {parsed.club}</p> : null}
                     {parsed.model ? <p style={{ margin: 0 }}>→ Model: {parsed.model}</p> : null}
                     <p style={{ margin: 0 }}>→ Type: {parsed.type ?? ""}</p>
-                    {effectiveColour ? <p style={{ margin: 0 }}>→ Colour: {effectiveColour}{!parsed.colour && variantColours.length ? " (from variants)" : ""}</p> : null}
+                    {effectiveColour ? (
+                      <p style={{ margin: 0 }}>
+                        → Colour: {effectiveColour}
+                        {colourSource && colourSource !== "title" ? ` (from ${colourSource})` : ""}
+                      </p>
+                    ) : null}
                     <p style={{ margin: 0 }}>→ Status: {effectiveStatus}</p>
                     {["partial", "review", "needs-colour"].includes(effectiveStatus) && effectiveReason ? (
                       <p style={{ margin: 0 }}>→ Reason: {effectiveReason}</p>
@@ -478,16 +542,39 @@ export default function Index() {
                         → Allowed colours: {getAllowedColoursMessage(parsed)}
                       </p>
                     ) : null}
+
+                    {effectiveStatus === "needs-colour" && parsed.allowedColours?.length > 0 ? (
+                      <Form method="post" style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                        <input type="hidden" name="productId" value={product.id} />
+                        <label style={{ fontSize: "0.875rem", color: "#303030" }}>
+                          Assign colour:
+                          <select
+                            name="colour"
+                            defaultValue={product.assignedColour ?? ""}
+                            style={{ marginLeft: "0.5rem", padding: "0.25rem" }}
+                          >
+                            <option value="">— pick —</option>
+                            {parsed.allowedColours.map((c) => (
+                              <option key={c} value={c}>{c}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>
+                          Save
+                        </button>
+                      </Form>
+                    ) : null}
                   </div>
                   <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", color: "#303030" }}>
                     <p style={{ margin: 0, fontWeight: 600 }}>Variants:</p>
                     {(() => {
                       const seen = new Set();
                       return product.variants.edges.map(({ node: variant }) => {
-                        // Prefer Shopify variant options over title parsing
+                        // Prefer Shopify variant options over title parsing,
+                        // then fall back to assigned-colour metafield (effectiveColour).
                         const variantColour = detectColourFromVariant(variant, parsed.allowedColours);
                         const variantSize = detectSizeFromVariant(variant);
-                        const finalColour = parsed.colour ?? variantColour;
+                        const finalColour = variantColour ?? effectiveColour;
                         const generatedSku = generateVariantSku({
                           model: parsed.model,
                           colour: finalColour,
@@ -547,4 +634,76 @@ export default function Index() {
   );
 }
 
+}
+s === "partial" || effectiveStatus === "needs-colour") && parsed.modelReference ? (
+                      <p style={{ margin: 0 }}>
+                        → Allowed colours: {getAllowedColoursMessage(parsed)}
+                      </p>
+                    ) : null}
+
+                    {effectiveStatus === "needs-colour" && parsed.allowedColours?.length > 0 ? (
+                      <Form method="post" style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                        <input type="hidden" name="productId" value={product.id} />
+                        <label style={{ fontSize: "0.875rem", color: "#303030" }}>
+                          Assign colour:
+                          <select
+                            name="colour"
+                            defaultValue={product.assignedColour ?? ""}
+                            style={{ marginLeft: "0.5rem", padding: "0.25rem" }}
+                          >
+                            <option value="">— pick —</option>
+                            {parsed.allowedColours.map((c) => (
+                              <option key={c} value={c}>{c}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>
+                          Save
+                        </button>
+                      </Form>
+                    ) : null}
+                  </div>
+                  <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", color: "#303030" }}>
+                    <p style={{ margin: 0, fontWeight: 600 }}>Variants:</p>
+                    {(() => {
+                      const seen = new Set();
+                      return product.variants.edges.map(({ node: variant }) => {
+                        // Prefer Shopify variant options over title parsing,
+                        // then fall back to assigned-colour metafield (effectiveColour).
+                        const variantColour = detectColourFromVariant(variant, parsed.allowedColours);
+                        const variantSize = detectSizeFromVariant(variant);
+                        const finalColour = variantColour ?? effectiveColour;
+                        const generatedSku = generateVariantSku({
+                          model: parsed.model,
+                          colour: finalColour,
+                          size: variantSize,
+                        });
+                        // Dedupe identical SKUs (e.g. variants 's' and 'Small' both normalise to '-s')
+                        const dedupeKey = generatedSku;
+                        const isDuplicate = seen.has(dedupeKey);
+                        seen.add(dedupeKey);
+                        return (
+                          <p key={variant.id} style={{ margin: 0, opacity: isDuplicate ? 0.45 : 1 }}>
+                            - Size: {variantSize}{variantColour ? ` · Colour: ${variantColour}` : ""} → SKU: {generatedSku}{isDuplicate ? " (dup)" : ""}
+                          </p>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+     </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+  );
 }
