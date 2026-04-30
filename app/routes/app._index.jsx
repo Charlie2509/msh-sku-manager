@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { Form, useLoaderData, useFetcher } from "react-router";
 import { authenticate } from "../shopify.server";
 import { suggestColourFromImage } from "../lib/imageMatcher.server";
@@ -371,11 +372,16 @@ export const action = async ({ request }) => {
 export default function Index() {
   const { products } = useLoaderData();
   const bulkFetcher = useFetcher();
+  const [activeFilter, setActiveFilter] = useState("all");
+
+  const productPresentations = useMemo(
+    () => products.map((product) => ({ product, presentation: getProductPresentation(product) })),
+    [products],
+  );
 
   // Quick stats for the dashboard summary
-  const stats = products.reduce(
-    (acc, p) => {
-      const presentation = getProductPresentation(p);
+  const stats = productPresentations.reduce(
+    (acc, { presentation }) => {
       if (presentation.effectiveStatus === "matched") acc.matched += 1;
       else if (presentation.effectiveStatus === "review") acc.review += 1;
       else acc.needsColour += 1;
@@ -384,6 +390,38 @@ export default function Index() {
     },
     { matched: 0, needsColour: 0, review: 0, duplicateSkuWarning: 0 },
   );
+
+  const filterDefinitions = [
+    { key: "all", label: "All", count: productPresentations.length },
+    {
+      key: "safe-to-write",
+      label: "Safe to write",
+      count: productPresentations.filter(({ presentation }) => presentation.isSafeForSkuWrite).length,
+    },
+    {
+      key: "needs-colour",
+      label: "Needs colour",
+      count: productPresentations.filter(({ presentation }) => presentation.effectiveStatus === "needs-colour").length,
+    },
+    {
+      key: "review",
+      label: "Review",
+      count: productPresentations.filter(({ presentation }) => presentation.effectiveStatus === "review").length,
+    },
+    {
+      key: "duplicate-sku-warnings",
+      label: "Duplicate SKU warnings",
+      count: productPresentations.filter(({ presentation }) => presentation.hasDuplicateGeneratedSkus).length,
+    },
+  ];
+
+  const filteredProducts = productPresentations.filter(({ presentation }) => {
+    if (activeFilter === "safe-to-write") return presentation.isSafeForSkuWrite;
+    if (activeFilter === "needs-colour") return presentation.effectiveStatus === "needs-colour";
+    if (activeFilter === "review") return presentation.effectiveStatus === "review";
+    if (activeFilter === "duplicate-sku-warnings") return presentation.hasDuplicateGeneratedSkus;
+    return true;
+  });
 
   return (
     <div style={{ padding: "1.6rem" }}>
@@ -454,6 +492,29 @@ export default function Index() {
       </div>
 
       <div style={{ marginTop: "1rem", maxWidth: "640px" }}>
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
+          {filterDefinitions.map((filter) => {
+            const isActive = activeFilter === filter.key;
+            return (
+              <button
+                key={filter.key}
+                type="button"
+                onClick={() => setActiveFilter(filter.key)}
+                style={{
+                  padding: "0.4rem 0.7rem",
+                  borderRadius: "999px",
+                  border: isActive ? "1px solid #1a73e8" : "1px solid #dfe3e8",
+                  background: isActive ? "#e8f0fe" : "white",
+                  color: "#303030",
+                  fontWeight: isActive ? 600 : 400,
+                  cursor: "pointer",
+                }}
+              >
+                {filter.label} ({filter.count})
+              </button>
+            );
+          })}
+        </div>
         <div
           style={{
             background: "white",
@@ -463,7 +524,7 @@ export default function Index() {
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            {products.map((product) => {
+            {filteredProducts.map(({ product, presentation }) => {
               const {
                 parsed,
                 normalizedAssignedColour,
@@ -474,7 +535,7 @@ export default function Index() {
                 variantRows,
                 hasDuplicateGeneratedSkus,
                 isSafeForSkuWrite,
-              } = getProductPresentation(product);
+              } = presentation;
 
               return (
                 <div key={product.id}>
