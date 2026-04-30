@@ -44,7 +44,15 @@ function getProductPresentation(product) {
     const finalColour = variantColour ?? effectiveColour;
     const generatedSku = generateVariantSku({ model: parsed.model, colour: finalColour, size: variantSize });
     counts.set(generatedSku, (counts.get(generatedSku) ?? 0) + 1);
-    variantRows.push({ id: variant.id, variantColour, variantSize, generatedSku, existingSku: variant.sku ?? "" });
+    variantRows.push({
+      id: variant.id,
+      inventoryItemId: variant.inventoryItem?.id ?? null,
+      inventoryItemSku: variant.inventoryItem?.sku ?? "",
+      variantColour,
+      variantSize,
+      generatedSku,
+      existingSku: variant.sku ?? "",
+    });
   }
   const hasDuplicateGeneratedSkus = [...counts.values()].some((n) => n > 1);
   const hasNaGeneratedSku = variantRows.some((row) => row.generatedSku?.toLowerCase().includes("na"));
@@ -95,6 +103,7 @@ export const loader = async ({ request }) => {
                   title
                   sku
                   selectedOptions { name value }
+                  inventoryItem { id sku }
                 }
               }
             }
@@ -164,6 +173,7 @@ async function fetchAllProductsForBulk(admin) {
                   title
                   sku
                   selectedOptions { name value }
+                  inventoryItem { id sku }
                 }
               }
             }
@@ -260,30 +270,40 @@ export const action = async ({ request }) => {
       const presentation = getProductPresentation(product);
       if (!presentation.isSafeForSkuWrite) continue;
       for (const row of presentation.variantRows) {
-        if (row.existingSku === row.generatedSku) {
+        if (!row.inventoryItemId) {
+          skipped += 1;
+          continue;
+        }
+        if (row.existingSku === row.generatedSku || row.inventoryItemSku === row.generatedSku) {
           skipped += 1;
           continue;
         }
         const resp = await admin.graphql(
           `#graphql
-          mutation UpdateVariantSku($input: ProductVariantInput!) {
-            productVariantUpdate(input: $input) {
-              productVariant { id sku }
-              userErrors { field message }
+          mutation inventoryItemUpdate($id: ID!, $input: InventoryItemInput!) {
+            inventoryItemUpdate(id: $id, input: $input) {
+              inventoryItem {
+                id
+                sku
+              }
+              userErrors {
+                field
+                message
+              }
             }
           }
           `,
           {
             variables: {
+              id: row.inventoryItemId,
               input: {
-                id: row.id,
                 sku: row.generatedSku,
               },
             },
           },
         );
         const json = await resp.json();
-        const errors = json?.data?.productVariantUpdate?.userErrors ?? [];
+        const errors = json?.data?.inventoryItemUpdate?.userErrors ?? [];
         if (errors.length) {
           failed += 1;
         } else {
