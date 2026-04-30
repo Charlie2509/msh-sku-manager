@@ -90,6 +90,62 @@ function getModelReference(model) {
   return macronReferenceMap[model.toLowerCase()] ?? null;
 }
 
+// Try to find a multi-word Macron model in the title (e.g. "ROUND EVO", "RIGEL HERO")
+function detectMacronModelFromTitle(words) {
+  if (!words || words.length === 0) return null;
+  const lowerTokens = words.map((w) => w.toLowerCase().replace(/[^a-z0-9]/g, ""));
+  // Try 3-, 2-, then 1-word slices, prefer longer matches
+  for (const span of [3, 2, 1]) {
+    for (let i = 0; i <= lowerTokens.length - span; i += 1) {
+      const slice = lowerTokens.slice(i, i + span).filter(Boolean);
+      if (slice.length === 0) continue;
+      const candidates = [
+        slice.join("-"),
+        slice.join(" "),
+        slice.join(""),
+      ];
+      for (const candidate of candidates) {
+        const ref = macronReferenceMap[candidate];
+        if (ref) {
+          // Return the original-cased word(s) so display stays nice
+          const original = words.slice(i, i + span).join(" ");
+          return { model: original, modelIndices: Array.from({ length: span }, (_, k) => i + k), reference: ref };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+// Pull colour from Shopify variant selectedOptions (any option named like 'color' / 'colour')
+function detectColourFromVariant(variant, allowedColours) {
+  if (!variant?.selectedOptions) return null;
+  for (const opt of variant.selectedOptions) {
+    const optName = (opt.name || "").toLowerCase();
+    if (optName.includes("color") || optName.includes("colour")) {
+      const value = (opt.value || "").trim().toUpperCase();
+      if (!value) continue;
+      // Validate against allowedColours if provided
+      if (allowedColours && allowedColours.length > 0) {
+        const match = allowedColours.find((c) => c.toUpperCase() === value || value.includes(c.toUpperCase()));
+        if (match) return match;
+      }
+      return value;
+    }
+  }
+  return null;
+}
+
+// Pull size from variant — prefer selectedOptions named 'size'
+function detectSizeFromVariant(variant) {
+  if (variant?.selectedOptions) {
+    for (const opt of variant.selectedOptions) {
+      if ((opt.name || "").toLowerCase() === "size" && opt.value) return opt.value;
+    }
+  }
+  return variant?.title ?? null;
+}
+
 function attachModelReference(parsedResult) {
   if (!parsedResult.model) return parsedResult;
 
@@ -209,16 +265,18 @@ function parseProductTitle(title, handle = "") {
 
   const clubWords = genderIndex > 0 ? words.slice(0, genderIndex) : [];
   const club = clubWords.length > 0 ? clubWords.join(" ") : null;
+
+  // First try to find a known Macron model (multi-word aware) anywhere in the title
+  const macronHit = detectMacronModelFromTitle(words);
   const directModelCandidate = modelIndex !== -1 && modelIndex < words.length ? words[modelIndex] : null;
   const directModelUpper = directModelCandidate?.toUpperCase() ?? null;
-  const model =
+  const directModelOK =
     directModelCandidate &&
     isStrongModelWord(directModelCandidate) &&
     !typeWordIndexSet.has(modelIndex) &&
     directModelUpper &&
-    !modelStopWords.includes(directModelUpper)
-      ? directModelCandidate
-      : null;
+    !modelStopWords.includes(directModelUpper);
+  const model = macronHit?.model ?? (directModelOK ? directModelCandidate : null);
 
   const wordsAfterModel =
     modelIndex !== -1 && modelIndex + 1 < words.length ? upperWords.slice(modelIndex + 1) : [];
@@ -319,18 +377,20 @@ export const loader = async ({ request }) => {
   const response = await admin.graphql(`
     #graphql
     query DashboardProducts {
-      products(first: 20) {
+      products(first: 50) {
         edges {
           node {
             id
             title
             handle
-            variants(first: 10) {
+            options { name values }
+            variants(first: 50) {
               edges {
                 node {
                   id
                   title
                   sku
+                  selectedOptions { name value }
                 }
               }
             }
@@ -386,6 +446,16 @@ export default function Index() {
             {products.map((product) => {
               const parsed = parseProductTitle(product.title, product.handle);
 
+              // If title didn't yield a colour but variants have a Color option, treat as matched
+              const variantColours = (product.variants?.edges ?? [])
+                .map(({ node }) => detectColourFromVariant(node, parsed.allowedColours))
+                .filter(Boolean);
+              const effectiveColour = parsed.colour ?? variantColours[0] ?? null;
+              const effectiveStatus =
+                parsed.model && parsed.type && effectiveColour
+                  ? "matched"
+                  : parsed.status;
+
               return (
                 <div key={product.id}>
                   <p style={{ margin: 0, fontWeight: 700 }}>{product.title}</p>
@@ -396,12 +466,12 @@ export default function Index() {
                     {parsed.club ? <p style={{ margin: 0 }}>→ Club: {parsed.club}</p> : null}
                     {parsed.model ? <p style={{ margin: 0 }}>→ Model: {parsed.model}</p> : null}
                     <p style={{ margin: 0 }}>→ Type: {parsed.type ?? ""}</p>
-                    {parsed.colour ? <p style={{ margin: 0 }}>→ Colour: {parsed.colour}</p> : null}
-                    <p style={{ margin: 0 }}>→ Status: {parsed.status}</p>
-                    {["partial", "review"].includes(parsed.status) && parsed.partialReason ? (
+                    {effectiveColour ? <p style={{ margin: 0 }}>→ Colour: {effectiveColour}{!parsed.colour && variantColours.length ? " (from variants)" : ""}</p> : null}
+                    <p style={{ margin: 0 }}>→ Status: {effectiveStatus}</p>
+                    {["partial", "review"].includes(effectiveStatus) && parsed.partialReason ? (
                       <p style={{ margin: 0 }}>→ Reason: {parsed.partialReason}</p>
                     ) : null}
-                    {parsed.status === "partial" && parsed.partialReason === "missing colour" ? (
+                    {effectiveStatus === "partial" && parsed.partialReason === "missing colour" ? (
                       <p style={{ margin: 0 }}>
                         → Allowed colours: {getAllowedColoursMessage(parsed)}
                       </p>
@@ -409,19 +479,29 @@ export default function Index() {
                   </div>
                   <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", color: "#303030" }}>
                     <p style={{ margin: 0, fontWeight: 600 }}>Variants:</p>
-                    {product.variants.edges.map(({ node: variant }) => {
-                      const generatedSku = generateVariantSku({
-                        model: parsed.model,
-                        colour: parsed.colour,
-                        size: variant.title,
+                    {(() => {
+                      const seen = new Set();
+                      return product.variants.edges.map(({ node: variant }) => {
+                        // Prefer Shopify variant options over title parsing
+                        const variantColour = detectColourFromVariant(variant, parsed.allowedColours);
+                        const variantSize = detectSizeFromVariant(variant);
+                        const finalColour = parsed.colour ?? variantColour;
+                        const generatedSku = generateVariantSku({
+                          model: parsed.model,
+                          colour: finalColour,
+                          size: variantSize,
+                        });
+                        // Dedupe identical SKUs (e.g. variants 's' and 'Small' both normalise to '-s')
+                        const dedupeKey = generatedSku;
+                        const isDuplicate = seen.has(dedupeKey);
+                        seen.add(dedupeKey);
+                        return (
+                          <p key={variant.id} style={{ margin: 0, opacity: isDuplicate ? 0.45 : 1 }}>
+                            - Size: {variantSize}{variantColour ? ` · Colour: ${variantColour}` : ""} → SKU: {generatedSku}{isDuplicate ? " (dup)" : ""}
+                          </p>
+                        );
                       });
-
-                      return (
-                        <p key={variant.id} style={{ margin: 0 }}>
-                          - Size: {variant.title} → SKU: {generatedSku}
-                        </p>
-                      );
-                    })}
+                    })()}
                   </div>
                 </div>
               );

@@ -5,23 +5,13 @@ const CATALOGUE_PENDING_SOURCE = "catalogue-pending";
 const CATALOGUE_VERIFIED_SOURCE = "catalogue-verified";
 
 const createReferenceEntry = ({
-  slug,
-  displayName,
-  garmentType,
-  allowedColours,
-  aliases,
-  source,
+  slug, displayName, garmentType, allowedColours, aliases, source,
 }) => ({
-  slug,
-  displayName,
-  garmentType,
-  allowedColours,
-  aliases,
-  source,
+  slug, displayName, garmentType, allowedColours, aliases, source,
 });
 
 export const macronReferenceData = {
-  "3_4": createReferenceEntry({
+  "3-4": createReferenceEntry({
     slug: "3-4",
     displayName: "3/4",
     garmentType: "match day short",
@@ -29,7 +19,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  accordion: createReferenceEntry({
+  "accordion": createReferenceEntry({
     slug: "accordion",
     displayName: "Accordion",
     garmentType: "trousers",
@@ -37,15 +27,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  acrux_hero: createReferenceEntry({
+  "acrux-hero": createReferenceEntry({
     slug: "acrux-hero",
     displayName: "Acrux Hero",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "WHITE"],
-    aliases: [],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
+    aliases: ["acrux hero", "acrux-hero", "acruxhero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  adamant: createReferenceEntry({
+  "adamant": createReferenceEntry({
     slug: "adamant",
     displayName: "Adamant",
     garmentType: "trousers",
@@ -53,15 +43,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  adjustable_xi: createReferenceEntry({
+  "adjustable-xi": createReferenceEntry({
     slug: "adjustable-xi",
     displayName: "Adjustable Xi",
     garmentType: "t-shirt",
     allowedColours: [],
-    aliases: [],
+    aliases: ["adjustable xi", "adjustable-xi", "adjustablexi"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  advanced: createReferenceEntry({
+  "advanced": createReferenceEntry({
     slug: "advanced",
     displayName: "Advanced",
     garmentType: "unknown",
@@ -69,23 +59,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  agility_ladder: createReferenceEntry({
+  "agility-ladder": createReferenceEntry({
     slug: "agility-ladder",
     displayName: "Agility Ladder",
     garmentType: "60 cm x 180 cm x 1 cm",
     allowedColours: [],
-    aliases: [],
+    aliases: ["agility ladder", "agility-ladder", "agilityladder"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  agnes: createReferenceEntry({
+  "agnes": createReferenceEntry({
     slug: "agnes",
     displayName: "Agnes",
     garmentType: "t-shirt",
-    allowedColours: ["BLUE", "ORANGE", "RED", "WHITE"],
+    allowedColours: ["ORANGE", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  airstone: createReferenceEntry({
+  "airstone": createReferenceEntry({
     slug: "airstone",
     displayName: "Airstone",
     garmentType: "bermuda with zip pocket",
@@ -93,15 +83,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  alabaster: createReferenceEntry({
+  "alabaster": createReferenceEntry({
     slug: "alabaster",
     displayName: "Alabaster",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLACK RED", "BLACK WHITE", "COLUMBIA", "GREEN", "GREEN WHITE", "NAVY", "NAVY COLUMBIA", "NAVY WHITE", "RED", "WHITE"],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  albatross: createReferenceEntry({
+  "albatross": createReferenceEntry({
     slug: "albatross",
     displayName: "Albatross",
     garmentType: "trousers",
@@ -109,31 +99,31 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  alchemist: createReferenceEntry({
+  "alchemist": createReferenceEntry({
     slug: "alchemist",
     displayName: "Alchemist",
-    garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLUE WHITE", "BOTTLE GREEN", "BOTTLE GREEN MINT", "INDIGO SKY", "INDIGO SKY NAVY", "MINT", "NAVY", "NAVY WHITE", "RED", "RED WHITE", "ROYAL BLUE", "STONE GRAY GUN METAL", "STONE GREY", "WHITE"],
+    garmentType: "hoody",
+    allowedColours: ["BLACK", "BOTTLE GREEN", "INDIGO", "MINT", "NAVY", "RED", "STONE", "STONE GREY", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  alcyon: createReferenceEntry({
+  "alcyon": createReferenceEntry({
     slug: "alcyon",
     displayName: "Alcyon",
     garmentType: "t-shirt",
-    allowedColours: ["WHITE BLUE", "WHITE GREEN", "WHITE RED"],
+    allowedColours: ["WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  alcyon_eco: createReferenceEntry({
+  "alcyon-eco": createReferenceEntry({
     slug: "alcyon-eco",
     displayName: "Alcyon Eco",
     garmentType: "t-shirt",
-    allowedColours: ["GREEN", "RED", "ROYAL BLUE", "WHITE"],
-    aliases: [],
+    allowedColours: ["WHITE"],
+    aliases: ["alcyon eco", "alcyon-eco", "alcyoneco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  alder: createReferenceEntry({
+  "alder": createReferenceEntry({
     slug: "alder",
     displayName: "Alder",
     garmentType: "unknown",
@@ -141,23 +131,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  alioth: createReferenceEntry({
+  "alioth": createReferenceEntry({
     slug: "alioth",
     displayName: "Alioth",
     garmentType: "t-shirt",
-    allowedColours: ["AMBER BLACK", "BLACK", "BLUE WHITE", "BLUE YELLOW", "ELECTRIC BLUE ORANGE", "GREEN WHITE", "GUN METAL COLUMBIA", "ORANGE BLACK", "RED WHITE", "WHITE BLACK", "WHITE BLUE", "WHITE GREEN", "WHITE RED"],
+    allowedColours: ["AMBER", "BLACK", "COLUMBIA", "ORANGE", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  alioth_eco: createReferenceEntry({
+  "alioth-eco": createReferenceEntry({
     slug: "alioth-eco",
     displayName: "Alioth Eco",
     garmentType: "t-shirt",
-    allowedColours: ["AMBER", "ANTHRACITE", "BLACK", "COLUMBIA", "DARK GREY", "ELECTRIC BLUE", "GREEN", "ORANGE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["AMBER", "ANTHRACITE", "BLACK", "GREEN", "ORANGE", "RED", "WHITE"],
+    aliases: ["alioth eco", "alioth-eco", "aliotheco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  all: createReferenceEntry({
+  "all": createReferenceEntry({
     slug: "all",
     displayName: "All",
     garmentType: "bag",
@@ -165,39 +155,39 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  all_in: createReferenceEntry({
+  "all-in": createReferenceEntry({
     slug: "all-in",
     displayName: "All In",
     garmentType: "bag",
     allowedColours: [],
-    aliases: [],
+    aliases: ["all in", "all-in", "allin"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  allien_evo_custom: createReferenceEntry({
+  "allien-evo-custom": createReferenceEntry({
     slug: "allien-evo-custom",
     displayName: "Allien Evo Custom",
     garmentType: "trousers",
     allowedColours: [],
-    aliases: [],
+    aliases: ["allien evo custom", "allien-evo-custom", "allienevocustom"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  alma: createReferenceEntry({
+  "alma": createReferenceEntry({
     slug: "alma",
     displayName: "Alma",
-    garmentType: "bag",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE"],
+    garmentType: "t-shirt",
+    allowedColours: ["BLACK", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  alps: createReferenceEntry({
+  "alps": createReferenceEntry({
     slug: "alps",
     displayName: "Alps",
     garmentType: "jacket",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLUE", "DARK GREY", "DARK ROYAL BLUE", "LIGHT NAVY", "NAVY", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  altair: createReferenceEntry({
+  "altair": createReferenceEntry({
     slug: "altair",
     displayName: "Altair",
     garmentType: "match day short",
@@ -205,7 +195,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  american: createReferenceEntry({
+  "american": createReferenceEntry({
     slug: "american",
     displayName: "American",
     garmentType: "unknown",
@@ -213,15 +203,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  amethyst_hero: createReferenceEntry({
+  "amethyst-hero": createReferenceEntry({
     slug: "amethyst-hero",
     displayName: "Amethyst Hero",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
-    aliases: [],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
+    aliases: ["amethyst hero", "amethyst-hero", "amethysthero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  andes: createReferenceEntry({
+  "andes": createReferenceEntry({
     slug: "andes",
     displayName: "Andes",
     garmentType: "jacket",
@@ -229,63 +219,63 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  anduin: createReferenceEntry({
+  "anduin": createReferenceEntry({
     slug: "anduin",
     displayName: "Anduin",
     garmentType: "tracksuit",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK BLACK", "BLUE BLUE", "BOTTLE GREEN", "BOTTLE GREEN BOTTLE GREEN", "CARDINAL", "CARDINAL CARDINAL", "DARK CARDINAL", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "GUN METAL OFF WHITE", "LIGHT BOTTLE GREEN", "LIGHT NAVY", "LILAC", "LILAC GUN METAL", "NAVY", "NAVY NAVY", "OFF WHITE", "RED", "RED RED", "ROYAL BLUE", "TURQUOISE", "TURQUOISE NAVY"],
+    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "CARDINAL", "GREEN", "LILAC", "NAVY", "RED", "TURQUOISE", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  anduril: createReferenceEntry({
+  "anduril": createReferenceEntry({
     slug: "anduril",
     displayName: "Anduril",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLACK WHITE", "BLUE WHITE", "NAVY", "NAVY WHITE", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "WHITE BLACK"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  anora: createReferenceEntry({
+  "anora": createReferenceEntry({
     slug: "anora",
     displayName: "Anora",
-    garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK BLACK", "BLUE BLUE", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "LIGHT NAVY", "LILAC", "LILAC GUN METAL", "NAVY", "NAVY NAVY", "RED", "RED RED", "ROYAL BLUE"],
+    garmentType: "1/4 zip top",
+    allowedColours: ["BLACK", "LILAC", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  anti_vibration_technology: createReferenceEntry({
+  "anti-vibration-technology": createReferenceEntry({
     slug: "anti-vibration-technology",
     displayName: "Anti-Vibration Technology",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["anti-vibration technology", "anti-vibration-technology", "anti-vibrationtechnology"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  anubis: createReferenceEntry({
+  "anubis": createReferenceEntry({
     slug: "anubis",
     displayName: "Anubis",
     garmentType: "full length zip top",
-    allowedColours: ["BLACK", "BLACK BLACK", "BLUE BLUE", "CARDINAL", "CARDINAL CARDINAL", "DARK CARDINAL", "DARK GREEN", "DARK GREY", "DARK PURPLE", "DARK RED", "DARK ROYAL BLUE", "DARK YELLOW", "GREEN", "GREEN GREEN", "LIGHT GREY", "LIGHT NAVY", "NAVY", "NAVY NAVY", "PURPLE", "RED", "RED RED", "ROYAL BLUE", "WHITE", "WHITE GREY", "YELLOW", "YELLOW YELLOW"],
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "PURPLE", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  anvik_hero: createReferenceEntry({
+  "anvik-hero": createReferenceEntry({
     slug: "anvik-hero",
     displayName: "Anvik Hero",
     garmentType: "mixture",
     allowedColours: ["BLACK", "NAVY"],
-    aliases: [],
+    aliases: ["anvik hero", "anvik-hero", "anvikhero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  aoki_eco_custom: createReferenceEntry({
+  "aoki-eco-custom": createReferenceEntry({
     slug: "aoki-eco-custom",
     displayName: "Aoki Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["FIXED DESIGN", "OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["aoki eco custom", "aoki-eco-custom", "aokiecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  aras: createReferenceEntry({
+  "aras": createReferenceEntry({
     slug: "aras",
     displayName: "Aras",
     garmentType: "tracksuit",
@@ -293,23 +283,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  arcane: createReferenceEntry({
+  "arcane": createReferenceEntry({
     slug: "arcane",
     displayName: "Arcane",
     garmentType: "t-shirt",
-    allowedColours: ["AMBER BLACK", "BLACK GOLD", "BLACK WHITE", "BLUE WHITE", "CARDINAL WHITE", "COLUMBIA WHITE", "GREEN WHITE", "PINK BLACK", "RED WHITE", "SILVER GUN METAL", "WHITE BLUE", "WHITE RED", "WHITE SILVER", "YELLOW BLUE"],
+    allowedColours: ["AMBER", "CARDINAL", "GOLD", "PINK", "SILVER", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  arcane_eco: createReferenceEntry({
+  "arcane-eco": createReferenceEntry({
     slug: "arcane-eco",
     displayName: "Arcane Eco",
     garmentType: "t-shirt",
-    allowedColours: ["AMBER", "ANTHRACITE", "BLACK", "CARDINAL", "COLUMBIA", "GOLD", "GREEN", "PINK", "RED", "ROYAL BLUE", "SILVER", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["AMBER", "BLACK", "CARDINAL", "COLUMBIA", "GREEN", "PINK", "RED", "SILVER", "WHITE", "YELLOW"],
+    aliases: ["arcane eco", "arcane-eco", "arcaneeco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  archen: createReferenceEntry({
+  "archen": createReferenceEntry({
     slug: "archen",
     displayName: "Archen",
     garmentType: "tracksuit",
@@ -317,7 +307,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  arctic: createReferenceEntry({
+  "arctic": createReferenceEntry({
     slug: "arctic",
     displayName: "Arctic",
     garmentType: "jacket",
@@ -325,71 +315,71 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  argo: createReferenceEntry({
+  "argo": createReferenceEntry({
     slug: "argo",
     displayName: "Argo",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "NEON YELLOW", "NEON YELLOW BLACK", "ORANGE", "ORANGE BLACK", "PURPLE", "PURPLE BLACK", "TURQUOISE", "TURQUOISE BLACK"],
+    allowedColours: ["NEON YELLOW", "ORANGE", "PURPLE", "TURQUOISE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  ariel: createReferenceEntry({
+  "ariel": createReferenceEntry({
     slug: "ariel",
     displayName: "Ariel",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLUE", "GREEN", "GUN METAL", "NAVY", "PINK", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["ANTHRACITE", "BLACK", "GREEN", "GUN METAL", "NAVY", "PINK", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  artemis: createReferenceEntry({
+  "artemis": createReferenceEntry({
     slug: "artemis",
     displayName: "Artemis",
     garmentType: "sr",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK BLACK", "BLUE BLUE", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "GUN METAL LILAC", "LIGHT NAVY", "LILAC", "NAVY", "NAVY NAVY", "RED", "RED RED", "ROYAL BLUE"],
+    allowedColours: ["ANTHRACITE", "BLACK", "LILAC", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  ash: createReferenceEntry({
+  "ash": createReferenceEntry({
     slug: "ash",
     displayName: "Ash",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  aspire_control_i: createReferenceEntry({
+  "aspire-control-i": createReferenceEntry({
     slug: "aspire-control-i",
     displayName: "Aspire Control I",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["aspire control i", "aspire-control-i", "aspirecontroli"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  aspire_control_ii: createReferenceEntry({
+  "aspire-control-ii": createReferenceEntry({
     slug: "aspire-control-ii",
     displayName: "Aspire Control Ii",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["aspire control ii", "aspire-control-ii", "aspirecontrolii"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  aspire_power_i: createReferenceEntry({
+  "aspire-power-i": createReferenceEntry({
     slug: "aspire-power-i",
     displayName: "Aspire Power I",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["aspire power i", "aspire-power-i", "aspirepoweri"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  aspire_power_ii: createReferenceEntry({
+  "aspire-power-ii": createReferenceEntry({
     slug: "aspire-power-ii",
     displayName: "Aspire Power Ii",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["aspire power ii", "aspire-power-ii", "aspirepowerii"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  aster: createReferenceEntry({
+  "aster": createReferenceEntry({
     slug: "aster",
     displayName: "Aster",
     garmentType: "bermuda with zip pocket",
@@ -397,15 +387,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  athena: createReferenceEntry({
+  "athena": createReferenceEntry({
     slug: "athena",
     displayName: "Athena",
     garmentType: "full length zip top",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "INDIGO SKY", "INDIGO SKY NAVY", "NAVY", "NAVY WHITE", "RED", "RED WHITE", "STONE GRAY GUN METAL", "STONE GREY", "WHITE"],
+    allowedColours: ["BLACK", "INDIGO", "NAVY", "RED", "STONE", "STONE GREY", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  athleisure: createReferenceEntry({
+  "athleisure": createReferenceEntry({
     slug: "athleisure",
     displayName: "Athleisure",
     garmentType: "unknown",
@@ -413,23 +403,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  atlantic_hero: createReferenceEntry({
+  "atlantic-hero": createReferenceEntry({
     slug: "atlantic-hero",
     displayName: "Atlantic Hero",
     garmentType: "windbreaker",
-    allowedColours: ["BLACK", "BLUE", "CARDINAL", "GREEN", "NAVY", "NEON YELLOW", "RED", "STONE GREY"],
-    aliases: [],
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "NEON YELLOW", "RED", "STONE GREY"],
+    aliases: ["atlantic hero", "atlantic-hero", "atlantichero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  atlas: createReferenceEntry({
+  "atlas": createReferenceEntry({
     slug: "atlas",
     displayName: "Atlas",
     garmentType: "sr",
-    allowedColours: ["BLACK", "BLACK BLACK", "BLUE BLUE", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "LIGHT GREY", "LIGHT NAVY", "NAVY", "NAVY NAVY", "RED", "RED RED", "ROYAL BLUE", "WHITE", "WHITE GREY"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  auke: createReferenceEntry({
+  "auke": createReferenceEntry({
     slug: "auke",
     displayName: "Auke",
     garmentType: "unknown",
@@ -437,15 +427,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  aulos: createReferenceEntry({
+  "aulos": createReferenceEntry({
     slug: "aulos",
     displayName: "Aulos",
     garmentType: "polo shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLUE WHITE", "DARK ANTHRACITE", "GREEN", "GREEN NEON GREEN", "GUN METAL", "LIGHT NAVY", "NAVY", "NEON GREEN", "RED", "RED WHITE", "ROYAL BLUE", "SILVER", "WHITE", "WHITE SILVER"],
+    allowedColours: ["ANTHRACITE", "BLACK", "GREEN", "GUN METAL", "NAVY", "RED", "SILVER", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  auriga: createReferenceEntry({
+  "auriga": createReferenceEntry({
     slug: "auriga",
     displayName: "Auriga",
     garmentType: "gk training",
@@ -453,15 +443,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  aurora: createReferenceEntry({
+  "aurora": createReferenceEntry({
     slug: "aurora",
     displayName: "Aurora",
     garmentType: "w - polifiber",
-    allowedColours: ["BLACK WHITE", "BLUE WHITE", "NAVY WHITE", "RED WHITE"],
+    allowedColours: ["WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  auster: createReferenceEntry({
+  "auster": createReferenceEntry({
     slug: "auster",
     displayName: "Auster",
     garmentType: "unknown",
@@ -469,7 +459,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  australian: createReferenceEntry({
+  "australian": createReferenceEntry({
     slug: "australian",
     displayName: "Australian",
     garmentType: "unknown",
@@ -477,7 +467,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  axima: createReferenceEntry({
+  "axima": createReferenceEntry({
     slug: "axima",
     displayName: "Axima",
     garmentType: "t-shirt",
@@ -485,95 +475,95 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  axis: createReferenceEntry({
+  "axis": createReferenceEntry({
     slug: "axis",
     displayName: "Axis",
-    garmentType: "bag",
-    allowedColours: ["BLACK", "BLUE", "CARDINAL", "GREEN", "NAVY", "RED", "ROYAL BLUE"],
+    garmentType: "t-shirt",
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  axwell_eco_custom: createReferenceEntry({
+  "axwell-eco-custom": createReferenceEntry({
     slug: "axwell-eco-custom",
     displayName: "Axwell Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["FIXED DESIGN", "OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["axwell eco custom", "axwell-eco-custom", "axwellecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  azlon: createReferenceEntry({
+  "azlon": createReferenceEntry({
     slug: "azlon",
     displayName: "Azlon",
     garmentType: "socks",
-    allowedColours: ["AMBER", "ANTHRACITE", "BLACK", "BLACK COLUMBIA", "BOTTLE GREEN", "BOTTLE GREEN BLACK", "CARDINAL", "COLUMBIA", "GREEN", "GREEN WHITE", "LILAC", "NAVY", "RED", "RED YELLOW", "ROYAL BLUE", "TURQUOISE", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "LILAC", "NAVY", "RED", "TURQUOISE", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  baldwin: createReferenceEntry({
+  "baldwin": createReferenceEntry({
     slug: "baldwin",
     displayName: "Baldwin",
     garmentType: "polo shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK BLACK", "BLUE BLUE", "BOTTLE GREEN", "BOTTLE GREEN BOTTLE GREEN", "CARDINAL", "CARDINAL CARDINAL", "DARK CARDINAL", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "GUN METAL LILAC", "LIGHT BOTTLE GREEN", "LIGHT NAVY", "LILAC", "NAVY", "NAVY NAVY", "OFF WHITE", "OFF WHITE GUN METAL", "RED", "RED RED", "ROYAL BLUE", "TURQUOISE", "TURQUOISE NAVY"],
+    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "CARDINAL", "GREEN", "LILAC", "NAVY", "OFF WHITE", "RED", "TURQUOISE", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  ball_bag: createReferenceEntry({
+  "ball-bag": createReferenceEntry({
     slug: "ball-bag",
     displayName: "Ball Bag",
     garmentType: "bag",
     allowedColours: [],
-    aliases: [],
+    aliases: ["ball bag", "ball-bag", "ballbag"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  ball_pump: createReferenceEntry({
+  "ball-pump": createReferenceEntry({
     slug: "ball-pump",
     displayName: "Ball Pump",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["ball pump", "ball-pump", "ballpump"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  ball_pump_needles: createReferenceEntry({
+  "ball-pump-needles": createReferenceEntry({
     slug: "ball-pump-needles",
     displayName: "Ball Pump Needles",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["ball pump needles", "ball-pump-needles", "ballpumpneedles"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  ball_scheme: createReferenceEntry({
+  "ball-scheme": createReferenceEntry({
     slug: "ball-scheme",
     displayName: "Ball Scheme",
     garmentType: "match day",
     allowedColours: [],
-    aliases: [],
+    aliases: ["ball scheme", "ball-scheme", "ballscheme"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  banjo_hero: createReferenceEntry({
+  "banjo-hero": createReferenceEntry({
     slug: "banjo-hero",
     displayName: "Banjo Hero",
     garmentType: "hoody",
-    allowedColours: ["BLACK", "CARDINAL", "GREY", "NAVY", "RED", "ROYAL BLUE"],
-    aliases: [],
+    allowedColours: ["BLACK", "CARDINAL", "GREY", "NAVY", "RED"],
+    aliases: ["banjo hero", "banjo-hero", "banjohero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  banshee: createReferenceEntry({
+  "banshee": createReferenceEntry({
     slug: "banshee",
     displayName: "Banshee",
     garmentType: "match day short",
-    allowedColours: ["BLACK WHITE", "BLUE WHITE", "NAVY WHITE", "RED WHITE"],
+    allowedColours: ["WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  banshee_eco: createReferenceEntry({
+  "banshee-eco": createReferenceEntry({
     slug: "banshee-eco",
     displayName: "Banshee Eco",
     garmentType: "shorts",
     allowedColours: [],
-    aliases: [],
+    aliases: ["banshee eco", "banshee-eco", "bansheeeco"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  barber: createReferenceEntry({
+  "barber": createReferenceEntry({
     slug: "barber",
     displayName: "Barber",
     garmentType: "unknown",
@@ -581,7 +571,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  barrier: createReferenceEntry({
+  "barrier": createReferenceEntry({
     slug: "barrier",
     displayName: "Barrier",
     garmentType: "gloves",
@@ -589,47 +579,47 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  bass: createReferenceEntry({
+  "bass": createReferenceEntry({
     slug: "bass",
     displayName: "Bass",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK GUN METAL", "GREY GUN METAL", "NAVY"],
+    allowedColours: ["BLACK", "GREY", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  bass_eco: createReferenceEntry({
+  "bass-eco": createReferenceEntry({
     slug: "bass-eco",
     displayName: "Bass Eco",
     garmentType: "hoody",
     allowedColours: [],
-    aliases: [],
+    aliases: ["bass eco", "bass-eco", "basseco"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  bastet: createReferenceEntry({
+  "bastet": createReferenceEntry({
     slug: "bastet",
     displayName: "Bastet",
     garmentType: "sr",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLUE WHITE", "GUN METAL NEON SKY", "NAVY", "NAVY WHITE", "NEON SKY", "RED", "RED WHITE", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["ANTHRACITE", "BLACK", "NAVY", "RED", "SKY", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  bazalt: createReferenceEntry({
+  "bazalt": createReferenceEntry({
     slug: "bazalt",
     displayName: "Bazalt",
     garmentType: "short",
-    allowedColours: ["BLACK", "BLACK GREY", "GREY", "NAVY", "NAVY GREY"],
+    allowedColours: ["BLACK", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  beat: createReferenceEntry({
+  "beat": createReferenceEntry({
     slug: "beat",
     displayName: "Beat",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "GREY", "GREY MELANGE", "NAVY", "RED"],
+    allowedColours: ["BLACK", "GREY", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  beginner: createReferenceEntry({
+  "beginner": createReferenceEntry({
     slug: "beginner",
     displayName: "Beginner",
     garmentType: "unknown",
@@ -637,7 +627,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  beryl: createReferenceEntry({
+  "beryl": createReferenceEntry({
     slug: "beryl",
     displayName: "Beryl",
     garmentType: "t-shirt",
@@ -645,7 +635,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  bibian: createReferenceEntry({
+  "bibian": createReferenceEntry({
     slug: "bibian",
     displayName: "Bibian",
     garmentType: "referee",
@@ -653,15 +643,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  bibian_eco: createReferenceEntry({
+  "bibian-eco": createReferenceEntry({
     slug: "bibian-eco",
     displayName: "Bibian Eco",
     garmentType: "shorts",
     allowedColours: [],
-    aliases: [],
+    aliases: ["bibian eco", "bibian-eco", "bibianeco"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  bise: createReferenceEntry({
+  "bise": createReferenceEntry({
     slug: "bise",
     displayName: "Bise",
     garmentType: "unknown",
@@ -669,23 +659,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  bismuth_hero: createReferenceEntry({
+  "bismuth-hero": createReferenceEntry({
     slug: "bismuth-hero",
     displayName: "Bismuth Hero",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "ROYAL BLUE"],
-    aliases: [],
+    allowedColours: ["BLACK", "NAVY"],
+    aliases: ["bismuth hero", "bismuth-hero", "bismuthhero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  blizzard: createReferenceEntry({
+  "blizzard": createReferenceEntry({
     slug: "blizzard",
     displayName: "Blizzard",
     garmentType: "mixture",
-    allowedColours: ["UNKNOWN"],
+    allowedColours: [],
     aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  boarding: createReferenceEntry({
+  "boarding": createReferenceEntry({
     slug: "boarding",
     displayName: "Boarding",
     garmentType: "unknown",
@@ -693,23 +683,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  boost: createReferenceEntry({
+  "boost": createReferenceEntry({
     slug: "boost",
     displayName: "Boost",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "BOTTLE GREEN GOLD", "CARDINAL", "COLUMBIA", "GREEN", "GREY", "NAVY", "ORANGE", "PURPLE", "RED", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "CARDINAL", "COLUMBIA", "GOLD", "GREEN", "GREY", "NAVY", "ORANGE", "PURPLE", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  boost_eco: createReferenceEntry({
+  "boost-eco": createReferenceEntry({
     slug: "boost-eco",
     displayName: "Boost Eco",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GOLD", "GREEN", "GREY MELANGE", "NAVY", "ORANGE", "PURPLE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "GREY", "NAVY", "ORANGE", "PURPLE", "RED", "WHITE", "YELLOW"],
+    aliases: ["boost eco", "boost-eco", "boosteco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  boreas: createReferenceEntry({
+  "boreas": createReferenceEntry({
     slug: "boreas",
     displayName: "Boreas",
     garmentType: "unknown",
@@ -717,23 +707,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  born_for_sport: createReferenceEntry({
+  "born-for-sport": createReferenceEntry({
     slug: "born-for-sport",
     displayName: "Born For Sport",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["born for sport", "born-for-sport", "bornforsport"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  bottle_carrier: createReferenceEntry({
+  "bottle-carrier": createReferenceEntry({
     slug: "bottle-carrier",
     displayName: "Bottle Carrier",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["bottle carrier", "bottle-carrier", "bottlecarrier"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  bounce: createReferenceEntry({
+  "bounce": createReferenceEntry({
     slug: "bounce",
     displayName: "Bounce",
     garmentType: "unknown",
@@ -741,7 +731,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  bowls: createReferenceEntry({
+  "bowls": createReferenceEntry({
     slug: "bowls",
     displayName: "Bowls",
     garmentType: "unknown",
@@ -749,7 +739,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  boxe: createReferenceEntry({
+  "boxe": createReferenceEntry({
     slug: "boxe",
     displayName: "Boxe",
     garmentType: "unknown",
@@ -757,7 +747,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  breeze: createReferenceEntry({
+  "breeze": createReferenceEntry({
     slug: "breeze",
     displayName: "Breeze",
     garmentType: "sr",
@@ -765,7 +755,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  broad: createReferenceEntry({
+  "broad": createReferenceEntry({
     slug: "broad",
     displayName: "Broad",
     garmentType: "t-shirt",
@@ -773,23 +763,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  broad_custom: createReferenceEntry({
+  "broad-custom": createReferenceEntry({
     slug: "broad-custom",
     displayName: "Broad Custom",
     garmentType: "match day slipover",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["broad custom", "broad-custom", "broadcustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  bromir_eco_custom: createReferenceEntry({
+  "bromir-eco-custom": createReferenceEntry({
     slug: "bromir-eco-custom",
     displayName: "Bromir Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["FIXED DESIGN", "OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["bromir eco custom", "bromir-eco-custom", "bromirecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  brushed: createReferenceEntry({
+  "brushed": createReferenceEntry({
     slug: "brushed",
     displayName: "Brushed",
     garmentType: "bermuda/pant",
@@ -797,7 +787,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  burst: createReferenceEntry({
+  "burst": createReferenceEntry({
     slug: "burst",
     displayName: "Burst",
     garmentType: "53 lt",
@@ -805,7 +795,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  butan: createReferenceEntry({
+  "butan": createReferenceEntry({
     slug: "butan",
     displayName: "Butan",
     garmentType: "sr",
@@ -813,7 +803,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  bwp: createReferenceEntry({
+  "bwp": createReferenceEntry({
     slug: "bwp",
     displayName: "Bwp",
     garmentType: "wooden bat",
@@ -821,7 +811,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  campus: createReferenceEntry({
+  "campus": createReferenceEntry({
     slug: "campus",
     displayName: "Campus",
     garmentType: "bag",
@@ -829,23 +819,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  carbon: createReferenceEntry({
+  "carbon": createReferenceEntry({
     slug: "carbon",
     displayName: "Carbon",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "WHITE"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  carbon_eco: createReferenceEntry({
+  "carbon-eco": createReferenceEntry({
     slug: "carbon-eco",
     displayName: "Carbon Eco",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
-    aliases: [],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
+    aliases: ["carbon eco", "carbon-eco", "carboneco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  cargo: createReferenceEntry({
+  "cargo": createReferenceEntry({
     slug: "cargo",
     displayName: "Cargo",
     garmentType: "unknown",
@@ -853,7 +843,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  carol: createReferenceEntry({
+  "carol": createReferenceEntry({
     slug: "carol",
     displayName: "Carol",
     garmentType: "t-shirt",
@@ -861,15 +851,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  cassidi_eco_custom: createReferenceEntry({
+  "cassidi-eco-custom": createReferenceEntry({
     slug: "cassidi-eco-custom",
     displayName: "Cassidi Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["FIXED DESIGN", "OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["cassidi eco custom", "cassidi-eco-custom", "cassidiecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  cassiopea: createReferenceEntry({
+  "cassiopea": createReferenceEntry({
     slug: "cassiopea",
     displayName: "Cassiopea",
     garmentType: "match day short",
@@ -877,55 +867,55 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  cassiopea_hero: createReferenceEntry({
+  "cassiopea-hero": createReferenceEntry({
     slug: "cassiopea-hero",
     displayName: "Cassiopea Hero",
     garmentType: "sr",
     allowedColours: [],
-    aliases: [],
+    aliases: ["cassiopea hero", "cassiopea-hero", "cassiopeahero"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  cello: createReferenceEntry({
+  "cello": createReferenceEntry({
     slug: "cello",
     displayName: "Cello",
-    garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "CARDINAL", "GREEN", "GREY", "NAVY", "RED", "ROYAL BLUE"],
+    garmentType: "hoody",
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "GREY", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  cerberus: createReferenceEntry({
+  "cerberus": createReferenceEntry({
     slug: "cerberus",
     displayName: "Cerberus",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK BLACK", "BLUE WHITE", "BLUE YELLOW", "GREEN WHITE", "GUN METAL NEON YELLOW", "NAVY YELLOW", "RED BLACK", "RED WHITE", "WHITE BLACK", "WHITE BLUE", "WHITE GREEN", "WHITE RED"],
+    allowedColours: ["BLACK", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  cerberus_eco: createReferenceEntry({
+  "cerberus-eco": createReferenceEntry({
     slug: "cerberus-eco",
     displayName: "Cerberus Eco",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "DARK GREY", "GREEN", "NAVY", "NEON YELLOW", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["ANTHRACITE", "BLACK", "GREEN", "NAVY", "RED", "WHITE"],
+    aliases: ["cerberus eco", "cerberus-eco", "cerberuseco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  cesar_hero: createReferenceEntry({
+  "cesar-hero": createReferenceEntry({
     slug: "cesar-hero",
     displayName: "Cesar Hero",
     garmentType: "shorts",
     allowedColours: ["BLACK"],
-    aliases: [],
+    aliases: ["cesar hero", "cesar-hero", "cesarhero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  chantico: createReferenceEntry({
+  "chantico": createReferenceEntry({
     slug: "chantico",
     displayName: "Chantico",
-    garmentType: "t-shirt",
-    allowedColours: ["BLACK WHITE", "BLUE WHITE", "NAVY WHITE", "NEON CORAL GUN METAL", "RED WHITE"],
+    garmentType: "1/4 zip top",
+    allowedColours: ["CORAL", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  charm: createReferenceEntry({
+  "charm": createReferenceEntry({
     slug: "charm",
     displayName: "Charm",
     garmentType: "mini ball",
@@ -933,39 +923,39 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  charon: createReferenceEntry({
+  "charon": createReferenceEntry({
     slug: "charon",
     displayName: "Charon",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK GREEN", "BLUE RED", "GUN METAL BLACK", "NAVY COLUMBIA", "NEON GREEN BLACK", "NEON YELLOW CARDINAL", "WHITE RED", "YELLOW RED"],
+    allowedColours: ["BLACK", "CARDINAL", "NAVY", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  charon_eco: createReferenceEntry({
+  "charon-eco": createReferenceEntry({
     slug: "charon-eco",
     displayName: "Charon Eco",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "NEON GREEN", "NEON YELLOW", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["ANTHRACITE", "BLACK", "NAVY", "NEON GREEN", "NEON YELLOW", "WHITE", "YELLOW"],
+    aliases: ["charon eco", "charon-eco", "charoneco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  chronos: createReferenceEntry({
+  "chronos": createReferenceEntry({
     slug: "chronos",
     displayName: "Chronos",
     garmentType: "hoody",
-    allowedColours: ["BLACK", "BLUE", "DARK GREEN", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "GREEN", "LIGHT GREY", "LIGHT NAVY", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  clarinet: createReferenceEntry({
+  "clarinet": createReferenceEntry({
     slug: "clarinet",
     displayName: "Clarinet",
     garmentType: "polo shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK GUN METAL", "BLUE", "DARK RED", "DARK ROYAL BLUE", "LIGHT NAVY", "NAVY", "RED", "ROYAL BLUE", "SILVER", "WHITE", "WHITE SILVER"],
+    allowedColours: ["BLACK", "NAVY", "RED", "SILVER", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  clips: createReferenceEntry({
+  "clips": createReferenceEntry({
     slug: "clips",
     displayName: "Clips",
     garmentType: "polyester - aluminium - pvc",
@@ -973,15 +963,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  cloud: createReferenceEntry({
+  "cloud": createReferenceEntry({
     slug: "cloud",
     displayName: "Cloud",
     garmentType: "jacket",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE", "STONE GRAY", "STONE GREY"],
+    allowedColours: ["BLACK", "NAVY", "RED", "STONE GRAY", "STONE GREY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  coldmire: createReferenceEntry({
+  "coldmire": createReferenceEntry({
     slug: "coldmire",
     displayName: "Coldmire",
     garmentType: "body warmer",
@@ -989,15 +979,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  comedy_eco: createReferenceEntry({
+  "comedy-eco": createReferenceEntry({
     slug: "comedy-eco",
     displayName: "Comedy Eco",
     garmentType: "polo shirt",
-    allowedColours: ["BLACK", "GREY MELANGE", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
-    aliases: [],
+    allowedColours: ["BLACK", "GREY", "NAVY", "RED", "WHITE"],
+    aliases: ["comedy eco", "comedy-eco", "comedyeco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  compass: createReferenceEntry({
+  "compass": createReferenceEntry({
     slug: "compass",
     displayName: "Compass",
     garmentType: "bag",
@@ -1005,7 +995,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  competition: createReferenceEntry({
+  "competition": createReferenceEntry({
     slug: "competition",
     displayName: "Competition",
     garmentType: "origin i",
@@ -1013,7 +1003,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  cone: createReferenceEntry({
+  "cone": createReferenceEntry({
     slug: "cone",
     displayName: "Cone",
     garmentType: "unknown",
@@ -1021,31 +1011,31 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  cone_flexi: createReferenceEntry({
+  "cone-flexi": createReferenceEntry({
     slug: "cone-flexi",
     displayName: "Cone Flexi",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["cone flexi", "cone-flexi", "coneflexi"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  conlan_eco_custom: createReferenceEntry({
+  "conlan-eco-custom": createReferenceEntry({
     slug: "conlan-eco-custom",
     displayName: "Conlan Eco Custom",
     garmentType: "match day top singlet",
-    allowedColours: ["OPEN DESIGN", "XL"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["conlan eco custom", "conlan-eco-custom", "conlanecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  corner_set: createReferenceEntry({
+  "corner-set": createReferenceEntry({
     slug: "corner-set",
     displayName: "Corner Set",
     garmentType: "polyester - aluminium - pvc",
     allowedColours: [],
-    aliases: [],
+    aliases: ["corner set", "corner-set", "cornerset"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  corver: createReferenceEntry({
+  "corver": createReferenceEntry({
     slug: "corver",
     displayName: "Corver",
     garmentType: "shorts",
@@ -1053,55 +1043,55 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  corvus: createReferenceEntry({
+  "corvus": createReferenceEntry({
     slug: "corvus",
     displayName: "Corvus",
     garmentType: "t-shirt",
-    allowedColours: ["GUN METAL NEON YELLOW", "NEON YELLOW BLACK", "ORANGE BLACK", "TURQUOISE BLACK"],
+    allowedColours: ["ORANGE", "TURQUOISE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  corvus_eco: createReferenceEntry({
+  "corvus-eco": createReferenceEntry({
     slug: "corvus-eco",
     displayName: "Corvus Eco",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "NEON YELLOW", "ORANGE", "TURQUOISE"],
-    aliases: [],
+    allowedColours: ["ANTHRACITE", "NEON YELLOW", "ORANGE", "TURQUOISE"],
+    aliases: ["corvus eco", "corvus-eco", "corvuseco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  cotton: createReferenceEntry({
+  "cotton": createReferenceEntry({
     slug: "cotton",
     displayName: "Cotton",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLACK GUN METAL", "BLUE", "GREY", "NAVY", "RED", "WHITE SILVER"],
+    allowedColours: ["BLACK", "GREY", "NAVY", "RED", "SILVER"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  creed_eco_custom: createReferenceEntry({
+  "creed-eco-custom": createReferenceEntry({
     slug: "creed-eco-custom",
     displayName: "Creed Eco Custom",
     garmentType: "shorts",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["creed eco custom", "creed-eco-custom", "creedecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  crew: createReferenceEntry({
+  "crew": createReferenceEntry({
     slug: "crew",
     displayName: "Crew",
-    garmentType: "bag",
-    allowedColours: ["BLACK", "BLUE", "CARDINAL", "GREEN", "NAVY", "RED"],
+    garmentType: "t-shirt",
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  cricket_catalogue: createReferenceEntry({
+  "cricket-catalogue": createReferenceEntry({
     slug: "cricket-catalogue",
     displayName: "Cricket Catalogue",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["cricket catalogue", "cricket-catalogue", "cricketcatalogue"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  crowe: createReferenceEntry({
+  "crowe": createReferenceEntry({
     slug: "crowe",
     displayName: "Crowe",
     garmentType: "t-shirt",
@@ -1109,7 +1099,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  cruise: createReferenceEntry({
+  "cruise": createReferenceEntry({
     slug: "cruise",
     displayName: "Cruise",
     garmentType: "bag",
@@ -1117,39 +1107,39 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  curium: createReferenceEntry({
+  "curium": createReferenceEntry({
     slug: "curium",
     displayName: "Curium",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "BLUE", "GREEN", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  cuzco: createReferenceEntry({
+  "cuzco": createReferenceEntry({
     slug: "cuzco",
     displayName: "Cuzco",
     garmentType: "tracksuit",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK RED", "BLACK WHITE", "BLUE WHITE", "GREEN", "NAVY", "NAVY RED", "NAVY WHITE", "NEON CORAL", "NEON CORAL GUN METAL", "NEON GREEN", "NEON GREEN GREEN", "RED", "RED WHITE", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "CORAL", "GREEN", "NAVY", "NEON CORAL", "NEON GREEN", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  cygnus: createReferenceEntry({
+  "cygnus": createReferenceEntry({
     slug: "cygnus",
     displayName: "Cygnus",
     garmentType: "t-shirt",
-    allowedColours: ["GUN METAL BLACK", "NEON GREEN BLACK", "NEON YELLOW BLACK", "PURPLE BLACK"],
+    allowedColours: ["BLACK", "PURPLE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  cygnus_eco: createReferenceEntry({
+  "cygnus-eco": createReferenceEntry({
     slug: "cygnus-eco",
     displayName: "Cygnus Eco",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "NEON GREEN", "NEON YELLOW", "PURPLE"],
-    aliases: [],
+    allowedColours: ["ANTHRACITE", "NEON GREEN", "NEON YELLOW", "PURPLE"],
+    aliases: ["cygnus eco", "cygnus-eco", "cygnuseco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  cymbal: createReferenceEntry({
+  "cymbal": createReferenceEntry({
     slug: "cymbal",
     displayName: "Cymbal",
     garmentType: "trousers",
@@ -1157,15 +1147,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  dacite_hero: createReferenceEntry({
+  "dacite-hero": createReferenceEntry({
     slug: "dacite-hero",
     displayName: "Dacite Hero",
     garmentType: "bermuda/pant",
     allowedColours: ["BLACK", "NAVY"],
-    aliases: [],
+    aliases: ["dacite hero", "dacite-hero", "dacitehero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  dahlia: createReferenceEntry({
+  "dahlia": createReferenceEntry({
     slug: "dahlia",
     displayName: "Dahlia",
     garmentType: "trousers",
@@ -1173,7 +1163,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  daily: createReferenceEntry({
+  "daily": createReferenceEntry({
     slug: "daily",
     displayName: "Daily",
     garmentType: "socks",
@@ -1181,23 +1171,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  dance: createReferenceEntry({
+  "dance": createReferenceEntry({
     slug: "dance",
     displayName: "Dance",
     garmentType: "hoody",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK GUN METAL", "BLUE", "DARK RED", "DARK ROYAL BLUE", "GREY", "GREY GUN METAL", "GREY MELANGE", "LIGHT NAVY", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "GREY", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  danube_hero: createReferenceEntry({
+  "danube-hero": createReferenceEntry({
     slug: "danube-hero",
     displayName: "Danube Hero",
     garmentType: "sr",
     allowedColours: ["ANTHRACITE", "BLACK", "GUN METAL", "NAVY"],
-    aliases: [],
+    aliases: ["danube hero", "danube-hero", "danubehero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  dart: createReferenceEntry({
+  "dart": createReferenceEntry({
     slug: "dart",
     displayName: "Dart",
     garmentType: "unknown",
@@ -1205,31 +1195,31 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  defender: createReferenceEntry({
+  "defender": createReferenceEntry({
     slug: "defender",
     displayName: "Defender",
-    garmentType: "t-shirt",
-    allowedColours: ["BLACK ORANGE", "BLUE RED", "GREY", "NAVY RED", "RED BLACK", "WHITE"],
+    garmentType: "trousers",
+    allowedColours: ["GREY", "NAVY", "ORANGE", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  degree_xh: createReferenceEntry({
+  "degree-xh": createReferenceEntry({
     slug: "degree-xh",
     displayName: "Degree Xh",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["degree xh", "degree-xh", "degreexh"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  degree_xi: createReferenceEntry({
+  "degree-xi": createReferenceEntry({
     slug: "degree-xi",
     displayName: "Degree Xi",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["degree xi", "degree-xi", "degreexi"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  delaney: createReferenceEntry({
+  "delaney": createReferenceEntry({
     slug: "delaney",
     displayName: "Delaney",
     garmentType: "trousers",
@@ -1237,7 +1227,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  delcourt: createReferenceEntry({
+  "delcourt": createReferenceEntry({
     slug: "delcourt",
     displayName: "Delcourt",
     garmentType: "t-shirt",
@@ -1245,55 +1235,55 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  denali: createReferenceEntry({
+  "denali": createReferenceEntry({
     slug: "denali",
     displayName: "Denali",
     garmentType: "windbreaker",
-    allowedColours: ["BLACK", "BLUE", "BOTTLE GREEN", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "LIGHT BOTTLE GREEN", "LIGHT NAVY", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  denver_hero: createReferenceEntry({
+  "denver-hero": createReferenceEntry({
     slug: "denver-hero",
     displayName: "Denver Hero",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "BLACK WHITE", "BLACK YELLOW", "BLUE WHITE", "CARDINAL", "CARDINAL WHITE", "GREEN", "GREEN WHITE", "NAVY", "NAVY WHITE", "NAVY YELLOW", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "RED", "WHITE", "YELLOW"],
+    aliases: ["denver hero", "denver-hero", "denverhero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  design_su_misura_per_seguire_i_tuoi_movimenti: createReferenceEntry({
+  "design-su-misura-per-seguire-i-tuoi-movimenti": createReferenceEntry({
     slug: "design-su-misura-per-seguire-i-tuoi-movimenti",
     displayName: "Design Su Misura Per Seguire I Tuoi Movimenti",
     garmentType: "performance",
     allowedColours: [],
-    aliases: [],
+    aliases: ["design su misura per seguire i tuoi movimenti", "design-su-misura-per-seguire-i-tuoi-movimenti", "designsumisuraperseguireituoimovimenti"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  desna_hero: createReferenceEntry({
+  "desna-hero": createReferenceEntry({
     slug: "desna-hero",
     displayName: "Desna Hero",
     garmentType: "tracksuit",
     allowedColours: ["ANTHRACITE", "BLACK", "GUN METAL", "NAVY"],
-    aliases: [],
+    aliases: ["desna hero", "desna-hero", "desnahero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  deva: createReferenceEntry({
+  "deva": createReferenceEntry({
     slug: "deva",
     displayName: "Deva",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "GREEN", "NAVY", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  dew_xi: createReferenceEntry({
+  "dew-xi": createReferenceEntry({
     slug: "dew-xi",
     displayName: "Dew Xi",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["dew xi", "dew-xi", "dewxi"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  dexif: createReferenceEntry({
+  "dexif": createReferenceEntry({
     slug: "dexif",
     displayName: "Dexif",
     garmentType: "unknown",
@@ -1301,143 +1291,143 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  dexif_custom: createReferenceEntry({
+  "dexif-custom": createReferenceEntry({
     slug: "dexif-custom",
     displayName: "Dexif Custom",
     garmentType: "socks",
     allowedColours: [],
-    aliases: [],
+    aliases: ["dexif custom", "dexif-custom", "dexifcustom"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  diamond: createReferenceEntry({
+  "diamond": createReferenceEntry({
     slug: "diamond",
     displayName: "Diamond",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "GREY", "NAVY", "RED", "WHITE", "WHITE NAVY"],
+    allowedColours: ["BLACK", "GREY", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  diamond_evo: createReferenceEntry({
+  "diamond-evo": createReferenceEntry({
     slug: "diamond-evo",
     displayName: "Diamond Evo",
     garmentType: "trousers",
-    allowedColours: ["BLACK", "GREY", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
-    aliases: [],
+    allowedColours: ["BLACK", "GREY", "NAVY", "RED", "WHITE"],
+    aliases: ["diamond evo", "diamond-evo", "diamondevo"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  discovery: createReferenceEntry({
+  "discovery": createReferenceEntry({
     slug: "discovery",
     displayName: "Discovery",
-    garmentType: "bag",
+    garmentType: "t-shirt",
     allowedColours: ["BLACK"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  dise_o_a_medida_para_adaptarse_a_tus_movimientos: createReferenceEntry({
+  "dise-o-a-medida-para-adaptarse-a-tus-movimientos": createReferenceEntry({
     slug: "dise-o-a-medida-para-adaptarse-a-tus-movimientos",
     displayName: "Diseño A Medida Para Adaptarse A Tus Movimientos",
     garmentType: "performance",
     allowedColours: [],
-    aliases: [],
+    aliases: ["diseño a medida para adaptarse a tus movimientos", "diseño-a-medida-para-adaptarse-a-tus-movimientos", "diseñoamedidaparaadaptarseatusmovimientos"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  doja_eco_custom: createReferenceEntry({
+  "doja-eco-custom": createReferenceEntry({
     slug: "doja-eco-custom",
     displayName: "Doja Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["doja eco custom", "doja-eco-custom", "dojaecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  dolly: createReferenceEntry({
+  "dolly": createReferenceEntry({
     slug: "dolly",
     displayName: "Dolly",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE BLACK", "NEON YELLOW", "NEON YELLOW BLACK", "RED", "RED BLACK", "ROYAL BLUE", "TURQUOISE", "TURQUOISE BLACK", "WHITE", "WHITE BLACK"],
+    allowedColours: ["NEON YELLOW", "RED", "TURQUOISE", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  dolly_eco_custom: createReferenceEntry({
+  "dolly-eco-custom": createReferenceEntry({
     slug: "dolly-eco-custom",
     displayName: "Dolly Eco Custom",
     garmentType: "eco tank",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["dolly eco custom", "dolly-eco-custom", "dollyecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  dolomite: createReferenceEntry({
+  "dolomite": createReferenceEntry({
     slug: "dolomite",
     displayName: "Dolomite",
     garmentType: "trousers",
-    allowedColours: ["BLACK", "DARK GREY", "LIGHT NAVY", "NAVY"],
+    allowedColours: ["BLACK", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  doom: createReferenceEntry({
+  "doom": createReferenceEntry({
     slug: "doom",
     displayName: "Doom",
-    garmentType: "balls",
-    allowedColours: ["UNKNOWN"],
+    garmentType: "t-shirt",
+    allowedColours: [],
     aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  dora: createReferenceEntry({
+  "dora": createReferenceEntry({
     slug: "dora",
     displayName: "Dora",
     garmentType: "tracksuit",
-    allowedColours: ["ANTHRACITE", "BLACK", "DARK GREY", "DARK RED", "LIGHT NAVY", "NAVY", "RED", "SILVER", "SILVER GUN METAL"],
+    allowedColours: ["BLACK", "NAVY", "RED", "SILVER"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  dorian: createReferenceEntry({
+  "dorian": createReferenceEntry({
     slug: "dorian",
     displayName: "Dorian",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE BLACK", "NEON YELLOW", "NEON YELLOW BLACK", "RED", "RED BLACK", "ROYAL BLUE", "TURQUOISE", "TURQUOISE BLACK", "WHITE", "WHITE BLACK"],
+    allowedColours: ["NEON YELLOW", "RED", "TURQUOISE", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  dorian_eco_custom: createReferenceEntry({
+  "dorian-eco-custom": createReferenceEntry({
     slug: "dorian-eco-custom",
     displayName: "Dorian Eco Custom",
     garmentType: "eco singlet",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["dorian eco custom", "dorian-eco-custom", "dorianecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  draco: createReferenceEntry({
+  "draco": createReferenceEntry({
     slug: "draco",
     displayName: "Draco",
     garmentType: "polo shirt",
-    allowedColours: ["BLACK", "BLACK WHITE", "BLUE WHITE", "CARDINAL WHITE", "COLUMBIA", "COLUMBIA WHITE", "GREEN", "GREEN WHITE", "GREY", "NAVY", "NAVY WHITE", "RED WHITE", "WHITE", "WHITE GREY", "YELLOW", "YELLOW WHITE"],
+    allowedColours: ["BLACK", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  draco_hero: createReferenceEntry({
+  "draco-hero": createReferenceEntry({
     slug: "draco-hero",
     displayName: "Draco Hero",
     garmentType: "polo shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GOLD", "GREEN", "GREY", "NAVY", "NAVY WHITE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "RED", "WHITE", "YELLOW"],
+    aliases: ["draco hero", "draco-hero", "dracohero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  drake: createReferenceEntry({
+  "drake": createReferenceEntry({
     slug: "drake",
     displayName: "Drake",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "BOTTLE GREEN", "NAVY", "ORANGE", "RED", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "NAVY", "ORANGE", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  dravid_eco_custom: createReferenceEntry({
+  "dravid-eco-custom": createReferenceEntry({
     slug: "dravid-eco-custom",
     displayName: "Dravid Eco Custom",
     garmentType: "trousers",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["dravid eco custom", "dravid-eco-custom", "dravidecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  dravite: createReferenceEntry({
+  "dravite": createReferenceEntry({
     slug: "dravite",
     displayName: "Dravite",
     garmentType: "match day short",
@@ -1445,23 +1435,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  dravite_eco: createReferenceEntry({
+  "dravite-eco": createReferenceEntry({
     slug: "dravite-eco",
     displayName: "Dravite Eco",
     garmentType: "shorts",
     allowedColours: ["BLACK", "NAVY"],
-    aliases: [],
+    aliases: ["dravite eco", "dravite-eco", "draviteeco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  drizzle: createReferenceEntry({
+  "drizzle": createReferenceEntry({
     slug: "drizzle",
     displayName: "Drizzle",
     garmentType: "mesh lined windbreaker",
-    allowedColours: ["BLACK", "BLUE", "COLUMBIA", "GREEN", "NAVY", "NEON YELLOW", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "COLUMBIA", "GREEN", "NAVY", "NEON YELLOW", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  drum: createReferenceEntry({
+  "drum": createReferenceEntry({
     slug: "drum",
     displayName: "Drum",
     garmentType: "trousers",
@@ -1469,15 +1459,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  dryad: createReferenceEntry({
+  "dryad": createReferenceEntry({
     slug: "dryad",
     displayName: "Dryad",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK BLACK", "BLUE BLUE", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "LIGHT NAVY", "LILAC", "LILAC GUN METAL", "NAVY", "NAVY NAVY", "RED", "RED RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "LILAC", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  duality: createReferenceEntry({
+  "duality": createReferenceEntry({
     slug: "duality",
     displayName: "Duality",
     garmentType: "jacket",
@@ -1485,23 +1475,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  dynamic: createReferenceEntry({
+  "dynamic": createReferenceEntry({
     slug: "dynamic",
     displayName: "Dynamic",
-    garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "GREY", "GREY MELANGE", "LIGHT NAVY", "NAVY"],
+    garmentType: "hoody",
+    allowedColours: ["BLACK", "GREY", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  dynamite_kit: createReferenceEntry({
+  "dynamite-kit": createReferenceEntry({
     slug: "dynamite-kit",
     displayName: "Dynamite Kit",
     garmentType: "bat and ball set",
     allowedColours: [],
-    aliases: [],
+    aliases: ["dynamite kit", "dynamite-kit", "dynamitekit"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  eagle: createReferenceEntry({
+  "eagle": createReferenceEntry({
     slug: "eagle",
     displayName: "Eagle",
     garmentType: "bermuda",
@@ -1509,23 +1499,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  earthquake_xi: createReferenceEntry({
+  "earthquake-xi": createReferenceEntry({
     slug: "earthquake-xi",
     displayName: "Earthquake Xi",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["earthquake xi", "earthquake-xi", "earthquakexi"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  ease: createReferenceEntry({
+  "ease": createReferenceEntry({
     slug: "ease",
     displayName: "Ease",
-    garmentType: "shoes",
-    allowedColours: ["BLACK", "UNKNOWN"],
+    garmentType: "t-shirt",
+    allowedColours: ["BLACK"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  easy: createReferenceEntry({
+  "easy": createReferenceEntry({
     slug: "easy",
     displayName: "Easy",
     garmentType: "basketball ball",
@@ -1533,7 +1523,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  eblana: createReferenceEntry({
+  "eblana": createReferenceEntry({
     slug: "eblana",
     displayName: "Eblana",
     garmentType: "jacket",
@@ -1541,39 +1531,39 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  echoes: createReferenceEntry({
+  "echoes": createReferenceEntry({
     slug: "echoes",
     displayName: "Echoes",
     garmentType: "polo shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLUE WHITE", "BOTTLE GREEN", "BOTTLE GREEN MINT", "INDIGO SKY", "INDIGO SKY NAVY", "MINT", "NAVY", "NAVY WHITE", "RED", "RED WHITE", "ROYAL BLUE", "STONE GRAY GUN METAL", "STONE GREY", "WHITE"],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "INDIGO", "MINT", "NAVY", "RED", "STONE", "STONE GREY", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  elastic_belt: createReferenceEntry({
+  "elastic-belt": createReferenceEntry({
     slug: "elastic-belt",
     displayName: "Elastic Belt",
     garmentType: "evo",
     allowedColours: [],
-    aliases: [],
+    aliases: ["elastic belt", "elastic-belt", "elasticbelt"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  elbrus: createReferenceEntry({
+  "elbrus": createReferenceEntry({
     slug: "elbrus",
     displayName: "Elbrus",
     garmentType: "jacket",
-    allowedColours: ["BLACK", "BLUE", "BOTTLE GREEN", "DARK RED", "DARK ROYAL BLUE", "LIGHT BOTTLE GREEN", "LIGHT NAVY", "NAVY", "RED", "ROYAL BLUE", "STONE GRAY", "STONE GREY"],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "NAVY", "RED", "STONE GRAY", "STONE GREY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  electro: createReferenceEntry({
+  "electro": createReferenceEntry({
     slug: "electro",
     displayName: "Electro",
     garmentType: "hoody",
-    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "CARDINAL", "DARK CARDINAL", "DARK RED", "DARK ROYAL BLUE", "DARK SILVER", "LIGHT BOTTLE GREEN", "LIGHT NAVY", "NAVY", "RED", "ROYAL BLUE", "SILVER"],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "CARDINAL", "NAVY", "RED", "SILVER"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  elevate: createReferenceEntry({
+  "elevate": createReferenceEntry({
     slug: "elevate",
     displayName: "Elevate",
     garmentType: "socks",
@@ -1581,39 +1571,39 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  elite_control_i: createReferenceEntry({
+  "elite-control-i": createReferenceEntry({
     slug: "elite-control-i",
     displayName: "Elite Control I",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["elite control i", "elite-control-i", "elitecontroli"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  elite_control_ii: createReferenceEntry({
+  "elite-control-ii": createReferenceEntry({
     slug: "elite-control-ii",
     displayName: "Elite Control Ii",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["elite control ii", "elite-control-ii", "elitecontrolii"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  elite_power_i: createReferenceEntry({
+  "elite-power-i": createReferenceEntry({
     slug: "elite-power-i",
     displayName: "Elite Power I",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["elite power i", "elite-power-i", "elitepoweri"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  elite_power_ii: createReferenceEntry({
+  "elite-power-ii": createReferenceEntry({
     slug: "elite-power-ii",
     displayName: "Elite Power Ii",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["elite power ii", "elite-power-ii", "elitepowerii"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  elm: createReferenceEntry({
+  "elm": createReferenceEntry({
     slug: "elm",
     displayName: "Elm",
     garmentType: "bermuda/pant",
@@ -1621,31 +1611,31 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  elves: createReferenceEntry({
+  "elves": createReferenceEntry({
     slug: "elves",
     displayName: "Elves",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLACK YELLOW", "BLUE WHITE", "CARDINAL", "CARDINAL COLUMBIA", "COLUMBIA", "GREEN", "GREEN WHITE", "ORANGE", "ORANGE BLACK", "PURPLE", "PURPLE WHITE", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "WHITE GUN METAL", "YELLOW", "YELLOW BLUE"],
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "ORANGE", "PURPLE", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  elyon_eco_custom: createReferenceEntry({
+  "elyon-eco-custom": createReferenceEntry({
     slug: "elyon-eco-custom",
     displayName: "Elyon Eco Custom",
     garmentType: "shorts",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["elyon eco custom", "elyon-eco-custom", "elyonecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  endurance: createReferenceEntry({
+  "endurance": createReferenceEntry({
     slug: "endurance",
     displayName: "Endurance",
     garmentType: "socks",
-    allowedColours: ["BLACK GREY", "BLACK NEON CORAL", "BLACK NEON YELLOW"],
+    allowedColours: ["BLACK", "CORAL", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  enhance: createReferenceEntry({
+  "enhance": createReferenceEntry({
     slug: "enhance",
     displayName: "Enhance",
     garmentType: "socks",
@@ -1653,7 +1643,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  etesian: createReferenceEntry({
+  "etesian": createReferenceEntry({
     slug: "etesian",
     displayName: "Etesian",
     garmentType: "shoes",
@@ -1661,7 +1651,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  exert: createReferenceEntry({
+  "exert": createReferenceEntry({
     slug: "exert",
     displayName: "Exert",
     garmentType: "socks",
@@ -1669,79 +1659,79 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  f500: createReferenceEntry({
+  "f500": createReferenceEntry({
     slug: "f500",
     displayName: "F500",
     garmentType: "w - double",
-    allowedColours: ["BLUE WHITE", "RED WHITE"],
+    allowedColours: ["WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  fenders: createReferenceEntry({
+  "fenders": createReferenceEntry({
     slug: "fenders",
     displayName: "Fenders",
-    garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK BLACK", "BLUE BLUE", "BOTTLE GREEN", "BOTTLE GREEN BOTTLE GREEN", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "GUN METAL LILAC", "LIGHT BOTTLE GREEN", "LIGHT NAVY", "LILAC", "NAVY", "NAVY NAVY", "OFF WHITE", "OFF WHITE GUN METAL", "RED", "RED RED", "ROYAL BLUE"],
+    garmentType: "hoody",
+    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "GREEN", "LILAC", "NAVY", "OFF WHITE", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  fern: createReferenceEntry({
+  "fern": createReferenceEntry({
     slug: "fern",
     displayName: "Fern",
     garmentType: "bermuda",
-    allowedColours: ["BLACK", "GREY", "GREY MELANGE", "NAVY"],
+    allowedColours: ["BLACK", "GREY", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  ferry: createReferenceEntry({
+  "ferry": createReferenceEntry({
     slug: "ferry",
     displayName: "Ferry",
     garmentType: "mixture",
-    allowedColours: ["UNKNOWN"],
+    allowedColours: [],
     aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  fiddle: createReferenceEntry({
+  "fiddle": createReferenceEntry({
     slug: "fiddle",
     displayName: "Fiddle",
-    garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLACK OFF WHITE", "BLUE OFF WHITE", "NAVY", "NAVY OFF WHITE", "OFF WHITE", "RED", "RED OFF WHITE", "ROYAL BLUE"],
+    garmentType: "jacket",
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  fifa_standard_for_official_competitions: createReferenceEntry({
+  "fifa-standard-for-official-competitions": createReferenceEntry({
     slug: "fifa-standard-for-official-competitions",
     displayName: "Fifa Standard For Official Competitions",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["fifa standard for official competitions", "fifa-standard-for-official-competitions", "fifastandardforofficialcompetitions"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  finlay_hero: createReferenceEntry({
+  "finlay-hero": createReferenceEntry({
     slug: "finlay-hero",
     displayName: "Finlay Hero",
     garmentType: "tracksuit",
-    allowedColours: ["BLACK WHITE", "NAVY WHITE"],
-    aliases: [],
+    allowedColours: ["WHITE"],
+    aliases: ["finlay hero", "finlay-hero", "finlayhero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  fiona: createReferenceEntry({
+  "fiona": createReferenceEntry({
     slug: "fiona",
     displayName: "Fiona",
     garmentType: "bra",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  fitness_mat: createReferenceEntry({
+  "fitness-mat": createReferenceEntry({
     slug: "fitness-mat",
     displayName: "Fitness Mat",
     garmentType: "60 cm x 180 cm x 1 cm",
     allowedColours: [],
-    aliases: [],
+    aliases: ["fitness mat", "fitness-mat", "fitnessmat"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  fixed: createReferenceEntry({
+  "fixed": createReferenceEntry({
     slug: "fixed",
     displayName: "Fixed",
     garmentType: "socks",
@@ -1749,7 +1739,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  flags: createReferenceEntry({
+  "flags": createReferenceEntry({
     slug: "flags",
     displayName: "Flags",
     garmentType: "polyester - aluminium - pvc",
@@ -1757,23 +1747,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  flamenco: createReferenceEntry({
+  "flamenco": createReferenceEntry({
     slug: "flamenco",
     displayName: "Flamenco",
     garmentType: "polo shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "GREEN", "GREY", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "GREEN", "GREY", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  flat_marker_rubber: createReferenceEntry({
+  "flat-marker-rubber": createReferenceEntry({
     slug: "flat-marker-rubber",
     displayName: "Flat Marker Rubber",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["flat marker rubber", "flat-marker-rubber", "flatmarkerrubber"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  flight: createReferenceEntry({
+  "flight": createReferenceEntry({
     slug: "flight",
     displayName: "Flight",
     garmentType: "unknown",
@@ -1781,7 +1771,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  flow: createReferenceEntry({
+  "flow": createReferenceEntry({
     slug: "flow",
     displayName: "Flow",
     garmentType: "unknown",
@@ -1789,79 +1779,79 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  flower: createReferenceEntry({
+  "flower": createReferenceEntry({
     slug: "flower",
     displayName: "Flower",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  folk: createReferenceEntry({
+  "folk": createReferenceEntry({
     slug: "folk",
     displayName: "Folk",
     garmentType: "polo shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK RED", "BLACK WHITE", "BLUE WHITE", "GREEN", "GREEN BLACK", "NAVY", "NAVY RED", "NAVY WHITE", "NAVY YELLOW", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "WHITE GUN METAL"],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  fraser: createReferenceEntry({
+  "fraser": createReferenceEntry({
     slug: "fraser",
     displayName: "Fraser",
     garmentType: "tracksuit",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLUE WHITE", "CARDINAL", "CARDINAL WHITE", "DARK CARDINAL", "DARK GREEN", "DARK GREY", "DARK ORANGE", "DARK PURPLE", "DARK RED", "DARK ROYAL BLUE", "DARK YELLOW", "GREEN", "GREEN WHITE", "LIGHT NAVY", "NAVY", "NAVY WHITE", "NAVY YELLOW", "NEON SKY", "NEON SKY GUN METAL", "ORANGE", "PURPLE", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "YELLOW", "YELLOW BLACK"],
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "NEON SKY", "ORANGE", "PURPLE", "RED", "SKY", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  freon: createReferenceEntry({
+  "freon": createReferenceEntry({
     slug: "freon",
     displayName: "Freon",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLACK WHITE", "BLUE WHITE", "GREEN", "GREEN WHITE", "NAVY", "NAVY WHITE", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "YELLOW", "YELLOW WHITE"],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  freyr: createReferenceEntry({
+  "freyr": createReferenceEntry({
     slug: "freyr",
     displayName: "Freyr",
     garmentType: "hoody",
-    allowedColours: ["BLACK", "BLUE", "GREEN", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  frisk: createReferenceEntry({
+  "frisk": createReferenceEntry({
     slug: "frisk",
     displayName: "Frisk",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLACK WHITE", "NEON SKY BLACK", "NEON SKY BLUE", "NEON YELLOW", "NEON YELLOW BLACK", "WHITE"],
+    allowedColours: ["BLACK", "NEON YELLOW", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  frostmoor: createReferenceEntry({
+  "frostmoor": createReferenceEntry({
     slug: "frostmoor",
     displayName: "Frostmoor",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLACK WHITE", "BLUE WHITE", "NAVY", "NAVY WHITE", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "WHITE BLACK"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  full: createReferenceEntry({
+  "full": createReferenceEntry({
     slug: "full",
     displayName: "Full",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK GUN METAL", "BLUE", "GREY GUN METAL", "NAVY", "RED"],
+    allowedColours: ["BLACK", "GREY", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  gades_eco_custom: createReferenceEntry({
+  "gades-eco-custom": createReferenceEntry({
     slug: "gades-eco-custom",
     displayName: "Gades Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["FIXED DESIGN", "OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["gades eco custom", "gades-eco-custom", "gadesecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  gadreel: createReferenceEntry({
+  "gadreel": createReferenceEntry({
     slug: "gadreel",
     displayName: "Gadreel",
     garmentType: "t-shirt",
@@ -1869,23 +1859,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  gadreel_eco: createReferenceEntry({
+  "gadreel-eco": createReferenceEntry({
     slug: "gadreel-eco",
     displayName: "Gadreel Eco",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "GREY MELANGE", "NAVY", "WHITE"],
-    aliases: [],
+    allowedColours: ["BLACK", "GREY", "NAVY", "WHITE"],
+    aliases: ["gadreel eco", "gadreel-eco", "gadreeleco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  galax: createReferenceEntry({
+  "galax": createReferenceEntry({
     slug: "galax",
     displayName: "Galax",
     garmentType: "shorts",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLUE", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON CORAL", "NEON GREEN", "NEON SKY", "NEON YELLOW", "ORANGE", "PINK", "PURPLE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON CORAL", "NEON GREEN", "NEON SKY", "NEON YELLOW", "ORANGE", "PINK", "PURPLE", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  galler: createReferenceEntry({
+  "galler": createReferenceEntry({
     slug: "galler",
     displayName: "Galler",
     garmentType: "mixture",
@@ -1893,39 +1883,39 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  gallium_custom: createReferenceEntry({
+  "gallium-custom": createReferenceEntry({
     slug: "gallium-custom",
     displayName: "Gallium Custom",
-    garmentType: "netball dress",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    garmentType: "t-shirt",
+    allowedColours: [],
+    aliases: ["gallium custom", "gallium-custom", "galliumcustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  gaston_hero: createReferenceEntry({
+  "gaston-hero": createReferenceEntry({
     slug: "gaston-hero",
     displayName: "Gaston Hero",
     garmentType: "shorts",
     allowedColours: ["BLACK"],
-    aliases: [],
+    aliases: ["gaston hero", "gaston-hero", "gastonhero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  gate: createReferenceEntry({
+  "gate": createReferenceEntry({
     slug: "gate",
     displayName: "Gate",
     garmentType: "bag",
-    allowedColours: ["UNKNOWN"],
+    allowedColours: [],
     aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  ghible_eco_custom: createReferenceEntry({
+  "ghible-eco-custom": createReferenceEntry({
     slug: "ghible-eco-custom",
     displayName: "Ghible Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["FIXED DESIGN", "OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["ghible eco custom", "ghible-eco-custom", "ghibleecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  gila: createReferenceEntry({
+  "gila": createReferenceEntry({
     slug: "gila",
     displayName: "Gila",
     garmentType: "sr",
@@ -1933,7 +1923,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  gloves: createReferenceEntry({
+  "gloves": createReferenceEntry({
     slug: "gloves",
     displayName: "Gloves",
     garmentType: "mixture",
@@ -1941,15 +1931,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  golem: createReferenceEntry({
+  "golem": createReferenceEntry({
     slug: "golem",
     displayName: "Golem",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK RED", "BLACK WHITE", "BLUE WHITE", "GRAFFITI", "GREEN", "NAVY", "NAVY RED", "NAVY WHITE", "NEON CORAL", "NEON CORAL GUN METAL", "NEON GREEN", "NEON GREEN GREEN", "RED", "RED WHITE", "ROYAL BLUE", "SILVER", "WHITE", "WHITE SILVER"],
+    allowedColours: ["BLACK", "CORAL", "GREEN", "NAVY", "NEON CORAL", "NEON GREEN", "RED", "SILVER", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  golpeo: createReferenceEntry({
+  "golpeo": createReferenceEntry({
     slug: "golpeo",
     displayName: "Golpeo",
     garmentType: "unknown",
@@ -1957,7 +1947,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  grace: createReferenceEntry({
+  "grace": createReferenceEntry({
     slug: "grace",
     displayName: "Grace",
     garmentType: "t-shirt",
@@ -1965,63 +1955,63 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  granite: createReferenceEntry({
+  "granite": createReferenceEntry({
     slug: "granite",
     displayName: "Granite",
     garmentType: "r. training",
-    allowedColours: ["BLACK", "DARK GREY", "LIGHT NAVY", "NAVY"],
+    allowedColours: ["BLACK", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  greece_eco_custom: createReferenceEntry({
+  "greece-eco-custom": createReferenceEntry({
     slug: "greece-eco-custom",
     displayName: "Greece Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["greece eco custom", "greece-eco-custom", "greeceecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  gripfit: createReferenceEntry({
+  "gripfit": createReferenceEntry({
     slug: "gripfit",
     displayName: "Gripfit",
     garmentType: "socks",
-    allowedColours: ["BLACK", "BLUE", "GREEN", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  ground: createReferenceEntry({
+  "ground": createReferenceEntry({
     slug: "ground",
     displayName: "Ground",
-    garmentType: "r. accessories",
-    allowedColours: ["UNKNOWN"],
+    garmentType: "t-shirt",
+    allowedColours: [],
     aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  ground_xi: createReferenceEntry({
+  "ground-xi": createReferenceEntry({
     slug: "ground-xi",
     displayName: "Ground Xi",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "ROYAL BLUE"],
-    aliases: [],
+    allowedColours: ["BLACK"],
+    aliases: ["ground xi", "ground-xi", "groundxi"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  guardians_evo: createReferenceEntry({
+  "guardians-evo": createReferenceEntry({
     slug: "guardians-evo",
     displayName: "Guardians Evo",
     garmentType: "shinguards",
     allowedColours: [],
-    aliases: [],
+    aliases: ["guardians evo", "guardians-evo", "guardiansevo"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  guardians_pro: createReferenceEntry({
+  "guardians-pro": createReferenceEntry({
     slug: "guardians-pro",
     displayName: "Guardians Pro",
     garmentType: "shinguards",
     allowedColours: [],
-    aliases: [],
+    aliases: ["guardians pro", "guardians-pro", "guardianspro"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  guitar: createReferenceEntry({
+  "guitar": createReferenceEntry({
     slug: "guitar",
     displayName: "Guitar",
     garmentType: "trousers",
@@ -2029,7 +2019,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  gym: createReferenceEntry({
+  "gym": createReferenceEntry({
     slug: "gym",
     displayName: "Gym",
     garmentType: "bag",
@@ -2037,23 +2027,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  gyor: createReferenceEntry({
+  "gyor": createReferenceEntry({
     slug: "gyor",
     displayName: "Gyor",
     garmentType: "jacket",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  halley: createReferenceEntry({
+  "halley": createReferenceEntry({
     slug: "halley",
     displayName: "Halley",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "COLUMBIA", "GREEN", "NAVY", "RED", "ROYAL BLUE", "SILVER", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "COLUMBIA", "GREEN", "NAVY", "RED", "SILVER", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  hangar: createReferenceEntry({
+  "hangar": createReferenceEntry({
     slug: "hangar",
     displayName: "Hangar",
     garmentType: "bag",
@@ -2061,15 +2051,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  hanna_hero: createReferenceEntry({
+  "hanna-hero": createReferenceEntry({
     slug: "hanna-hero",
     displayName: "Hanna Hero",
     garmentType: "shorts",
     allowedColours: ["BLACK"],
-    aliases: [],
+    aliases: ["hanna hero", "hanna-hero", "hannahero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  harp: createReferenceEntry({
+  "harp": createReferenceEntry({
     slug: "harp",
     displayName: "Harp",
     garmentType: "trousers",
@@ -2077,15 +2067,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  harris_eco_custom: createReferenceEntry({
+  "harris-eco-custom": createReferenceEntry({
     slug: "harris-eco-custom",
     displayName: "Harris Eco Custom",
     garmentType: "shorts",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["harris eco custom", "harris-eco-custom", "harrisecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  harvey: createReferenceEntry({
+  "harvey": createReferenceEntry({
     slug: "harvey",
     displayName: "Harvey",
     garmentType: "t-shirt",
@@ -2093,23 +2083,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  havel: createReferenceEntry({
+  "havel": createReferenceEntry({
     slug: "havel",
     displayName: "Havel",
     garmentType: "tracksuit",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLUE", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON YELLOW", "ORANGE", "RED", "ROYAL BLUE", "YELLOW"],
+    allowedColours: ["ANTHRACITE", "BLACK", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON YELLOW", "ORANGE", "RED", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  hb: createReferenceEntry({
+  "hb": createReferenceEntry({
     slug: "hb",
     displayName: "Hb",
     garmentType: "one size",
-    allowedColours: ["ESPANTEX + COMBTEX: 92% POLYESTER - 8% ELASTAN"],
+    allowedColours: [],
     aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  heavy: createReferenceEntry({
+  "heavy": createReferenceEntry({
     slug: "heavy",
     displayName: "Heavy",
     garmentType: "tracksuit",
@@ -2117,15 +2107,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  helia_evo_custom: createReferenceEntry({
+  "helia-evo-custom": createReferenceEntry({
     slug: "helia-evo-custom",
     displayName: "Helia Evo Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["helia evo custom", "helia-evo-custom", "heliaevocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  heliodor: createReferenceEntry({
+  "heliodor": createReferenceEntry({
     slug: "heliodor",
     displayName: "Heliodor",
     garmentType: "bermuda/pant",
@@ -2133,23 +2123,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  helmet: createReferenceEntry({
+  "helmet": createReferenceEntry({
     slug: "helmet",
     displayName: "Helmet",
-    garmentType: "r. accessories",
-    allowedColours: ["BLACK", "CAMOUFLAGE", "RED"],
+    garmentType: "t-shirt",
+    allowedColours: ["BLACK", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  helmet_xe: createReferenceEntry({
+  "helmet-xe": createReferenceEntry({
     slug: "helmet-xe",
     displayName: "Helmet Xe",
     garmentType: "wr headgear",
-    allowedColours: ["BLACK", "CAMOUFLAGE GREEN", "RED"],
-    aliases: [],
+    allowedColours: ["BLACK", "GREEN", "RED"],
+    aliases: ["helmet xe", "helmet-xe", "helmetxe"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  heracles: createReferenceEntry({
+  "heracles": createReferenceEntry({
     slug: "heracles",
     displayName: "Heracles",
     garmentType: "polifiber",
@@ -2157,63 +2147,63 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  hero: createReferenceEntry({
+  "hero": createReferenceEntry({
     slug: "hero",
     displayName: "Hero",
     garmentType: "sr",
-    allowedColours: ["BLACK", "GREY", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "GREY", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  hero_pro_control_i: createReferenceEntry({
+  "hero-pro-control-i": createReferenceEntry({
     slug: "hero-pro-control-i",
     displayName: "Hero Pro Control I",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["hero pro control i", "hero-pro-control-i", "heroprocontroli"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  hero_pro_control_ii: createReferenceEntry({
+  "hero-pro-control-ii": createReferenceEntry({
     slug: "hero-pro-control-ii",
     displayName: "Hero Pro Control Ii",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["hero pro control ii", "hero-pro-control-ii", "heroprocontrolii"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  hero_pro_power_i: createReferenceEntry({
+  "hero-pro-power-i": createReferenceEntry({
     slug: "hero-pro-power-i",
     displayName: "Hero Pro Power I",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["hero pro power i", "hero-pro-power-i", "heropropoweri"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  hero_pro_power_ii: createReferenceEntry({
+  "hero-pro-power-ii": createReferenceEntry({
     slug: "hero-pro-power-ii",
     displayName: "Hero Pro Power Ii",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["hero pro power ii", "hero-pro-power-ii", "heropropowerii"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  heroes: createReferenceEntry({
+  "heroes": createReferenceEntry({
     slug: "heroes",
     displayName: "Heroes",
     garmentType: "backpack",
-    allowedColours: ["BLACK", "UNKNOWN"],
+    allowedColours: ["BLACK"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  hestia: createReferenceEntry({
+  "hestia": createReferenceEntry({
     slug: "hestia",
     displayName: "Hestia",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "WHITE"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  himalaya: createReferenceEntry({
+  "himalaya": createReferenceEntry({
     slug: "himalaya",
     displayName: "Himalaya",
     garmentType: "jacket",
@@ -2221,23 +2211,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  hit: createReferenceEntry({
+  "hit": createReferenceEntry({
     slug: "hit",
     displayName: "Hit",
-    garmentType: "r. accessories",
-    allowedColours: ["BLACK", "BLUE"],
+    garmentType: "t-shirt",
+    allowedColours: ["BLACK"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  hit_mouth_guard: createReferenceEntry({
+  "hit-mouth-guard": createReferenceEntry({
     slug: "hit-mouth-guard",
     displayName: "Hit Mouth Guard",
     garmentType: "mouth guard",
     allowedColours: [],
-    aliases: [],
+    aliases: ["hit mouth guard", "hit-mouth-guard", "hitmouthguard"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  hobbs: createReferenceEntry({
+  "hobbs": createReferenceEntry({
     slug: "hobbs",
     displayName: "Hobbs",
     garmentType: "t-shirt",
@@ -2245,87 +2235,87 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  hobbs_eco_custom: createReferenceEntry({
+  "hobbs-eco-custom": createReferenceEntry({
     slug: "hobbs-eco-custom",
     displayName: "Hobbs Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["hobbs eco custom", "hobbs-eco-custom", "hobbsecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  hollow: createReferenceEntry({
+  "hollow": createReferenceEntry({
     slug: "hollow",
     displayName: "Hollow",
     garmentType: "tracksuit",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLACK YELLOW", "BLUE WHITE", "BOTTLE GREEN", "INDIGO SKY", "INDIGO SKY NAVY", "MINT", "MINT BOTTLE GREEN", "NAVY", "NAVY WHITE", "NAVY YELLOW", "RED", "RED WHITE", "ROYAL BLUE", "STONE GRAY GUN METAL", "STONE GREY", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "INDIGO", "MINT", "NAVY", "RED", "STONE", "STONE GREY", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  holly: createReferenceEntry({
+  "holly": createReferenceEntry({
     slug: "holly",
     displayName: "Holly",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLUE", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON GREEN", "NEON YELLOW", "ORANGE", "PINK", "PURPLE", "RED", "ROYAL BLUE", "TURQUOISE", "WHITE", "YELLOW"],
+    allowedColours: ["ANTHRACITE", "BLACK", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON GREEN", "NEON YELLOW", "ORANGE", "PINK", "PURPLE", "RED", "TURQUOISE", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  hooded: createReferenceEntry({
+  "hooded": createReferenceEntry({
     slug: "hooded",
     displayName: "Hooded",
     garmentType: "windbreaker",
-    allowedColours: ["BLACK GUN METAL", "NAVY"],
+    allowedColours: ["BLACK", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  hoodie: createReferenceEntry({
+  "hoodie": createReferenceEntry({
     slug: "hoodie",
     displayName: "Hoodie",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "BOTTLE GREEN", "CARDINAL", "NAVY", "RED", "SILVER"],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "CARDINAL", "NAVY", "RED", "SILVER"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  hoops: createReferenceEntry({
+  "hoops": createReferenceEntry({
     slug: "hoops",
     displayName: "Hoops",
     garmentType: "socks",
-    allowedColours: ["BLACK", "BLUE RED", "COLUMBIA", "GREEN", "GREEN BLACK", "NAVY", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "COLUMBIA", "GREEN", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  horn: createReferenceEntry({
+  "horn": createReferenceEntry({
     slug: "horn",
     displayName: "Horn",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLACK BLACK", "BLUE BLUE", "CARDINAL", "CARDINAL CARDINAL", "CORALLO FLUO SCURO", "DARK CARDINAL NEON YELLOW", "DARK GREEN", "DARK GREY", "DARK NEON CORAL", "DARK NEON SKY", "DARK NEON YELLOW", "DARK RED", "DARK ROYAL BLUE", "DARK TURQUOISE", "GIALLO FLUO", "GIALLO FLUO SCURO CORALLO FLUO", "GREEN", "GREEN GREEN", "LIGHT GREY", "LIGHT NAVY", "NAVY", "NAVY NAVY", "NEON CORAL", "NEON CORAL NEON CORAL", "NEON SKY", "NEON SKY NEON SKY", "NEON YELLOW NEON YELLOW", "RED", "RED RED", "ROYAL BLUE", "TURQUOISE", "TURQUOISE TURQUOISE", "WHITE", "WHITE GREY"],
+    allowedColours: ["BLACK", "CARDINAL", "CORAL", "GREEN", "NAVY", "NEON CORAL", "NEON SKY", "RED", "SKY", "TURQUOISE", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  houston_eco_custom: createReferenceEntry({
+  "houston-eco-custom": createReferenceEntry({
     slug: "houston-eco-custom",
     displayName: "Houston Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["houston eco custom", "houston-eco-custom", "houstonecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  howlite_eco_custom: createReferenceEntry({
+  "howlite-eco-custom": createReferenceEntry({
     slug: "howlite-eco-custom",
     displayName: "Howlite Eco Custom",
     garmentType: "shorts",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["howlite eco custom", "howlite-eco-custom", "howliteecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  howlite_hero: createReferenceEntry({
+  "howlite-hero": createReferenceEntry({
     slug: "howlite-hero",
     displayName: "Howlite Hero",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "BLUE", "BOTTLE GREEN", "NAVY", "RED", "WHITE"],
-    aliases: [],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "NAVY", "RED", "WHITE"],
+    aliases: ["howlite hero", "howlite-hero", "howlitehero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  hurdles: createReferenceEntry({
+  "hurdles": createReferenceEntry({
     slug: "hurdles",
     displayName: "Hurdles",
     garmentType: "unknown",
@@ -2333,7 +2323,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  hutton: createReferenceEntry({
+  "hutton": createReferenceEntry({
     slug: "hutton",
     displayName: "Hutton",
     garmentType: "t-shirt",
@@ -2341,23 +2331,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  hutton_eco_custom: createReferenceEntry({
+  "hutton-eco-custom": createReferenceEntry({
     slug: "hutton-eco-custom",
     displayName: "Hutton Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["hutton eco custom", "hutton-eco-custom", "huttonecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  hydrogen_hero: createReferenceEntry({
+  "hydrogen-hero": createReferenceEntry({
     slug: "hydrogen-hero",
     displayName: "Hydrogen Hero",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "BLUE", "NAVY"],
-    aliases: [],
+    allowedColours: ["BLACK", "NAVY"],
+    aliases: ["hydrogen hero", "hydrogen-hero", "hydrogenhero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  icefang: createReferenceEntry({
+  "icefang": createReferenceEntry({
     slug: "icefang",
     displayName: "Icefang",
     garmentType: "jacket",
@@ -2365,47 +2355,47 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  idaho: createReferenceEntry({
+  "idaho": createReferenceEntry({
     slug: "idaho",
     displayName: "Idaho",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK WHITE", "BLACK YELLOW", "BLUE WHITE", "CARDINAL WHITE", "GREEN WHITE", "NAVY WHITE", "NAVY YELLOW", "RED WHITE"],
+    allowedColours: ["CARDINAL", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  idmon: createReferenceEntry({
+  "idmon": createReferenceEntry({
     slug: "idmon",
     displayName: "Idmon",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLACK RED", "BLACK WHITE", "COLUMBIA", "GREEN", "NAVY", "NAVY COLUMBIA", "NAVY RED", "NAVY WHITE", "RED", "RED WHITE", "WHITE", "WHITE GREEN"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  igloo: createReferenceEntry({
+  "igloo": createReferenceEntry({
     slug: "igloo",
     displayName: "Igloo",
     garmentType: "sr",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "NAVY", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  ignite_i: createReferenceEntry({
+  "ignite-i": createReferenceEntry({
     slug: "ignite-i",
     displayName: "Ignite I",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["ignite i", "ignite-i", "ignitei"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  ike_hero: createReferenceEntry({
+  "ike-hero": createReferenceEntry({
     slug: "ike-hero",
     displayName: "Ike Hero",
     garmentType: "shorts",
     allowedColours: ["BLACK"],
-    aliases: [],
+    aliases: ["ike hero", "ike-hero", "ikehero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  improve: createReferenceEntry({
+  "improve": createReferenceEntry({
     slug: "improve",
     displayName: "Improve",
     garmentType: "socks",
@@ -2413,15 +2403,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  inning: createReferenceEntry({
+  "inning": createReferenceEntry({
     slug: "inning",
     displayName: "Inning",
     garmentType: "t-shirt",
-    allowedColours: ["BLUE WHITE", "NAVY", "NAVY WHITE", "RED", "RED WHITE", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  intermediate: createReferenceEntry({
+  "intermediate": createReferenceEntry({
     slug: "intermediate",
     displayName: "Intermediate",
     garmentType: "unknown",
@@ -2429,127 +2419,127 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  interval: createReferenceEntry({
+  "interval": createReferenceEntry({
     slug: "interval",
     displayName: "Interval",
     garmentType: "socks",
-    allowedColours: ["BLACK", "BLACK GREY", "BLACK NEON CORAL", "BLACK NEON YELLOW", "GREY", "NEON CORAL", "NEON YELLOW"],
+    allowedColours: ["BLACK", "CORAL", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  inuit: createReferenceEntry({
+  "inuit": createReferenceEntry({
     slug: "inuit",
     displayName: "Inuit",
     garmentType: "sr",
-    allowedColours: ["BLACK", "DARK GREY", "LIGHT NAVY", "NAVY", "SILVER", "WHITE SILVER"],
+    allowedColours: ["BLACK", "NAVY", "SILVER"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  iolite: createReferenceEntry({
+  "iolite": createReferenceEntry({
     slug: "iolite",
     displayName: "Iolite",
     garmentType: "sr",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK GUN METAL", "LIGHT NAVY", "NAVY"],
+    allowedColours: ["BLACK", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  irma: createReferenceEntry({
+  "irma": createReferenceEntry({
     slug: "irma",
     displayName: "Irma",
     garmentType: "t-shirt",
-    allowedColours: ["BLUE BLACK", "NEON YELLOW BLACK", "RED BLACK", "TURQUOISE BLACK", "WHITE BLACK"],
+    allowedColours: ["RED", "TURQUOISE", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  irma_eco_custom: createReferenceEntry({
+  "irma-eco-custom": createReferenceEntry({
     slug: "irma-eco-custom",
     displayName: "Irma Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["irma eco custom", "irma-eco-custom", "irmaecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  iron: createReferenceEntry({
+  "iron": createReferenceEntry({
     slug: "iron",
     displayName: "Iron",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK WHITE", "BLUE WHITE", "NAVY", "NAVY WHITE", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "WHITE NAVY"],
+    allowedColours: ["NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  isen: createReferenceEntry({
+  "isen": createReferenceEntry({
     slug: "isen",
     displayName: "Isen",
     garmentType: "tracksuit",
-    allowedColours: ["ANTHRACITE", "BLACK BLACK", "BLUE BLUE", "BOTTLE GREEN", "BOTTLE GREEN GOLD", "CARDINAL CARDINAL", "DARK ANTHRACITE", "DARK NEON SKY", "DARK TURQUOISE", "GOLD", "GREEN GREEN", "GUN METAL", "NAVY NAVY", "NEON SKY", "NEON SKY NEON SKY", "ORANGE", "PURPLE", "RED RED", "TURQUOISE", "TURQUOISE TURQUOISE", "YELLOW YELLOW"],
+    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "CARDINAL", "GOLD", "GREEN", "GUN METAL", "NAVY", "NEON SKY", "ORANGE", "PURPLE", "RED", "SKY", "TURQUOISE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  ivan: createReferenceEntry({
+  "ivan": createReferenceEntry({
     slug: "ivan",
     displayName: "Ivan",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE BLACK", "NEON YELLOW", "NEON YELLOW BLACK", "RED", "RED BLACK", "ROYAL BLUE", "TURQUOISE", "TURQUOISE BLACK", "WHITE", "WHITE BLACK"],
+    allowedColours: ["NEON YELLOW", "RED", "TURQUOISE", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  ivan_eco_custom: createReferenceEntry({
+  "ivan-eco-custom": createReferenceEntry({
     slug: "ivan-eco-custom",
     displayName: "Ivan Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["ivan eco custom", "ivan-eco-custom", "ivanecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  ivy: createReferenceEntry({
+  "ivy": createReferenceEntry({
     slug: "ivy",
     displayName: "Ivy",
-    garmentType: "trousers",
+    garmentType: "t-shirt",
     allowedColours: [],
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  izel: createReferenceEntry({
+  "izel": createReferenceEntry({
     slug: "izel",
     displayName: "Izel",
     garmentType: "tracksuit",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK RED", "BLACK WHITE", "BLUE WHITE", "GREEN", "NAVY", "NAVY RED", "NAVY WHITE", "NEON CORAL", "NEON CORAL GUN METAL", "NEON GREEN", "NEON GREEN GREEN", "RED", "RED WHITE", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "CORAL", "GREEN", "NAVY", "NEON CORAL", "NEON GREEN", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  jasper: createReferenceEntry({
+  "jasper": createReferenceEntry({
     slug: "jasper",
     displayName: "Jasper",
     garmentType: "t-shirt",
-    allowedColours: ["AMBER", "BLACK", "BLACK AMBER", "BLACK GREY", "BLUE YELLOW", "GREY", "NAVY", "NAVY WHITE", "RED", "RED BLACK", "RED WHITE", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["AMBER", "BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  javelin: createReferenceEntry({
+  "javelin": createReferenceEntry({
     slug: "javelin",
     displayName: "Javelin",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  jazz: createReferenceEntry({
+  "jazz": createReferenceEntry({
     slug: "jazz",
     displayName: "Jazz",
     garmentType: "polo shirt",
-    allowedColours: ["ANTHRACITE", "BLUE", "GREY", "GUN METAL", "MELANGE", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["ANTHRACITE", "GREY", "GUN METAL", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  joanne_eco_custom: createReferenceEntry({
+  "joanne-eco-custom": createReferenceEntry({
     slug: "joanne-eco-custom",
     displayName: "Joanne Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["joanne eco custom", "joanne-eco-custom", "joanneecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  jolt: createReferenceEntry({
+  "jolt": createReferenceEntry({
     slug: "jolt",
     displayName: "Jolt",
     garmentType: "match day ball",
@@ -2557,15 +2547,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  jotnar: createReferenceEntry({
+  "jotnar": createReferenceEntry({
     slug: "jotnar",
     displayName: "Jotnar",
     garmentType: "polifiber",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  journey: createReferenceEntry({
+  "journey": createReferenceEntry({
     slug: "journey",
     displayName: "Journey",
     garmentType: "unknown",
@@ -2573,15 +2563,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  julien_eco_custom: createReferenceEntry({
+  "julien-eco-custom": createReferenceEntry({
     slug: "julien-eco-custom",
     displayName: "Julien Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["julien eco custom", "julien-eco-custom", "julienecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  junior: createReferenceEntry({
+  "junior": createReferenceEntry({
     slug: "junior",
     displayName: "Junior",
     garmentType: "anti-",
@@ -2589,39 +2579,39 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  kansas: createReferenceEntry({
+  "kansas": createReferenceEntry({
     slug: "kansas",
     displayName: "Kansas",
     garmentType: "match day short",
-    allowedColours: ["BLACK WHITE", "BLUE WHITE", "GREEN WHITE", "NAVY WHITE", "ORANGE WHITE", "RED WHITE", "WHITE", "YELLOW WHITE"],
+    allowedColours: ["ORANGE", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  kansas_eco: createReferenceEntry({
+  "kansas-eco": createReferenceEntry({
     slug: "kansas-eco",
     displayName: "Kansas Eco",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "GREEN", "NAVY", "ORANGE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "ORANGE", "RED", "WHITE", "YELLOW"],
+    aliases: ["kansas eco", "kansas-eco", "kansaseco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  kateryn: createReferenceEntry({
+  "kateryn": createReferenceEntry({
     slug: "kateryn",
     displayName: "Kateryn",
     garmentType: "referee",
-    allowedColours: ["BLACK", "NEON RED", "NEON SKY", "NEON YELLOW"],
+    allowedColours: ["BLACK", "NEON SKY", "NEON YELLOW", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  kateryn_eco: createReferenceEntry({
+  "kateryn-eco": createReferenceEntry({
     slug: "kateryn-eco",
     displayName: "Kateryn Eco",
     garmentType: "t-shirt",
     allowedColours: [],
-    aliases: [],
+    aliases: ["kateryn eco", "kateryn-eco", "kateryneco"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  kelvin: createReferenceEntry({
+  "kelvin": createReferenceEntry({
     slug: "kelvin",
     displayName: "Kelvin",
     garmentType: "unknown",
@@ -2629,63 +2619,63 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  kesil: createReferenceEntry({
+  "kesil": createReferenceEntry({
     slug: "kesil",
     displayName: "Kesil",
     garmentType: "sr",
-    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  kleffa_eco_custom: createReferenceEntry({
+  "kleffa-eco-custom": createReferenceEntry({
     slug: "kleffa-eco-custom",
     displayName: "Kleffa Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["FIXED DESIGN", "OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["kleffa eco custom", "kleffa-eco-custom", "kleffaecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  kneepads_and: createReferenceEntry({
+  "kneepads-and": createReferenceEntry({
     slug: "kneepads-and",
     displayName: "Kneepads And",
     garmentType: "unknown",
-    allowedColours: ["BLACK", "ROYAL BLUE", "WHITE"],
-    aliases: [],
+    allowedColours: ["BLACK", "WHITE"],
+    aliases: ["kneepads and", "kneepads-and", "kneepadsand"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  kolyma: createReferenceEntry({
+  "kolyma": createReferenceEntry({
     slug: "kolyma",
     displayName: "Kolyma",
     garmentType: "training top",
-    allowedColours: ["BLACK WHITE", "BLUE WHITE", "NAVY WHITE", "RED WHITE"],
+    allowedColours: ["WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  krypton: createReferenceEntry({
+  "krypton": createReferenceEntry({
     slug: "krypton",
     displayName: "Krypton",
     garmentType: "w - match day short",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED"],
+    allowedColours: ["BLACK", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  krypton_evo_hero: createReferenceEntry({
+  "krypton-evo-hero": createReferenceEntry({
     slug: "krypton-evo-hero",
     displayName: "Krypton Evo Hero",
     garmentType: "shorts",
     allowedColours: [],
-    aliases: [],
+    aliases: ["krypton evo hero", "krypton-evo-hero", "kryptonevohero"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  la_microfibra_amica_della_pelle: createReferenceEntry({
+  "la-microfibra-amica-della-pelle": createReferenceEntry({
     slug: "la-microfibra-amica-della-pelle",
     displayName: "La Microfibra Amica Della Pelle",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["la microfibra amica della pelle", "la-microfibra-amica-della-pelle", "lamicrofibraamicadellapelle"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  lancer: createReferenceEntry({
+  "lancer": createReferenceEntry({
     slug: "lancer",
     displayName: "Lancer",
     garmentType: "unknown",
@@ -2693,15 +2683,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  lanny_eco_custom: createReferenceEntry({
+  "lanny-eco-custom": createReferenceEntry({
     slug: "lanny-eco-custom",
     displayName: "Lanny Eco Custom",
     garmentType: "shorts",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["lanny eco custom", "lanny-eco-custom", "lannyecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  lapis: createReferenceEntry({
+  "lapis": createReferenceEntry({
     slug: "lapis",
     displayName: "Lapis",
     garmentType: "shorts",
@@ -2709,71 +2699,71 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  legion: createReferenceEntry({
+  "legion": createReferenceEntry({
     slug: "legion",
     displayName: "Legion",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE BLACK", "BLUE RED", "BLUE WHITE", "COLUMBIA", "COLUMBIA WHITE", "GREEN", "GREEN BLACK", "GREEN WHITE", "NAVY", "NAVY RED", "RED", "RED BLACK", "RED WHITE", "ROYAL BLUE", "WHITE", "WHITE BLACK", "YELLOW", "YELLOW BLACK"],
+    allowedColours: ["BLACK", "COLUMBIA", "GREEN", "NAVY", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  leisure: createReferenceEntry({
+  "leisure": createReferenceEntry({
     slug: "leisure",
     displayName: "Leisure",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "CARDINAL", "GREEN", "GREY", "NAVY", "RED", "WHITE"],
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "GREY", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  lena: createReferenceEntry({
+  "lena": createReferenceEntry({
     slug: "lena",
     displayName: "Lena",
-    garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLACK BLACK", "BLUE BLUE", "DARK GREY", "DARK NEON SKY", "DARK RED", "DARK ROYAL BLUE", "DARK TURQUOISE", "LIGHT NAVY", "NAVY", "NAVY NAVY", "NEON SKY", "NEON SKY NEON SKY", "RED", "RED RED", "ROYAL BLUE", "TURQUOISE", "TURQUOISE TURQUOISE"],
+    garmentType: "1/4 zip top",
+    allowedColours: ["BLACK", "NAVY", "NEON SKY", "RED", "SKY", "TURQUOISE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  leona: createReferenceEntry({
+  "leona": createReferenceEntry({
     slug: "leona",
     displayName: "Leona",
-    garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "INDIGO SKY", "INDIGO SKY NAVY", "NAVY", "NAVY WHITE", "RED", "RED WHITE", "STONE GRAY GUN METAL", "STONE GREY", "WHITE"],
+    garmentType: "1/4 zip top",
+    allowedColours: ["BLACK", "INDIGO", "NAVY", "RED", "STONE", "STONE GREY", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  leonidas_frequency: createReferenceEntry({
+  "leonidas-frequency": createReferenceEntry({
     slug: "leonidas-frequency",
     displayName: "Leonidas Frequency",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["leonidas frequency", "leonidas-frequency", "leonidasfrequency"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  leonidas_light_frequency: createReferenceEntry({
+  "leonidas-light-frequency": createReferenceEntry({
     slug: "leonidas-light-frequency",
     displayName: "Leonidas Light Frequency",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["leonidas light frequency", "leonidas-light-frequency", "leonidaslightfrequency"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  lily: createReferenceEntry({
+  "lily": createReferenceEntry({
     slug: "lily",
     displayName: "Lily",
     garmentType: "t-shirt",
-    allowedColours: ["BLUE WHITE", "GREEN WHITE", "NAVY WHITE", "RED WHITE", "WHITE SILVER"],
+    allowedColours: ["SILVER", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  lily_eco: createReferenceEntry({
+  "lily-eco": createReferenceEntry({
     slug: "lily-eco",
     displayName: "Lily Eco",
     garmentType: "t-shirt",
-    allowedColours: ["GREEN", "NAVY", "RED", "ROYAL BLUE", "SILVER", "WHITE"],
-    aliases: [],
+    allowedColours: ["GREEN", "NAVY", "RED", "WHITE"],
+    aliases: ["lily eco", "lily-eco", "lilyeco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  linesman: createReferenceEntry({
+  "linesman": createReferenceEntry({
     slug: "linesman",
     displayName: "Linesman",
     garmentType: "polyester - aluminium - pvc",
@@ -2781,15 +2771,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  load: createReferenceEntry({
+  "load": createReferenceEntry({
     slug: "load",
     displayName: "Load",
     garmentType: "bag",
-    allowedColours: ["UNKNOWN"],
+    allowedColours: [],
     aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  lotus: createReferenceEntry({
+  "lotus": createReferenceEntry({
     slug: "lotus",
     displayName: "Lotus",
     garmentType: "shorts",
@@ -2797,39 +2787,39 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  lute: createReferenceEntry({
+  "lute": createReferenceEntry({
     slug: "lute",
     displayName: "Lute",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "DARK RED", "DARK ROYAL BLUE", "LIGHT NAVY", "NAVY", "RED", "ROYAL BLUE", "SILVER", "WHITE"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  lutz: createReferenceEntry({
+  "lutz": createReferenceEntry({
     slug: "lutz",
     displayName: "Lutz",
     garmentType: "mixture",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED"],
+    allowedColours: ["BLACK", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  luzern: createReferenceEntry({
+  "luzern": createReferenceEntry({
     slug: "luzern",
     displayName: "Luzern",
     garmentType: "jacket",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  lyngen: createReferenceEntry({
+  "lyngen": createReferenceEntry({
     slug: "lyngen",
     displayName: "Lyngen",
     garmentType: "mesh lined windbreaker",
-    allowedColours: ["BLACK", "BLACK WHITE", "BLUE WHITE", "GREEN", "GREEN WHITE", "NAVY", "NAVY WHITE", "RED", "RED WHITE", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  maas: createReferenceEntry({
+  "maas": createReferenceEntry({
     slug: "maas",
     displayName: "Maas",
     garmentType: "tracksuit",
@@ -2837,15 +2827,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  maira: createReferenceEntry({
+  "maira": createReferenceEntry({
     slug: "maira",
     displayName: "Maira",
     garmentType: "tracksuit",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLUE WHITE", "NAVY", "NAVY WHITE", "NEON SKY", "NEON SKY GUN METAL", "RED", "RED WHITE", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "NAVY", "NEON SKY", "RED", "SKY", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  major: createReferenceEntry({
+  "major": createReferenceEntry({
     slug: "major",
     displayName: "Major",
     garmentType: "unknown",
@@ -2853,7 +2843,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  makalu: createReferenceEntry({
+  "makalu": createReferenceEntry({
     slug: "makalu",
     displayName: "Makalu",
     garmentType: "jacket",
@@ -2861,7 +2851,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  maple: createReferenceEntry({
+  "maple": createReferenceEntry({
     slug: "maple",
     displayName: "Maple",
     garmentType: "wooden bat",
@@ -2869,7 +2859,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  maracas: createReferenceEntry({
+  "maracas": createReferenceEntry({
     slug: "maracas",
     displayName: "Maracas",
     garmentType: "bermuda",
@@ -2877,7 +2867,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  marker: createReferenceEntry({
+  "marker": createReferenceEntry({
     slug: "marker",
     displayName: "Marker",
     garmentType: "unknown",
@@ -2885,7 +2875,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  marple: createReferenceEntry({
+  "marple": createReferenceEntry({
     slug: "marple",
     displayName: "Marple",
     garmentType: "sr",
@@ -2893,31 +2883,31 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  match_day_baseball: createReferenceEntry({
+  "match-day-baseball": createReferenceEntry({
     slug: "match-day-baseball",
     displayName: "Match Day Baseball",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["match day baseball", "match-day-baseball", "matchdaybaseball"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  match_day_cricket: createReferenceEntry({
+  "match-day-cricket": createReferenceEntry({
     slug: "match-day-cricket",
     displayName: "Match Day Cricket",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["match day cricket", "match-day-cricket", "matchdaycricket"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  matt_eco_custom: createReferenceEntry({
+  "matt-eco-custom": createReferenceEntry({
     slug: "matt-eco-custom",
     displayName: "Matt Eco Custom",
     garmentType: "shorts",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["matt eco custom", "matt-eco-custom", "mattecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  maxi: createReferenceEntry({
+  "maxi": createReferenceEntry({
     slug: "maxi",
     displayName: "Maxi",
     garmentType: "bag",
@@ -2925,63 +2915,63 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  maxi_academy_evo: createReferenceEntry({
+  "maxi-academy-evo": createReferenceEntry({
     slug: "maxi-academy-evo",
     displayName: "Maxi Academy Evo",
     garmentType: "unknown",
-    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "RED", "ROYAL BLUE"],
-    aliases: [],
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "RED"],
+    aliases: ["maxi academy evo", "maxi-academy-evo", "maxiacademyevo"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  maxi_path: createReferenceEntry({
+  "maxi-path": createReferenceEntry({
     slug: "maxi-path",
     displayName: "Maxi Path",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["maxi path", "maxi-path", "maxipath"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  medal: createReferenceEntry({
+  "medal": createReferenceEntry({
     slug: "medal",
     displayName: "Medal",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  melody: createReferenceEntry({
+  "melody": createReferenceEntry({
     slug: "melody",
     displayName: "Melody",
     garmentType: "polo shirt",
-    allowedColours: ["BLACK", "BLACK WHITE", "BLUE WHITE", "GREY", "NAVY", "NAVY WHITE", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "WHITE GREY"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  mendez: createReferenceEntry({
+  "mendez": createReferenceEntry({
     slug: "mendez",
     displayName: "Mendez",
     garmentType: "referee",
-    allowedColours: ["BLACK GOLD", "BRIGHT RED BLACK", "NEON SKY BLACK", "NEON YELLOW BLACK"],
+    allowedColours: ["BLACK", "GOLD", "RED", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  mendez_eco: createReferenceEntry({
+  "mendez-eco": createReferenceEntry({
     slug: "mendez-eco",
     displayName: "Mendez Eco",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BRIGHT RED", "GOLD", "NEON SKY BLUE", "NEON YELLOW"],
-    aliases: [],
+    allowedColours: ["BLACK", "NEON YELLOW", "RED"],
+    aliases: ["mendez eco", "mendez-eco", "mendezeco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  mesa_hero: createReferenceEntry({
+  "mesa-hero": createReferenceEntry({
     slug: "mesa-hero",
     displayName: "Mesa Hero",
     garmentType: "shorts",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLUE", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON GREEN", "NEON YELLOW", "ORANGE", "PURPLE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON GREEN", "NEON YELLOW", "ORANGE", "PURPLE", "RED", "WHITE", "YELLOW"],
+    aliases: ["mesa hero", "mesa-hero", "mesahero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  metel: createReferenceEntry({
+  "metel": createReferenceEntry({
     slug: "metel",
     displayName: "Metel",
     garmentType: "unknown",
@@ -2989,15 +2979,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  miley_eco_custom: createReferenceEntry({
+  "miley-eco-custom": createReferenceEntry({
     slug: "miley-eco-custom",
     displayName: "Miley Eco Custom",
     garmentType: "eco brief",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["miley eco custom", "miley-eco-custom", "mileyecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  minerva: createReferenceEntry({
+  "minerva": createReferenceEntry({
     slug: "minerva",
     displayName: "Minerva",
     garmentType: "trousers",
@@ -3005,7 +2995,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  mistral: createReferenceEntry({
+  "mistral": createReferenceEntry({
     slug: "mistral",
     displayName: "Mistral",
     garmentType: "sr",
@@ -3013,15 +3003,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  morpheus: createReferenceEntry({
+  "morpheus": createReferenceEntry({
     slug: "morpheus",
     displayName: "Morpheus",
     garmentType: "microfiber",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK BLACK", "BLUE BLUE", "BOTTLE GREEN", "BOTTLE GREEN BOTTLE GREEN", "CARDINAL", "CARDINAL CARDINAL", "DARK CARDINAL", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "GUN METAL LILAC", "LIGHT BOTTLE GREEN", "LIGHT NAVY", "LILAC", "NAVY", "NAVY NAVY", "OFF WHITE", "OFF WHITE GUN METAL", "RED", "RED RED", "ROYAL BLUE", "TURQUOISE", "TURQUOISE NAVY"],
+    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "CARDINAL", "GREEN", "LILAC", "NAVY", "OFF WHITE", "RED", "TURQUOISE", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  mythril: createReferenceEntry({
+  "mythril": createReferenceEntry({
     slug: "mythril",
     displayName: "Mythril",
     garmentType: "bermuda/pant",
@@ -3029,23 +3019,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  nacido_para_el_deporte: createReferenceEntry({
+  "nacido-para-el-deporte": createReferenceEntry({
     slug: "nacido-para-el-deporte",
     displayName: "Nacido Para El Deporte",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["nacido para el deporte", "nacido-para-el-deporte", "nacidoparaeldeporte"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  naga: createReferenceEntry({
+  "naga": createReferenceEntry({
     slug: "naga",
     displayName: "Naga",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "INDIGO SKY", "INDIGO SKY NAVY", "NAVY", "NAVY WHITE", "RED", "RED WHITE", "STONE GRAY GUN METAL", "STONE GREY", "WHITE"],
+    allowedColours: ["BLACK", "INDIGO", "NAVY", "RED", "STONE", "STONE GREY", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  narvik: createReferenceEntry({
+  "narvik": createReferenceEntry({
     slug: "narvik",
     displayName: "Narvik",
     garmentType: "jacket",
@@ -3053,15 +3043,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  nash: createReferenceEntry({
+  "nash": createReferenceEntry({
     slug: "nash",
     displayName: "Nash",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK WHITE", "BLACK YELLOW", "BLUE WHITE", "GREEN BLACK", "NAVY WHITE", "NAVY YELLOW", "RED WHITE", "SILVER GUN METAL", "WHITE SILVER"],
+    allowedColours: ["BLACK", "SILVER", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  nasser: createReferenceEntry({
+  "nasser": createReferenceEntry({
     slug: "nasser",
     displayName: "Nasser",
     garmentType: "referee",
@@ -3069,55 +3059,55 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  nasser_eco: createReferenceEntry({
+  "nasser-eco": createReferenceEntry({
     slug: "nasser-eco",
     displayName: "Nasser Eco",
     garmentType: "shorts",
     allowedColours: [],
-    aliases: [],
+    aliases: ["nasser eco", "nasser-eco", "nassereco"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  nata_per_lo_sport: createReferenceEntry({
+  "nata-per-lo-sport": createReferenceEntry({
     slug: "nata-per-lo-sport",
     displayName: "Nata Per Lo Sport",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["nata per lo sport", "nata-per-lo-sport", "nataperlosport"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  natiu_eco_custom: createReferenceEntry({
+  "natiu-eco-custom": createReferenceEntry({
     slug: "natiu-eco-custom",
     displayName: "Natiu Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["FIXED DESIGN", "OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["natiu eco custom", "natiu-eco-custom", "natiuecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  nebula: createReferenceEntry({
+  "nebula": createReferenceEntry({
     slug: "nebula",
     displayName: "Nebula",
     garmentType: "shorts",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLUE", "GREEN", "GUN METAL", "NAVY", "NEON CORAL", "PINK", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["ANTHRACITE", "BLACK", "GREEN", "GUN METAL", "NAVY", "NEON CORAL", "PINK", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  neckar: createReferenceEntry({
+  "neckar": createReferenceEntry({
     slug: "neckar",
     displayName: "Neckar",
     garmentType: "tracksuit",
-    allowedColours: ["BLACK WHITE", "NAVY WHITE"],
+    allowedColours: ["WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  nemesis: createReferenceEntry({
+  "nemesis": createReferenceEntry({
     slug: "nemesis",
     displayName: "Nemesis",
     garmentType: "full length zip top",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLUE", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "ORANGE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["ANTHRACITE", "BLACK", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "ORANGE", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  nen: createReferenceEntry({
+  "nen": createReferenceEntry({
     slug: "nen",
     displayName: "Nen",
     garmentType: "sr",
@@ -3125,23 +3115,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  nepri_hero: createReferenceEntry({
+  "nepri-hero": createReferenceEntry({
     slug: "nepri-hero",
     displayName: "Nepri Hero",
     garmentType: "polifiber",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "GUN METAL WHITE", "NAVY", "NAVY WHITE"],
-    aliases: [],
+    allowedColours: ["ANTHRACITE", "BLACK", "NAVY", "WHITE"],
+    aliases: ["nepri hero", "nepri-hero", "neprihero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  nerissa_eco_custom: createReferenceEntry({
+  "nerissa-eco-custom": createReferenceEntry({
     slug: "nerissa-eco-custom",
     displayName: "Nerissa Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["FIXED DESIGN", "OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["nerissa eco custom", "nerissa-eco-custom", "nerissaecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  nerium: createReferenceEntry({
+  "nerium": createReferenceEntry({
     slug: "nerium",
     displayName: "Nerium",
     garmentType: "sr",
@@ -3149,7 +3139,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  netball: createReferenceEntry({
+  "netball": createReferenceEntry({
     slug: "netball",
     displayName: "Netball",
     garmentType: "unknown",
@@ -3157,23 +3147,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  nevel: createReferenceEntry({
+  "nevel": createReferenceEntry({
     slug: "nevel",
     displayName: "Nevel",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK GUN METAL", "BLUE", "BOTTLE GREEN", "CARDINAL", "DARK CARDINAL", "DARK GREEN", "DARK RED", "DARK ROYAL BLUE", "GREEN", "LIGHT BOTTLE GREEN", "LIGHT NAVY", "NAVY", "RED", "ROYAL BLUE", "SILVER", "WHITE", "WHITE SILVER"],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "CARDINAL", "GREEN", "NAVY", "RED", "SILVER", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  next_gen_ii: createReferenceEntry({
+  "next-gen-ii": createReferenceEntry({
     slug: "next-gen-ii",
     displayName: "Next Gen Ii",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["next gen ii", "next-gen-ii", "nextgenii"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  nistro: createReferenceEntry({
+  "nistro": createReferenceEntry({
     slug: "nistro",
     displayName: "Nistro",
     garmentType: "sr",
@@ -3181,7 +3171,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  nitro: createReferenceEntry({
+  "nitro": createReferenceEntry({
     slug: "nitro",
     displayName: "Nitro",
     garmentType: "socks",
@@ -3189,15 +3179,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  nitro_ii: createReferenceEntry({
+  "nitro-ii": createReferenceEntry({
     slug: "nitro-ii",
     displayName: "Nitro Ii",
     garmentType: "socks",
     allowedColours: ["BLACK"],
-    aliases: [],
+    aliases: ["nitro ii", "nitro-ii", "nitroii"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  nobium: createReferenceEntry({
+  "nobium": createReferenceEntry({
     slug: "nobium",
     displayName: "Nobium",
     garmentType: "pro basketball ball",
@@ -3205,7 +3195,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  northland: createReferenceEntry({
+  "northland": createReferenceEntry({
     slug: "northland",
     displayName: "Northland",
     garmentType: "jacket",
@@ -3213,7 +3203,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  notus: createReferenceEntry({
+  "notus": createReferenceEntry({
     slug: "notus",
     displayName: "Notus",
     garmentType: "unknown",
@@ -3221,127 +3211,127 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  nyra_eco_custom: createReferenceEntry({
+  "nyra-eco-custom": createReferenceEntry({
     slug: "nyra-eco-custom",
     displayName: "Nyra Eco Custom",
     garmentType: "shorts",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["nyra eco custom", "nyra-eco-custom", "nyraecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  oak: createReferenceEntry({
+  "oak": createReferenceEntry({
     slug: "oak",
     displayName: "Oak",
-    garmentType: "shorts",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLUE", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON GREEN", "NEON YELLOW", "ORANGE", "PINK", "PURPLE", "RED", "ROYAL BLUE", "TURQUOISE", "WHITE", "YELLOW"],
+    garmentType: "t-shirt",
+    allowedColours: ["ANTHRACITE", "BLACK", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON GREEN", "NEON YELLOW", "ORANGE", "PINK", "PURPLE", "RED", "TURQUOISE", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  oasis_xg: createReferenceEntry({
+  "oasis-xg": createReferenceEntry({
     slug: "oasis-xg",
     displayName: "Oasis Xg",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["oasis xg", "oasis-xg", "oasisxg"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  obsidian_eco_custom: createReferenceEntry({
+  "obsidian-eco-custom": createReferenceEntry({
     slug: "obsidian-eco-custom",
     displayName: "Obsidian Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["obsidian eco custom", "obsidian-eco-custom", "obsidianecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  odette_hero: createReferenceEntry({
+  "odette-hero": createReferenceEntry({
     slug: "odette-hero",
     displayName: "Odette Hero",
     garmentType: "shorts",
     allowedColours: ["BLACK"],
-    aliases: [],
+    aliases: ["odette hero", "odette-hero", "odettehero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  odin: createReferenceEntry({
+  "odin": createReferenceEntry({
     slug: "odin",
     displayName: "Odin",
     garmentType: "full length zip top",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLACK YELLOW", "BLUE WHITE", "BOTTLE GREEN", "BOTTLE GREEN MINT", "INDIGO SKY", "INDIGO SKY NAVY", "MINT", "NAVY", "NAVY WHITE", "NAVY YELLOW", "RED", "RED WHITE", "ROYAL BLUE", "STONE GRAY GUN METAL", "STONE GREY", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "INDIGO", "MINT", "NAVY", "RED", "STONE", "STONE GREY", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  offroad: createReferenceEntry({
+  "offroad": createReferenceEntry({
     slug: "offroad",
     displayName: "Offroad",
     garmentType: "socks",
-    allowedColours: ["ANTHRACITE", "BLACK", "NEON CORAL", "NEON YELLOW", "WHITE"],
+    allowedColours: ["BLACK", "NEON CORAL", "NEON YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  ophelia: createReferenceEntry({
+  "ophelia": createReferenceEntry({
     slug: "ophelia",
     displayName: "Ophelia",
     garmentType: "brief",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  oregon_eco_custom: createReferenceEntry({
+  "oregon-eco-custom": createReferenceEntry({
     slug: "oregon-eco-custom",
     displayName: "Oregon Eco Custom",
     garmentType: "shorts",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["oregon eco custom", "oregon-eco-custom", "oregonecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  origin_i: createReferenceEntry({
+  "origin-i": createReferenceEntry({
     slug: "origin-i",
     displayName: "Origin I",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["origin i", "origin-i", "origini"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  orpheus: createReferenceEntry({
+  "orpheus": createReferenceEntry({
     slug: "orpheus",
     displayName: "Orpheus",
     garmentType: "microfiber",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK GUN METAL", "LIGHT NAVY", "NAVY"],
+    allowedColours: ["BLACK", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  orube_eco_custom: createReferenceEntry({
+  "orube-eco-custom": createReferenceEntry({
     slug: "orube-eco-custom",
     displayName: "Orube Eco Custom",
     garmentType: "shorts",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["orube eco custom", "orube-eco-custom", "orubeecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  osmium_evo_eco_custom: createReferenceEntry({
+  "osmium-evo-eco-custom": createReferenceEntry({
     slug: "osmium-evo-eco-custom",
     displayName: "Osmium Evo Eco Custom",
     garmentType: "shorts",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["osmium evo eco custom", "osmium-evo-eco-custom", "osmiumevoecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  osmium_hero: createReferenceEntry({
+  "osmium-hero": createReferenceEntry({
     slug: "osmium-hero",
     displayName: "Osmium Hero",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "BLUE", "NAVY"],
-    aliases: [],
+    allowedColours: ["BLACK", "NAVY"],
+    aliases: ["osmium hero", "osmium-hero", "osmiumhero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  otago_eco_custom: createReferenceEntry({
+  "otago-eco-custom": createReferenceEntry({
     slug: "otago-eco-custom",
     displayName: "Otago Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["otago eco custom", "otago-eco-custom", "otagoecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  over: createReferenceEntry({
+  "over": createReferenceEntry({
     slug: "over",
     displayName: "Over",
     garmentType: "unknown",
@@ -3349,15 +3339,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  oxide_hero: createReferenceEntry({
+  "oxide-hero": createReferenceEntry({
     slug: "oxide-hero",
     displayName: "Oxide Hero",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "GREEN", "NAVY", "RED", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "WHITE", "YELLOW"],
+    aliases: ["oxide hero", "oxide-hero", "oxidehero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  palladium: createReferenceEntry({
+  "palladium": createReferenceEntry({
     slug: "palladium",
     displayName: "Palladium",
     garmentType: "volleyball ball",
@@ -3365,7 +3355,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  pants: createReferenceEntry({
+  "pants": createReferenceEntry({
     slug: "pants",
     displayName: "Pants",
     garmentType: "w - bermuda/pant",
@@ -3373,15 +3363,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  paros: createReferenceEntry({
+  "paros": createReferenceEntry({
     slug: "paros",
     displayName: "Paros",
-    garmentType: "bag",
-    allowedColours: ["UNKNOWN"],
+    garmentType: "t-shirt",
+    allowedColours: [],
     aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  passenger: createReferenceEntry({
+  "passenger": createReferenceEntry({
     slug: "passenger",
     displayName: "Passenger",
     garmentType: "bag",
@@ -3389,7 +3379,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  path: createReferenceEntry({
+  "path": createReferenceEntry({
     slug: "path",
     displayName: "Path",
     garmentType: "bag",
@@ -3397,7 +3387,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  peak: createReferenceEntry({
+  "peak": createReferenceEntry({
     slug: "peak",
     displayName: "Peak",
     garmentType: "unknown",
@@ -3405,15 +3395,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  pearl_eco_custom: createReferenceEntry({
+  "pearl-eco-custom": createReferenceEntry({
     slug: "pearl-eco-custom",
     displayName: "Pearl Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["pearl eco custom", "pearl-eco-custom", "pearlecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  pepper: createReferenceEntry({
+  "pepper": createReferenceEntry({
     slug: "pepper",
     displayName: "Pepper",
     garmentType: "unknown",
@@ -3421,87 +3411,87 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  peridot: createReferenceEntry({
+  "peridot": createReferenceEntry({
     slug: "peridot",
     displayName: "Peridot",
     garmentType: "t-shirt",
-    allowedColours: ["AMBER", "BLACK", "BLACK AMBER", "BLUE", "BLUE YELLOW", "BOTTLE GREEN", "CARDINAL AMBER", "COLUMBIA", "COLUMBIA BLACK", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "LIGHT NAVY", "NAVY", "RED", "RED BLACK", "ROYAL BLUE", "WHITE", "WHITE SILVER", "YELLOW"],
+    allowedColours: ["AMBER", "BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "NAVY", "RED", "SILVER", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  petanque: createReferenceEntry({
+  "petanque": createReferenceEntry({
     slug: "petanque",
     displayName: "Petanque",
     garmentType: "bag",
-    allowedColours: ["PETANQUE"],
+    allowedColours: [],
     aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  piave: createReferenceEntry({
+  "piave": createReferenceEntry({
     slug: "piave",
     displayName: "Piave",
     garmentType: "tracksuit",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLUE WHITE", "CARDINAL WHITE", "GREEN", "GREEN WHITE", "NAVY", "NAVY WHITE", "NAVY YELLOW", "NEON SKY", "NEON SKY GUN METAL", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "YELLOW", "YELLOW BLACK"],
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "NEON SKY", "RED", "SKY", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  pilot: createReferenceEntry({
+  "pilot": createReferenceEntry({
     slug: "pilot",
     displayName: "Pilot",
     garmentType: "bag",
-    allowedColours: ["UNKNOWN"],
+    allowedColours: [],
     aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  pinto_eco_custom: createReferenceEntry({
+  "pinto-eco-custom": createReferenceEntry({
     slug: "pinto-eco-custom",
     displayName: "Pinto Eco Custom",
     garmentType: "shorts",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["pinto eco custom", "pinto-eco-custom", "pintoecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  platinum: createReferenceEntry({
+  "platinum": createReferenceEntry({
     slug: "platinum",
     displayName: "Platinum",
     garmentType: "w - match day short",
-    allowedColours: ["BLUE", "GREEN", "NAVY", "RED", "WHITE"],
+    allowedColours: ["GREEN", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  platinum_eco: createReferenceEntry({
+  "platinum-eco": createReferenceEntry({
     slug: "platinum-eco",
     displayName: "Platinum Eco",
     garmentType: "shorts",
-    allowedColours: ["GREEN", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
-    aliases: [],
+    allowedColours: ["GREEN", "NAVY", "RED", "WHITE"],
+    aliases: ["platinum eco", "platinum-eco", "platinumeco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  plaza_eco_custom: createReferenceEntry({
+  "plaza-eco-custom": createReferenceEntry({
     slug: "plaza-eco-custom",
     displayName: "Plaza Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["plaza eco custom", "plaza-eco-custom", "plazaecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  plutonium: createReferenceEntry({
+  "plutonium": createReferenceEntry({
     slug: "plutonium",
     displayName: "Plutonium",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK WHITE", "BLUE WHITE", "GREEN WHITE", "NAVY WHITE", "ORANGE WHITE", "RED WHITE", "WHITE"],
+    allowedColours: ["ORANGE", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  plutonium_eco: createReferenceEntry({
+  "plutonium-eco": createReferenceEntry({
     slug: "plutonium-eco",
     displayName: "Plutonium Eco",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "DARK GREEN", "DARK GREY", "DARK ORANGE", "DARK RED", "DARK ROYAL BLUE", "GREEN", "LIGHT NAVY", "NAVY", "ORANGE", "RED", "ROYAL BLUE", "WHITE"],
-    aliases: [],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "ORANGE", "RED", "WHITE"],
+    aliases: ["plutonium eco", "plutonium-eco", "plutoniumeco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  pole: createReferenceEntry({
+  "pole": createReferenceEntry({
     slug: "pole",
     displayName: "Pole",
     garmentType: "unknown",
@@ -3509,103 +3499,103 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  pole_spike: createReferenceEntry({
+  "pole-spike": createReferenceEntry({
     slug: "pole-spike",
     displayName: "Pole Spike",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["pole spike", "pole-spike", "polespike"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  polis: createReferenceEntry({
+  "polis": createReferenceEntry({
     slug: "polis",
     displayName: "Polis",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "CARDINAL", "COLUMBIA", "GOLD", "GREEN", "NAVY", "NEON YELLOW", "ORANGE", "PURPLE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "CARDINAL", "COLUMBIA", "GOLD", "GREEN", "NAVY", "NEON YELLOW", "ORANGE", "PURPLE", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  ponnet: createReferenceEntry({
+  "ponnet": createReferenceEntry({
     slug: "ponnet",
     displayName: "Ponnet",
     garmentType: "referee",
-    allowedColours: ["BLACK", "NEON RED", "NEON SKY", "NEON YELLOW"],
+    allowedColours: ["BLACK", "NEON SKY", "NEON YELLOW", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  ponnet_eco: createReferenceEntry({
+  "ponnet-eco": createReferenceEntry({
     slug: "ponnet-eco",
     displayName: "Ponnet Eco",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "NEON RED", "NEON SKY", "NEON YELLOW"],
-    aliases: [],
+    allowedColours: ["BLACK", "NEON SKY", "NEON YELLOW", "RED"],
+    aliases: ["ponnet eco", "ponnet-eco", "ponneteco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  poplar: createReferenceEntry({
+  "poplar": createReferenceEntry({
     slug: "poplar",
     displayName: "Poplar",
     garmentType: "kneepads",
-    allowedColours: ["BLACK", "BLUE", "WHITE"],
+    allowedColours: ["BLACK", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  poseidon: createReferenceEntry({
+  "poseidon": createReferenceEntry({
     slug: "poseidon",
     displayName: "Poseidon",
     garmentType: "full length zip top",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK BLACK", "BLUE BLUE", "BOTTLE GREEN", "BOTTLE GREEN BOTTLE GREEN", "CARDINAL", "CARDINAL CARDINAL", "DARK CARDINAL", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "GUN METAL LILAC", "LIGHT BOTTLE GREEN", "LIGHT NAVY", "LILAC", "NAVY", "NAVY NAVY", "OFF WHITE", "OFF WHITE GUN METAL", "RED", "RED RED", "ROYAL BLUE", "TURQUOISE", "TURQUOISE NAVY"],
+    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "CARDINAL", "GREEN", "LILAC", "NAVY", "OFF WHITE", "RED", "TURQUOISE", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  poseidon_ii: createReferenceEntry({
+  "poseidon-ii": createReferenceEntry({
     slug: "poseidon-ii",
     displayName: "Poseidon Ii",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["poseidon ii", "poseidon-ii", "poseidonii"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  poseidon_premium: createReferenceEntry({
+  "poseidon-premium": createReferenceEntry({
     slug: "poseidon-premium",
     displayName: "Poseidon Premium",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["poseidon premium", "poseidon-premium", "poseidonpremium"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  practice: createReferenceEntry({
+  "practice": createReferenceEntry({
     slug: "practice",
     displayName: "Practice+",
     garmentType: "bibs",
-    allowedColours: ["BLUE", "NEON GREEN", "NEON YELLOW", "ORANGE", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["NEON GREEN", "NEON YELLOW", "ORANGE", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  praia_hero: createReferenceEntry({
+  "praia-hero": createReferenceEntry({
     slug: "praia-hero",
     displayName: "Praia Hero",
     garmentType: "mesh lined windbreaker",
-    allowedColours: ["BLACK", "BLACK GREY", "BLUE GREY", "GREEN", "GREEN GREY", "NAVY", "NAVY GREY", "RED", "RED GREY", "ROYAL BLUE"],
-    aliases: [],
+    allowedColours: ["BLACK", "GREEN", "GREY", "NAVY", "RED"],
+    aliases: ["praia hero", "praia-hero", "praiahero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  pro: createReferenceEntry({
+  "pro": createReferenceEntry({
     slug: "pro",
     displayName: "Pro",
     garmentType: "socks",
-    allowedColours: ["BLACK", "BLUE", "RED", "WHITE"],
+    allowedColours: ["BLACK", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  pro_grip_hero: createReferenceEntry({
+  "pro-grip-hero": createReferenceEntry({
     slug: "pro-grip-hero",
     displayName: "Pro Grip Hero",
     garmentType: "socks",
-    allowedColours: ["BLACK", "RED", "ROYAL BLUE", "WHITE"],
-    aliases: [],
+    allowedColours: ["BLACK", "RED", "WHITE"],
+    aliases: ["pro grip hero", "pro-grip-hero", "progriphero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  professional: createReferenceEntry({
+  "professional": createReferenceEntry({
     slug: "professional",
     displayName: "Professional",
     garmentType: "matt",
@@ -3613,15 +3603,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  prometheus: createReferenceEntry({
+  "prometheus": createReferenceEntry({
     slug: "prometheus",
     displayName: "Prometheus",
     garmentType: "microfiber",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK RED", "BLACK WHITE", "BLUE WHITE", "GRAFFITI", "GREEN", "GREEN NEON GREEN", "GUN METAL NEON CORAL", "NAVY", "NAVY RED", "NAVY WHITE", "NEON CORAL", "NEON GREEN", "RED", "RED WHITE", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["ANTHRACITE", "BLACK", "CORAL", "GREEN", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  prometium: createReferenceEntry({
+  "prometium": createReferenceEntry({
     slug: "prometium",
     displayName: "Prometium",
     garmentType: "basketball ball",
@@ -3629,23 +3619,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  propus: createReferenceEntry({
+  "propus": createReferenceEntry({
     slug: "propus",
     displayName: "Propus",
     garmentType: "t-shirt",
-    allowedColours: ["BLUE BLACK", "BLUE CARDINAL", "BLUE WHITE", "COLUMBIA WHITE", "NAVY RED", "RED BLACK", "RED WHITE", "WHITE BLACK", "YELLOW BLUE"],
+    allowedColours: ["NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  propus_eco: createReferenceEntry({
+  "propus-eco": createReferenceEntry({
     slug: "propus-eco",
     displayName: "Propus Eco",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "CARDINAL", "COLUMBIA", "NAVY", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["COLUMBIA", "NAVY", "RED", "WHITE", "YELLOW"],
+    aliases: ["propus eco", "propus-eco", "propuseco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  rackets: createReferenceEntry({
+  "rackets": createReferenceEntry({
     slug: "rackets",
     displayName: "Rackets",
     garmentType: "unknown",
@@ -3653,39 +3643,39 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  rackets_scheme: createReferenceEntry({
+  "rackets-scheme": createReferenceEntry({
     slug: "rackets-scheme",
     displayName: "Rackets Scheme",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["rackets scheme", "rackets-scheme", "racketsscheme"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  raijin: createReferenceEntry({
+  "raijin": createReferenceEntry({
     slug: "raijin",
     displayName: "Raijin",
     garmentType: "full length zip top",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLACK YELLOW", "BLUE WHITE", "CARDINAL WHITE", "GREEN", "GREEN WHITE", "GUN METAL NEON SKY", "NAVY", "NAVY WHITE", "NAVY YELLOW", "NEON SKY", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["ANTHRACITE", "BLACK", "CARDINAL", "GREEN", "NAVY", "RED", "SKY", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  rama: createReferenceEntry({
+  "rama": createReferenceEntry({
     slug: "rama",
     displayName: "Rama",
     garmentType: "sr",
-    allowedColours: ["BLACK BLACK", "BLUE BLUE", "NAVY NAVY", "RED RED", "WHITE GREY"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  rap: createReferenceEntry({
+  "rap": createReferenceEntry({
     slug: "rap",
     displayName: "Rap",
     garmentType: "polo shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLUE WHITE", "CARDINAL", "CARDINAL WHITE", "GREEN", "GREEN WHITE", "GUN METAL NEON SKY", "NAVY", "NAVY WHITE", "NAVY YELLOW", "NEON SKY", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "WHITE GUN METAL", "YELLOW", "YELLOW BLACK"],
+    allowedColours: ["ANTHRACITE", "BLACK", "CARDINAL", "GREEN", "NAVY", "RED", "SKY", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  rayon: createReferenceEntry({
+  "rayon": createReferenceEntry({
     slug: "rayon",
     displayName: "Rayon",
     garmentType: "socks",
@@ -3693,7 +3683,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  recommendation: createReferenceEntry({
+  "recommendation": createReferenceEntry({
     slug: "recommendation",
     displayName: "Recommendation",
     garmentType: "unknown",
@@ -3701,23 +3691,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  record: createReferenceEntry({
+  "record": createReferenceEntry({
     slug: "record",
     displayName: "Record",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK GUN METAL", "LIGHT NAVY", "NAVY"],
+    allowedColours: ["BLACK", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  relay: createReferenceEntry({
+  "relay": createReferenceEntry({
     slug: "relay",
     displayName: "Relay",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  rescue: createReferenceEntry({
+  "rescue": createReferenceEntry({
     slug: "rescue",
     displayName: "Rescue",
     garmentType: "unknown",
@@ -3725,7 +3715,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  rhenium: createReferenceEntry({
+  "rhenium": createReferenceEntry({
     slug: "rhenium",
     displayName: "Rhenium",
     garmentType: "basketball ball",
@@ -3733,23 +3723,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  rhodium: createReferenceEntry({
+  "rhodium": createReferenceEntry({
     slug: "rhodium",
     displayName: "Rhodium",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK WHITE", "BLUE WHITE", "GREEN WHITE", "NAVY WHITE", "RED WHITE", "WHITE"],
+    allowedColours: ["WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  rhodium_eco: createReferenceEntry({
+  "rhodium-eco": createReferenceEntry({
     slug: "rhodium-eco",
     displayName: "Rhodium Eco",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "DARK GREEN", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "GREEN", "LIGHT NAVY", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
-    aliases: [],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "WHITE"],
+    aliases: ["rhodium eco", "rhodium-eco", "rhodiumeco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  richard: createReferenceEntry({
+  "richard": createReferenceEntry({
     slug: "richard",
     displayName: "Richard",
     garmentType: "match day short",
@@ -3757,7 +3747,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  richards: createReferenceEntry({
+  "richards": createReferenceEntry({
     slug: "richards",
     displayName: "Richards",
     garmentType: "trousers",
@@ -3765,23 +3755,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  richards_eco_custom: createReferenceEntry({
+  "richards-eco-custom": createReferenceEntry({
     slug: "richards-eco-custom",
     displayName: "Richards Eco Custom",
     garmentType: "trousers",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["richards eco custom", "richards-eco-custom", "richardsecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  rigel_hero: createReferenceEntry({
+  "rigel-hero": createReferenceEntry({
     slug: "rigel-hero",
     displayName: "Rigel Hero",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLUE", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON GREEN", "NEON YELLOW", "ORANGE", "PINK", "PURPLE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON GREEN", "NEON YELLOW", "ORANGE", "PINK", "PURPLE", "RED", "WHITE", "YELLOW"],
+    aliases: ["rigel hero", "rigel-hero", "rigelhero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  rise: createReferenceEntry({
+  "rise": createReferenceEntry({
     slug: "rise",
     displayName: "Rise",
     garmentType: "trousers",
@@ -3789,7 +3779,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  rivendell: createReferenceEntry({
+  "rivendell": createReferenceEntry({
     slug: "rivendell",
     displayName: "Rivendell",
     garmentType: "jacket",
@@ -3797,15 +3787,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  rivet: createReferenceEntry({
+  "rivet": createReferenceEntry({
     slug: "rivet",
     displayName: "Rivet",
     garmentType: "mixture",
-    allowedColours: ["BLACK", "BLUE", "NAVY"],
+    allowedColours: ["BLACK", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  rocket: createReferenceEntry({
+  "rocket": createReferenceEntry({
     slug: "rocket",
     displayName: "Rocket",
     garmentType: "bag",
@@ -3813,31 +3803,31 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  rookie: createReferenceEntry({
+  "rookie": createReferenceEntry({
     slug: "rookie",
     displayName: "Rookie",
     garmentType: "unknown",
-    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  round: createReferenceEntry({
+  "round": createReferenceEntry({
     slug: "round",
     displayName: "Round",
     garmentType: "socks",
-    allowedColours: ["BLACK", "BLUE", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "ORANGE", "PURPLE", "RED", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "ORANGE", "PURPLE", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  round_evo: createReferenceEntry({
+  "round-evo": createReferenceEntry({
     slug: "round-evo",
     displayName: "Round Evo",
     garmentType: "socks",
-    allowedColours: ["BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "ORANGE", "PURPLE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "ORANGE", "PURPLE", "RED", "WHITE", "YELLOW"],
+    aliases: ["round evo", "round-evo", "roundevo"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  route: createReferenceEntry({
+  "route": createReferenceEntry({
     slug: "route",
     displayName: "Route",
     garmentType: "unknown",
@@ -3845,47 +3835,47 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  roxy_eco_custom: createReferenceEntry({
+  "roxy-eco-custom": createReferenceEntry({
     slug: "roxy-eco-custom",
     displayName: "Roxy Eco Custom",
     garmentType: "shorts",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["roxy eco custom", "roxy-eco-custom", "roxyecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  rubber_pole_base: createReferenceEntry({
+  "rubber-pole-base": createReferenceEntry({
     slug: "rubber-pole-base",
     displayName: "Rubber Pole Base",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["rubber pole base", "rubber-pole-base", "rubberpolebase"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  ruby: createReferenceEntry({
+  "ruby": createReferenceEntry({
     slug: "ruby",
     displayName: "Ruby",
     garmentType: "r. training",
-    allowedColours: ["BLACK", "BLACK AMBER", "BLACK GREEN", "BLACK RED", "BLUE YELLOW", "COLUMBIA", "GREEN", "NAVY", "NAVY COLUMBIA", "RED", "ROYAL BLUE", "YELLOW"],
+    allowedColours: ["AMBER", "BLACK", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  sage: createReferenceEntry({
+  "sage": createReferenceEntry({
     slug: "sage",
     displayName: "Sage",
     garmentType: "kneepads",
-    allowedColours: ["BLACK", "BLUE", "WHITE"],
+    allowedColours: ["BLACK", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  sage_evo: createReferenceEntry({
+  "sage-evo": createReferenceEntry({
     slug: "sage-evo",
     displayName: "Sage Evo",
     garmentType: "kneepads",
     allowedColours: [],
-    aliases: [],
+    aliases: ["sage evo", "sage-evo", "sageevo"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  saiph: createReferenceEntry({
+  "saiph": createReferenceEntry({
     slug: "saiph",
     displayName: "Saiph",
     garmentType: "gk training",
@@ -3893,15 +3883,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  salzach: createReferenceEntry({
+  "salzach": createReferenceEntry({
     slug: "salzach",
     displayName: "Salzach",
     garmentType: "training top",
-    allowedColours: ["BLACK", "BLUE", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  sarez: createReferenceEntry({
+  "sarez": createReferenceEntry({
     slug: "sarez",
     displayName: "Sarez",
     garmentType: "sr",
@@ -3909,7 +3899,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  sasha: createReferenceEntry({
+  "sasha": createReferenceEntry({
     slug: "sasha",
     displayName: "Sasha",
     garmentType: "unknown",
@@ -3917,71 +3907,71 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  sceptrum: createReferenceEntry({
+  "sceptrum": createReferenceEntry({
     slug: "sceptrum",
     displayName: "Sceptrum",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE BLACK", "BLUE RED", "BLUE WHITE", "COLUMBIA", "COLUMBIA WHITE", "GREEN", "GREEN BLACK", "GREEN WHITE", "RED", "RED BLACK", "RED WHITE", "ROYAL BLUE", "WHITE", "WHITE BLACK", "YELLOW", "YELLOW BLACK", "YELLOW RED"],
+    allowedColours: ["BLACK", "COLUMBIA", "GREEN", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  scorpio: createReferenceEntry({
+  "scorpio": createReferenceEntry({
     slug: "scorpio",
     displayName: "Scorpio",
     garmentType: "t-shirt",
-    allowedColours: ["NEON YELLOW BLACK", "ORANGE BLACK", "PURPLE BLACK", "TURQUOISE BLACK"],
+    allowedColours: ["ORANGE", "PURPLE", "TURQUOISE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  scorpio_eco: createReferenceEntry({
+  "scorpio-eco": createReferenceEntry({
     slug: "scorpio-eco",
     displayName: "Scorpio Eco",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "NEON YELLOW", "ORANGE", "PURPLE", "TURQUOISE"],
-    aliases: [],
+    allowedColours: ["NEON YELLOW", "ORANGE", "PURPLE", "TURQUOISE"],
+    aliases: ["scorpio eco", "scorpio-eco", "scorpioeco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  seraphine_eco_custom: createReferenceEntry({
+  "seraphine-eco-custom": createReferenceEntry({
     slug: "seraphine-eco-custom",
     displayName: "Seraphine Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["FIXED DESIGN", "OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["seraphine eco custom", "seraphine-eco-custom", "seraphineecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  shedir: createReferenceEntry({
+  "shedir": createReferenceEntry({
     slug: "shedir",
     displayName: "Shedir",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLUE WHITE", "CARDINAL", "CARDINAL WHITE", "GREEN", "GREEN WHITE", "NAVY", "NAVY WHITE", "NAVY YELLOW", "NEON SKY", "NEON SKY GUN METAL", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "WHITE GUN METAL", "YELLOW", "YELLOW BLACK"],
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "NEON SKY", "RED", "SKY", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  shen: createReferenceEntry({
+  "shen": createReferenceEntry({
     slug: "shen",
     displayName: "Shen",
     garmentType: "match day short",
-    allowedColours: ["BLACK GREEN", "BLACK ORANGE", "BLACK RED", "BLACK WHITE", "BLACK YELLOW", "BLUE WHITE", "BLUE YELLOW", "CARDINAL WHITE", "GREEN WHITE", "NAVY RED", "NAVY WHITE", "NAVY YELLOW", "RED WHITE", "WHITE BLACK", "WHITE BLUE", "WHITE RED"],
+    allowedColours: ["BLACK", "CARDINAL", "NAVY", "ORANGE", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  shen_eco: createReferenceEntry({
+  "shen-eco": createReferenceEntry({
     slug: "shen-eco",
     displayName: "Shen Eco",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "ORANGE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "RED", "WHITE"],
+    aliases: ["shen eco", "shen-eco", "sheneco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  shirt: createReferenceEntry({
+  "shirt": createReferenceEntry({
     slug: "shirt",
     displayName: "Shirt",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "NAVY", "ORANGE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "NAVY", "ORANGE", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  shoes: createReferenceEntry({
+  "shoes": createReferenceEntry({
     slug: "shoes",
     displayName: "Shoes",
     garmentType: "unknown",
@@ -3989,31 +3979,31 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  shorts: createReferenceEntry({
+  "shorts": createReferenceEntry({
     slug: "shorts",
     displayName: "Shorts",
     garmentType: "shorts",
-    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "ORANGE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "ORANGE", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  shuttle: createReferenceEntry({
+  "shuttle": createReferenceEntry({
     slug: "shuttle",
     displayName: "Shuttle",
     garmentType: "bag",
-    allowedColours: ["UNKNOWN"],
+    allowedColours: [],
     aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  shyla_eco_custom: createReferenceEntry({
+  "shyla-eco-custom": createReferenceEntry({
     slug: "shyla-eco-custom",
     displayName: "Shyla Eco Custom",
     garmentType: "eco crop top",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["shyla eco custom", "shyla-eco-custom", "shylaecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  simoon: createReferenceEntry({
+  "simoon": createReferenceEntry({
     slug: "simoon",
     displayName: "Simoon",
     garmentType: "competition ball",
@@ -4021,39 +4011,39 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  skara: createReferenceEntry({
+  "skara": createReferenceEntry({
     slug: "skara",
     displayName: "Skara",
     garmentType: "match day short",
-    allowedColours: ["BLACK", "BLACK RED", "BLACK WHITE", "BLUE", "BLUE WHITE", "BLUE YELLOW", "CARDINAL", "COLUMBIA", "ELECTRIC BLUE ORANGE", "GREEN", "GUN METAL", "NAVY", "RED", "RED WHITE", "TURQUOISE", "WHITE", "WHITE BLACK", "WHITE BLUE", "WHITE GREEN", "WHITE RED", "YELLOW"],
+    allowedColours: ["BLACK", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "RED", "TURQUOISE", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  skara_eco: createReferenceEntry({
+  "skara-eco": createReferenceEntry({
     slug: "skara-eco",
     displayName: "Skara Eco",
     garmentType: "shorts",
-    allowedColours: ["ANTHRACITE", "BLACK", "CARDINAL", "COLUMBIA", "ELECTRIC BLUE", "GREEN", "NAVY", "ORANGE", "RED", "ROYAL BLUE", "TURQUOISE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["ANTHRACITE", "BLACK", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "RED", "TURQUOISE", "WHITE", "YELLOW"],
+    aliases: ["skara eco", "skara-eco", "skaraeco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  skarn: createReferenceEntry({
+  "skarn": createReferenceEntry({
     slug: "skarn",
     displayName: "Skarn",
     garmentType: "r. training",
-    allowedColours: ["BLACK", "BLACK BLACK", "BLUE BLUE", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "LIGHT NAVY", "NAVY", "NAVY NAVY", "RED", "RED RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  skat: createReferenceEntry({
+  "skat": createReferenceEntry({
     slug: "skat",
     displayName: "Skat",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLUE WHITE", "CARDINAL", "CARDINAL WHITE", "NAVY", "NAVY WHITE", "NEON SKY", "NEON SKY GUN METAL", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "WHITE GUN METAL"],
+    allowedColours: ["BLACK", "CARDINAL", "NAVY", "NEON SKY", "RED", "SKY", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  skill: createReferenceEntry({
+  "skill": createReferenceEntry({
     slug: "skill",
     displayName: "Skill",
     garmentType: "socks",
@@ -4061,15 +4051,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  skitti_eco_custom: createReferenceEntry({
+  "skitti-eco-custom": createReferenceEntry({
     slug: "skitti-eco-custom",
     displayName: "Skitti Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["FIXED DESIGN", "OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["skitti eco custom", "skitti-eco-custom", "skittiecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  snow: createReferenceEntry({
+  "snow": createReferenceEntry({
     slug: "snow",
     displayName: "Snow",
     garmentType: "mixture",
@@ -4077,7 +4067,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  softball: createReferenceEntry({
+  "softball": createReferenceEntry({
     slug: "softball",
     displayName: "Softball",
     garmentType: "unknown",
@@ -4085,23 +4075,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  solstice_xh: createReferenceEntry({
+  "solstice-xh": createReferenceEntry({
     slug: "solstice-xh",
     displayName: "Solstice Xh",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["solstice xh", "solstice-xh", "solsticexh"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  solstice_xi: createReferenceEntry({
+  "solstice-xi": createReferenceEntry({
     slug: "solstice-xi",
     displayName: "Solstice Xi",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["solstice xi", "solstice-xi", "solsticexi"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  spark: createReferenceEntry({
+  "spark": createReferenceEntry({
     slug: "spark",
     displayName: "Spark",
     garmentType: "mini ball",
@@ -4109,79 +4099,79 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  speed_ring: createReferenceEntry({
+  "speed-ring": createReferenceEntry({
     slug: "speed-ring",
     displayName: "Speed Ring",
     garmentType: "ø 50 cm available in yellow",
     allowedColours: [],
-    aliases: [],
+    aliases: ["speed ring", "speed-ring", "speedring"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  sphinx: createReferenceEntry({
+  "sphinx": createReferenceEntry({
     slug: "sphinx",
     displayName: "Sphinx",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLUE WHITE", "NAVY", "NAVY WHITE", "NEON CORAL", "NEON CORAL GUN METAL", "RED", "RED WHITE", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "CORAL", "NAVY", "NEON CORAL", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  sprint: createReferenceEntry({
+  "sprint": createReferenceEntry({
     slug: "sprint",
     displayName: "Sprint",
     garmentType: "socks",
-    allowedColours: ["BLACK", "BLUE", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "ORANGE", "PURPLE", "RED", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "ORANGE", "PURPLE", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  sprint_evo: createReferenceEntry({
+  "sprint-evo": createReferenceEntry({
     slug: "sprint-evo",
     displayName: "Sprint Evo",
     garmentType: "socks",
-    allowedColours: ["BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "ORANGE", "PURPLE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "ORANGE", "PURPLE", "RED", "WHITE", "YELLOW"],
+    aliases: ["sprint evo", "sprint-evo", "sprintevo"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  stage_eco: createReferenceEntry({
+  "stage-eco": createReferenceEntry({
     slug: "stage-eco",
     displayName: "Stage Eco",
     garmentType: "hoody",
-    allowedColours: ["ANTHRACITE", "BLACK", "GREY MELANGE", "LIGHT NAVY", "NAVY"],
-    aliases: [],
+    allowedColours: ["BLACK", "GREY", "NAVY"],
+    aliases: ["stage eco", "stage-eco", "stageeco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  starfall: createReferenceEntry({
+  "starfall": createReferenceEntry({
     slug: "starfall",
     displayName: "Starfall",
     garmentType: "tracksuit",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLACK YELLOW", "BLUE WHITE", "BOTTLE GREEN", "INDIGO SKY", "INDIGO SKY NAVY", "MINT", "MINT BOTTLE GREEN", "NAVY", "NAVY WHITE", "NAVY YELLOW", "NEST", "RED", "RED WHITE", "ROYAL BLUE", "STONE GRAY GUN METAL", "STONE GREY", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "INDIGO", "MINT", "NAVY", "RED", "STONE", "STONE GREY", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  steel: createReferenceEntry({
+  "steel": createReferenceEntry({
     slug: "steel",
     displayName: "Steel",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK WHITE", "BLUE WHITE", "NAVY WHITE", "RED WHITE", "WHITE"],
+    allowedColours: ["WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  steel_eco: createReferenceEntry({
+  "steel-eco": createReferenceEntry({
     slug: "steel-eco",
     displayName: "Steel Eco",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "LIGHT NAVY", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
-    aliases: [],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
+    aliases: ["steel eco", "steel-eco", "steeleco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  striped: createReferenceEntry({
+  "striped": createReferenceEntry({
     slug: "striped",
     displayName: "Striped",
     garmentType: "polo shirt",
-    allowedColours: ["BLACK WHITE", "BLUE WHITE", "GREEN WHITE", "GREY GUN METAL", "NAVY WHITE", "RED WHITE", "WHITE GUN METAL"],
+    allowedColours: ["GREY", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  strive: createReferenceEntry({
+  "strive": createReferenceEntry({
     slug: "strive",
     displayName: "Strive",
     garmentType: "socks",
@@ -4189,7 +4179,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  subzero: createReferenceEntry({
+  "subzero": createReferenceEntry({
     slug: "subzero",
     displayName: "Subzero",
     garmentType: "jacket",
@@ -4197,39 +4187,39 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  success: createReferenceEntry({
+  "success": createReferenceEntry({
     slug: "success",
     displayName: "Success",
-    garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK GUN METAL", "LIGHT NAVY", "NAVY"],
+    garmentType: "hoody",
+    allowedColours: ["BLACK", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  summit_eco_custom: createReferenceEntry({
+  "summit-eco-custom": createReferenceEntry({
     slug: "summit-eco-custom",
     displayName: "Summit Eco Custom",
     garmentType: "shorts",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["summit eco custom", "summit-eco-custom", "summitecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  surat: createReferenceEntry({
+  "surat": createReferenceEntry({
     slug: "surat",
     displayName: "Surat",
     garmentType: "jacket",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  sylen: createReferenceEntry({
+  "sylen": createReferenceEntry({
     slug: "sylen",
     displayName: "Sylen",
-    garmentType: "shoes/sandals",
+    garmentType: "t-shirt",
     allowedColours: ["BLACK"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  tactic: createReferenceEntry({
+  "tactic": createReferenceEntry({
     slug: "tactic",
     displayName: "Tactic",
     garmentType: "trousers",
@@ -4237,31 +4227,31 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  taiga_xh: createReferenceEntry({
+  "taiga-xh": createReferenceEntry({
     slug: "taiga-xh",
     displayName: "Taiga Xh",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["taiga xh", "taiga-xh", "taigaxh"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  taiga_xi: createReferenceEntry({
+  "taiga-xi": createReferenceEntry({
     slug: "taiga-xi",
     displayName: "Taiga Xi",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["taiga xi", "taiga-xi", "taigaxi"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  tailored_design_to_follow_your_movements: createReferenceEntry({
+  "tailored-design-to-follow-your-movements": createReferenceEntry({
     slug: "tailored-design-to-follow-your-movements",
     displayName: "Tailored Design To Follow Your Movements",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["tailored design to follow your movements", "tailored-design-to-follow-your-movements", "tailoreddesigntofollowyourmovements"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  talisman: createReferenceEntry({
+  "talisman": createReferenceEntry({
     slug: "talisman",
     displayName: "Talisman",
     garmentType: "mini ball",
@@ -4269,31 +4259,31 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  tecla_eco_custom: createReferenceEntry({
+  "tecla-eco-custom": createReferenceEntry({
     slug: "tecla-eco-custom",
     displayName: "Tecla Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["FIXED DESIGN", "OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["tecla eco custom", "tecla-eco-custom", "teclaecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  tellurium: createReferenceEntry({
+  "tellurium": createReferenceEntry({
     slug: "tellurium",
     displayName: "Tellurium",
     garmentType: "t-shirt",
-    allowedColours: ["BLUE WHITE", "GREEN WHITE", "NAVY WHITE", "RED WHITE", "WHITE"],
+    allowedColours: ["WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  tellurium_eco: createReferenceEntry({
+  "tellurium-eco": createReferenceEntry({
     slug: "tellurium-eco",
     displayName: "Tellurium Eco",
     garmentType: "t-shirt",
-    allowedColours: ["GREEN", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
-    aliases: [],
+    allowedColours: ["GREEN", "NAVY", "RED", "WHITE"],
+    aliases: ["tellurium eco", "tellurium-eco", "telluriumeco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  tempest: createReferenceEntry({
+  "tempest": createReferenceEntry({
     slug: "tempest",
     displayName: "Tempest",
     garmentType: "training ball",
@@ -4301,7 +4291,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  tender: createReferenceEntry({
+  "tender": createReferenceEntry({
     slug: "tender",
     displayName: "Tender",
     garmentType: "bag",
@@ -4309,103 +4299,103 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  tess: createReferenceEntry({
+  "tess": createReferenceEntry({
     slug: "tess",
     displayName: "Tess",
     garmentType: "referee",
-    allowedColours: ["BLACK GOLD", "BRIGHT RED BLACK", "NEON SKY BLACK", "NEON YELLOW BLACK"],
+    allowedColours: ["BLACK", "GOLD", "RED", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  tess_eco: createReferenceEntry({
+  "tess-eco": createReferenceEntry({
     slug: "tess-eco",
     displayName: "Tess Eco",
     garmentType: "t-shirt",
     allowedColours: [],
-    aliases: [],
+    aliases: ["tess eco", "tess-eco", "tesseco"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  thallium: createReferenceEntry({
+  "thallium": createReferenceEntry({
     slug: "thallium",
     displayName: "Thallium",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLUE WHITE", "GREEN", "GREEN WHITE", "NAVY", "NAVY WHITE", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "WHITE GUN METAL"],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  thalos: createReferenceEntry({
+  "thalos": createReferenceEntry({
     slug: "thalos",
     displayName: "Thalos",
     garmentType: "training top",
-    allowedColours: ["BLACK", "BLUE", "DARK GREEN", "DARK GREY", "DARK NEON SKY", "DARK RED", "DARK ROYAL BLUE", "GREEN", "LIGHT NAVY", "NAVY", "NEON SKY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "NEON SKY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  thames_hero: createReferenceEntry({
+  "thames-hero": createReferenceEntry({
     slug: "thames-hero",
     displayName: "Thames Hero",
     garmentType: "tracksuit",
     allowedColours: ["ANTHRACITE", "BLACK", "GUN METAL", "NAVY"],
-    aliases: [],
+    aliases: ["thames hero", "thames-hero", "thameshero"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  thavil: createReferenceEntry({
+  "thavil": createReferenceEntry({
     slug: "thavil",
     displayName: "Thavil",
     garmentType: "polo shirt",
-    allowedColours: ["BLACK WHITE", "BLUE WHITE", "GREEN WHITE", "NAVY WHITE", "RED WHITE", "TURQUOISE GUN METAL", "WHITE SILVER"],
+    allowedColours: ["SILVER", "TURQUOISE", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  theater: createReferenceEntry({
+  "theater": createReferenceEntry({
     slug: "theater",
     displayName: "Theater",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK GUN METAL", "GREY GUN METAL", "NAVY"],
+    allowedColours: ["BLACK", "GREY", "NAVY"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  theater_eco: createReferenceEntry({
+  "theater-eco": createReferenceEntry({
     slug: "theater-eco",
     displayName: "Theater Eco",
     garmentType: "hoody",
     allowedColours: [],
-    aliases: [],
+    aliases: ["theater eco", "theater-eco", "theatereco"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  themis: createReferenceEntry({
+  "themis": createReferenceEntry({
     slug: "themis",
     displayName: "Themis",
     garmentType: "t-shirt",
-    allowedColours: ["AMBER BLACK", "BLACK WHITE", "BLUE WHITE", "CARDINAL WHITE", "GREEN WHITE", "PURPLE WHITE", "RED WHITE", "TURQUOISE GUN METAL", "WHITE BLUE", "WHITE GREEN", "WHITE GUN METAL", "WHITE RED"],
+    allowedColours: ["AMBER", "CARDINAL", "TURQUOISE", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  themis_eco: createReferenceEntry({
+  "themis-eco": createReferenceEntry({
     slug: "themis-eco",
     displayName: "Themis Eco",
     garmentType: "t-shirt",
-    allowedColours: ["AMBER", "ANTHRACITE", "BLACK", "CARDINAL", "GREEN", "PURPLE", "RED", "ROYAL BLUE", "TURQUOISE", "WHITE"],
-    aliases: [],
+    allowedColours: ["AMBER", "BLACK", "CARDINAL", "GREEN", "PURPLE", "RED", "TURQUOISE", "WHITE"],
+    aliases: ["themis eco", "themis-eco", "themiseco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  tiamat: createReferenceEntry({
+  "tiamat": createReferenceEntry({
     slug: "tiamat",
     displayName: "Tiamat",
     garmentType: "hoody",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLACK YELLOW", "BLUE WHITE", "CARDINAL WHITE", "GREEN", "GREEN WHITE", "GUN METAL NEON SKY", "NAVY", "NAVY WHITE", "NAVY YELLOW", "NEON SKY", "RED", "RED WHITE", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["ANTHRACITE", "BLACK", "CARDINAL", "GREEN", "NAVY", "RED", "SKY", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  tiber: createReferenceEntry({
+  "tiber": createReferenceEntry({
     slug: "tiber",
     displayName: "Tiber",
     garmentType: "tracksuit",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLACK YELLOW", "BLUE WHITE", "GREEN", "GREEN BLACK", "NAVY", "NAVY WHITE", "NAVY YELLOW", "RED", "RED WHITE", "ROYAL BLUE", "SILVER", "SILVER GUN METAL", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "GREEN", "NAVY", "RED", "SILVER", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  tidal: createReferenceEntry({
+  "tidal": createReferenceEntry({
     slug: "tidal",
     displayName: "Tidal",
     garmentType: "unknown",
@@ -4413,7 +4403,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  tobol: createReferenceEntry({
+  "tobol": createReferenceEntry({
     slug: "tobol",
     displayName: "Tobol",
     garmentType: "sr",
@@ -4421,7 +4411,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  toque: createReferenceEntry({
+  "toque": createReferenceEntry({
     slug: "toque",
     displayName: "Toque",
     garmentType: "unknown",
@@ -4429,15 +4419,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  totem: createReferenceEntry({
+  "totem": createReferenceEntry({
     slug: "totem",
     displayName: "Totem",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLACK YELLOW", "BLUE WHITE", "BOTTLE GREEN", "INDIGO SKY", "INDIGO SKY NAVY", "MINT", "MINT BOTTLE GREEN", "NAVY", "NAVY WHITE", "NAVY YELLOW", "NEST", "RED", "RED WHITE", "ROYAL BLUE", "STONE GRAY GUN METAL", "STONE GREY", "WHITE", "YELLOW"],
+    allowedColours: ["BLACK", "INDIGO", "MINT", "NAVY", "RED", "STONE", "STONE GREY", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  trick: createReferenceEntry({
+  "trick": createReferenceEntry({
     slug: "trick",
     displayName: "Trick",
     garmentType: "socks",
@@ -4445,71 +4435,71 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  tridens_pro: createReferenceEntry({
+  "tridens-pro": createReferenceEntry({
     slug: "tridens-pro",
     displayName: "Tridens Pro",
     garmentType: "finish",
     allowedColours: [],
-    aliases: [],
+    aliases: ["tridens pro", "tridens-pro", "tridenspro"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  trip: createReferenceEntry({
+  "trip": createReferenceEntry({
     slug: "trip",
     displayName: "Trip",
     garmentType: "bag",
-    allowedColours: ["BLACK", "BOTTOM BACKPACK REDUCER", "CARDINAL", "GREEN", "NAVY", "PETANQUE", "RED", "ROYAL"],
+    allowedColours: ["BLACK", "CARDINAL", "GREEN", "NAVY", "RED", "ROYAL"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  trophy: createReferenceEntry({
+  "trophy": createReferenceEntry({
     slug: "trophy",
     displayName: "Trophy",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  tropical_xi: createReferenceEntry({
+  "tropical-xi": createReferenceEntry({
     slug: "tropical-xi",
     displayName: "Tropical Xi",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["tropical xi", "tropical-xi", "tropicalxi"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  trumpet: createReferenceEntry({
+  "trumpet": createReferenceEntry({
     slug: "trumpet",
     displayName: "Trumpet",
     garmentType: "hoody",
-    allowedColours: ["ANTHRACITE", "BLACK", "DARK RED", "DARK ROYAL BLUE", "GREY MELANGE", "LIGHT NAVY", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "GREY", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  tsunami_xi: createReferenceEntry({
+  "tsunami-xi": createReferenceEntry({
     slug: "tsunami-xi",
     displayName: "Tsunami Xi",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["tsunami xi", "tsunami-xi", "tsunamixi"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  tulip: createReferenceEntry({
+  "tulip": createReferenceEntry({
     slug: "tulip",
     displayName: "Tulip",
     garmentType: "kneepads",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "WHITE"],
+    allowedColours: ["BLACK", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  tungsten_eco_custom: createReferenceEntry({
+  "tungsten-eco-custom": createReferenceEntry({
     slug: "tungsten-eco-custom",
     displayName: "Tungsten Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["FIXED DESIGN", "OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["tungsten eco custom", "tungsten-eco-custom", "tungstenecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  turbolence: createReferenceEntry({
+  "turbolence": createReferenceEntry({
     slug: "turbolence",
     displayName: "Turbolence",
     garmentType: "unknown",
@@ -4517,7 +4507,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  turvey: createReferenceEntry({
+  "turvey": createReferenceEntry({
     slug: "turvey",
     displayName: "Turvey",
     garmentType: "jacket",
@@ -4525,15 +4515,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  twirl: createReferenceEntry({
+  "twirl": createReferenceEntry({
     slug: "twirl",
     displayName: "Twirl",
     garmentType: "mixture",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  twister: createReferenceEntry({
+  "twister": createReferenceEntry({
     slug: "twister",
     displayName: "Twister",
     garmentType: "unknown",
@@ -4541,7 +4531,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  ultralight: createReferenceEntry({
+  "ultralight": createReferenceEntry({
     slug: "ultralight",
     displayName: "Ultralight",
     garmentType: "jacket",
@@ -4549,7 +4539,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  under: createReferenceEntry({
+  "under": createReferenceEntry({
     slug: "under",
     displayName: "Under",
     garmentType: "size 4 light",
@@ -4557,23 +4547,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  valkyria: createReferenceEntry({
+  "valkyria": createReferenceEntry({
     slug: "valkyria",
     displayName: "Valkyria",
     garmentType: "sr",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLUE WHITE", "GUN METAL NEON CORAL", "NAVY", "NAVY WHITE", "NEON CORAL", "RED", "RED WHITE", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["ANTHRACITE", "BLACK", "CORAL", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  vanir: createReferenceEntry({
+  "vanir": createReferenceEntry({
     slug: "vanir",
     displayName: "Vanir",
     garmentType: "full length zip top",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK RED", "BLACK WHITE", "BLUE WHITE", "GREEN", "GREEN NEON GREEN", "GUN METAL NEON CORAL", "NAVY", "NAVY RED", "NAVY WHITE", "NEON CORAL", "NEON GREEN", "RED", "RED WHITE", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["ANTHRACITE", "BLACK", "CORAL", "GREEN", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  vibe: createReferenceEntry({
+  "vibe": createReferenceEntry({
     slug: "vibe",
     displayName: "Vibe",
     garmentType: "unknown",
@@ -4581,23 +4571,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  void: createReferenceEntry({
+  "void": createReferenceEntry({
     slug: "void",
     displayName: "Void",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLUE", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON CORAL", "NEON GREEN", "NEON SKY", "NEON YELLOW", "ORANGE", "PINK", "PURPLE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "GUN METAL", "NAVY", "NEON CORAL", "NEON GREEN", "NEON SKY", "NEON YELLOW", "ORANGE", "PINK", "PURPLE", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  volga: createReferenceEntry({
+  "volga": createReferenceEntry({
     slug: "volga",
     displayName: "Volga",
     garmentType: "sr",
-    allowedColours: ["BLACK WHITE", "NAVY WHITE"],
+    allowedColours: ["WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  vortex: createReferenceEntry({
+  "vortex": createReferenceEntry({
     slug: "vortex",
     displayName: "Vortex",
     garmentType: "sr",
@@ -4605,7 +4595,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  vostok: createReferenceEntry({
+  "vostok": createReferenceEntry({
     slug: "vostok",
     displayName: "Vostok",
     garmentType: "jacket",
@@ -4613,15 +4603,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  walker_eco_custom: createReferenceEntry({
+  "walker-eco-custom": createReferenceEntry({
     slug: "walker-eco-custom",
     displayName: "Walker Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["walker eco custom", "walker-eco-custom", "walkerecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  walo: createReferenceEntry({
+  "walo": createReferenceEntry({
     slug: "walo",
     displayName: "Walo",
     garmentType: "polifiber",
@@ -4629,7 +4619,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  walsh: createReferenceEntry({
+  "walsh": createReferenceEntry({
     slug: "walsh",
     displayName: "Walsh",
     garmentType: "t-shirt",
@@ -4637,71 +4627,71 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  waltz: createReferenceEntry({
+  "waltz": createReferenceEntry({
     slug: "waltz",
     displayName: "Waltz",
     garmentType: "polo shirt",
-    allowedColours: ["BLACK", "BLUE", "GREY", "NAVY", "RED", "WHITE"],
+    allowedColours: ["BLACK", "GREY", "NAVY", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  waltz_eco: createReferenceEntry({
+  "waltz-eco": createReferenceEntry({
     slug: "waltz-eco",
     displayName: "Waltz Eco",
     garmentType: "polo shirt",
-    allowedColours: ["BLACK", "GREY MELANGE", "NAVY", "RED", "ROYAL BLUE", "WHITE"],
-    aliases: [],
+    allowedColours: ["BLACK", "GREY", "NAVY", "RED", "WHITE"],
+    aliases: ["waltz eco", "waltz-eco", "waltzeco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  warden: createReferenceEntry({
+  "warden": createReferenceEntry({
     slug: "warden",
     displayName: "Warden",
     garmentType: "t-shirt",
-    allowedColours: ["BLUE WHITE", "COLUMBIA NAVY", "PURPLE WHITE", "RED WHITE", "WHITE BLUE", "WHITE RED", "YELLOW BLACK"],
+    allowedColours: ["NAVY", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  warden_eco: createReferenceEntry({
+  "warden-eco": createReferenceEntry({
     slug: "warden-eco",
     displayName: "Warden Eco",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "COLUMBIA", "NAVY", "PURPLE", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["COLUMBIA", "PURPLE", "RED", "WHITE", "YELLOW"],
+    aliases: ["warden eco", "warden-eco", "wardeneco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  water_bottle: createReferenceEntry({
+  "water-bottle": createReferenceEntry({
     slug: "water-bottle",
     displayName: "Water Bottle",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["water bottle", "water-bottle", "waterbottle"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  widia: createReferenceEntry({
+  "widia": createReferenceEntry({
     slug: "widia",
     displayName: "Widia",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK WHITE", "BLUE WHITE", "GREEN WHITE", "NAVY WHITE", "RED WHITE", "WHITE"],
+    allowedColours: ["WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  widia_eco: createReferenceEntry({
+  "widia-eco": createReferenceEntry({
     slug: "widia-eco",
     displayName: "Widia Eco",
     garmentType: "t-shirt",
     allowedColours: [],
-    aliases: [],
+    aliases: ["widia eco", "widia-eco", "widiaeco"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  willow: createReferenceEntry({
+  "willow": createReferenceEntry({
     slug: "willow",
     displayName: "Willow",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  windfall: createReferenceEntry({
+  "windfall": createReferenceEntry({
     slug: "windfall",
     displayName: "Windfall",
     garmentType: "bag",
@@ -4709,7 +4699,7 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  wing: createReferenceEntry({
+  "wing": createReferenceEntry({
     slug: "wing",
     displayName: "Wing",
     garmentType: "bag",
@@ -4717,23 +4707,23 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  wisp: createReferenceEntry({
+  "wisp": createReferenceEntry({
     slug: "wisp",
     displayName: "Wisp",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK THUNDER", "BLUE", "BOTTLE GREEN", "CARDINAL", "DARK CARDINAL BOTTLE GREEN", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "GUN METAL OFF WHITE", "LIGHT BOTTLE GREEN", "LIGHT NAVY", "LILAC", "LILAC GUN METAL", "NAVY", "OFF WHITE", "RED", "ROYAL BLUE", "THUNDER", "TURQUOISE", "TURQUOISE NAVY"],
+    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "CARDINAL", "LILAC", "NAVY", "RED", "TURQUOISE", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  woman_woman_fit_fit: createReferenceEntry({
+  "woman-woman-fit-fit": createReferenceEntry({
     slug: "woman-woman-fit-fit",
     displayName: "Woman Woman Fit Fit",
     garmentType: "unknown",
     allowedColours: [],
-    aliases: [],
+    aliases: ["woman woman fit fit", "woman-woman-fit-fit", "womanwomanfitfit"],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  wright: createReferenceEntry({
+  "wright": createReferenceEntry({
     slug: "wright",
     displayName: "Wright",
     garmentType: "t-shirt",
@@ -4741,15 +4731,15 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  wright_custom: createReferenceEntry({
+  "wright-custom": createReferenceEntry({
     slug: "wright-custom",
     displayName: "Wright Custom",
     garmentType: "match day pullover",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["wright custom", "wright-custom", "wrightcustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  wyn: createReferenceEntry({
+  "wyn": createReferenceEntry({
     slug: "wyn",
     displayName: "Wyn",
     garmentType: "unknown",
@@ -4757,75 +4747,75 @@ export const macronReferenceData = {
     aliases: [],
     source: CATALOGUE_PENDING_SOURCE,
   }),
-  wyrm: createReferenceEntry({
+  "wyrm": createReferenceEntry({
     slug: "wyrm",
     displayName: "Wyrm",
     garmentType: "t-shirt",
-    allowedColours: ["AMBER", "AMBER BLACK", "BLACK", "BLACK RED", "BLACK WHITE", "BLACK YELLOW", "BLUE WHITE", "BLUE YELLOW", "BOTTLE GREEN", "BOTTLE GREEN WHITE", "CARDINAL", "CARDINAL ORANGE", "COLUMBIA", "COLUMBIA NAVY", "GREEN", "GREEN BLACK", "NAVY", "NAVY RED", "NAVY WHITE", "ORANGE", "RED", "RED BLACK", "RED BLUE", "RED NAVY", "RED WHITE", "ROYAL BLUE", "WHITE", "WHITE BLACK", "YELLOW", "YELLOW BLUE", "YELLOW NAVY"],
+    allowedColours: ["AMBER", "BLACK", "BOTTLE GREEN", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  wyvern: createReferenceEntry({
+  "wyvern": createReferenceEntry({
     slug: "wyvern",
     displayName: "Wyvern",
     garmentType: "t-shirt",
-    allowedColours: ["BLACK GUN METAL", "BLUE WHITE", "CARDINAL COLUMBIA", "COLUMBIA WHITE", "GREEN WHITE", "GUN METAL NEON RED", "NAVY WHITE", "ORANGE BLACK", "RED WHITE", "WHITE BLUE", "WHITE RED", "WHITE SILVER", "YELLOW BLACK", "YELLOW BLUE"],
+    allowedColours: ["BLACK", "CARDINAL", "ORANGE", "RED", "SILVER", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  wyvern_eco: createReferenceEntry({
+  "wyvern-eco": createReferenceEntry({
     slug: "wyvern-eco",
     displayName: "Wyvern Eco",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "NEON RED", "ORANGE", "RED", "ROYAL BLUE", "SILVER", "WHITE", "YELLOW"],
-    aliases: [],
+    allowedColours: ["ANTHRACITE", "BLACK", "CARDINAL", "COLUMBIA", "GREEN", "NAVY", "ORANGE", "RED", "WHITE", "YELLOW"],
+    aliases: ["wyvern eco", "wyvern-eco", "wyverneco"],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  x500: createReferenceEntry({
+  "x500": createReferenceEntry({
     slug: "x500",
     displayName: "X500",
     garmentType: "double",
-    allowedColours: ["BLACK WHITE", "BLUE WHITE", "BLUE YELLOW", "NAVY WHITE", "ORANGE WHITE", "RED WHITE"],
+    allowedColours: ["ORANGE", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  yaruga: createReferenceEntry({
+  "yaruga": createReferenceEntry({
     slug: "yaruga",
     displayName: "Yaruga",
     garmentType: "tracksuit",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK BLACK", "BLACK THUNDER", "BLUE BLUE", "BOTTLE GREEN", "BOTTLE GREEN BOTTLE GREEN", "CARDINAL", "CARDINAL CARDINAL", "DARK CARDINAL", "DARK GREY", "DARK RED", "DARK ROYAL BLUE", "GUN METAL OFF WHITE", "LIGHT BOTTLE GREEN", "LIGHT NAVY", "LILAC", "LILAC GUN METAL", "NAVY", "NAVY NAVY", "OFF WHITE", "RED", "RED RED", "ROYAL BLUE", "THUNDER", "TURQUOISE", "TURQUOISE NAVY"],
+    allowedColours: ["ANTHRACITE", "BLACK", "BOTTLE GREEN", "CARDINAL", "GREEN", "LILAC", "NAVY", "RED", "TURQUOISE", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  york_eco_custom: createReferenceEntry({
+  "york-eco-custom": createReferenceEntry({
     slug: "york-eco-custom",
     displayName: "York Eco Custom",
     garmentType: "t-shirt",
-    allowedColours: ["OPEN DESIGN"],
-    aliases: [],
-    source: CATALOGUE_VERIFIED_SOURCE,
+    allowedColours: [],
+    aliases: ["york eco custom", "york-eco-custom", "yorkecocustom"],
+    source: CATALOGUE_PENDING_SOURCE,
   }),
-  zima: createReferenceEntry({
+  "zima": createReferenceEntry({
     slug: "zima",
     displayName: "Zima",
     garmentType: "mixture",
-    allowedColours: ["BLACK", "BLUE", "NAVY", "RED", "ROYAL BLUE"],
+    allowedColours: ["BLACK", "NAVY", "RED"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  zinc: createReferenceEntry({
+  "zinc": createReferenceEntry({
     slug: "zinc",
     displayName: "Zinc",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLACK WHITE", "BLUE WHITE", "DARK GREY", "DARK NEON CORAL", "DARK RED", "DARK ROYAL BLUE", "LIGHT NAVY", "NAVY", "NAVY WHITE", "NEON CORAL", "NEON CORAL GUN METAL", "RED", "RED WHITE", "ROYAL BLUE", "WHITE"],
+    allowedColours: ["BLACK", "CORAL", "NAVY", "NEON CORAL", "RED", "WHITE"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
-  zyra: createReferenceEntry({
+  "zyra": createReferenceEntry({
     slug: "zyra",
     displayName: "Zyra",
     garmentType: "t-shirt",
-    allowedColours: ["ANTHRACITE", "BLACK", "BLUE", "GREEN", "GUN METAL", "NAVY", "NEON CORAL", "PINK", "RED", "ROYAL BLUE", "WHITE", "YELLOW"],
+    allowedColours: ["ANTHRACITE", "BLACK", "GREEN", "GUN METAL", "NAVY", "NEON CORAL", "PINK", "RED", "WHITE", "YELLOW"],
     aliases: [],
     source: CATALOGUE_VERIFIED_SOURCE,
   }),
@@ -4833,8 +4823,18 @@ export const macronReferenceData = {
 
 export const macronModelReferences = Object.values(macronReferenceData);
 
-export const macronReferenceMap = Object.fromEntries(
-  Object.entries(macronReferenceData).map(([slug, reference]) => [reference.slug.toLowerCase(), reference]),
-);
+// Map from any of: slug, displayName, alias word -> reference
+export const macronReferenceMap = (() => {
+  const out = {};
+  for (const ref of macronModelReferences) {
+    out[ref.slug.toLowerCase()] = ref;
+    out[ref.displayName.toLowerCase()] = ref;
+    for (const alias of ref.aliases || []) out[alias.toLowerCase()] = ref;
+    // First word of multi-word names so 'ROUND' resolves to 'ROUND EVO'
+    const firstWord = ref.displayName.toLowerCase().split(/\s+/)[0];
+    if (!out[firstWord]) out[firstWord] = ref;
+  }
+  return out;
+})();
 
 export { CATALOGUE_PENDING_SOURCE, CATALOGUE_VERIFIED_SOURCE };
