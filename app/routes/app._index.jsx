@@ -103,7 +103,6 @@ export const loader = async ({ request }) => {
                   title
                   sku
                   selectedOptions { name value }
-                  inventoryItem { id sku }
                 }
               }
             }
@@ -173,7 +172,6 @@ async function fetchAllProductsForBulk(admin) {
                   title
                   sku
                   selectedOptions { name value }
-                  inventoryItem { id sku }
                 }
               }
             }
@@ -265,53 +263,75 @@ export const action = async ({ request }) => {
     let updated = 0;
     let skipped = 0;
     let failed = 0;
+    let failedProducts = 0;
+    const userErrorMessages = [];
 
     for (const product of products) {
       const presentation = getProductPresentation(product);
       if (!presentation.isSafeForSkuWrite) continue;
-      for (const row of presentation.variantRows) {
-        if (!row.inventoryItemId) {
-          skipped += 1;
-          continue;
-        }
-        if (row.existingSku === row.generatedSku || row.inventoryItemSku === row.generatedSku) {
-          skipped += 1;
-          continue;
-        }
-        const resp = await admin.graphql(
-          `#graphql
-          mutation inventoryItemUpdate($id: ID!, $input: InventoryItemInput!) {
-            inventoryItemUpdate(id: $id, input: $input) {
-              inventoryItem {
-                id
-                sku
-              }
-              userErrors {
-                field
-                message
-              }
+
+      const variants = presentation.variantRows
+        .filter((row) => row.existingSku !== row.generatedSku)
+        .map((row) => ({ id: row.id, sku: row.generatedSku }));
+
+      const unchangedCount = presentation.variantRows.length - variants.length;
+      skipped += unchangedCount;
+
+      if (!variants.length) {
+        continue;
+      }
+
+      const resp = await admin.graphql(
+        `#graphql
+        mutation productVariantsBulkUpdate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
+          productVariantsBulkUpdate(productId: $productId, variants: $variants) {
+            product {
+              id
+            }
+            productVariants {
+              id
+              sku
+            }
+            userErrors {
+              field
+              message
             }
           }
-          `,
-          {
-            variables: {
-              id: row.inventoryItemId,
-              input: {
-                sku: row.generatedSku,
-              },
-            },
-          },
-        );
-        const json = await resp.json();
-        const errors = json?.data?.inventoryItemUpdate?.userErrors ?? [];
-        if (errors.length) {
-          failed += 1;
-        } else {
-          updated += 1;
         }
+        `,
+        {
+          variables: {
+            productId: product.id,
+            variants,
+          },
+        },
+      );
+
+      const json = await resp.json();
+      const result = json?.data?.productVariantsBulkUpdate;
+      const errors = result?.userErrors ?? [];
+
+      if (errors.length) {
+        failedProducts += 1;
+        failed += variants.length;
+        userErrorMessages.push(
+          ...errors.slice(0, 3).map((e) => `${product.title}: ${e.message}`),
+        );
+        continue;
       }
+
+      updated += result?.productVariants?.length ?? variants.length;
     }
-    return { ok: true, bulk, updated, skipped, failed };
+
+    return {
+      ok: true,
+      bulk,
+      updated,
+      skipped,
+      failed,
+      failedProducts,
+      userErrors: userErrorMessages.slice(0, 5),
+    };
   }
 
   // ─── SINGLE: save one product's colour (the existing dropdown form) ───────
@@ -404,7 +424,7 @@ export default function Index() {
         {bulkFetcher.data?.bulk === "writeSafeSkus" ? (
           <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: bulkFetcher.data.ok ? "#1f8a4c" : "#a00" }}>
             {bulkFetcher.data.ok
-              ? `Updated ${bulkFetcher.data.updated} variants. Skipped ${bulkFetcher.data.skipped}. Failed ${bulkFetcher.data.failed}.`
+              ? `Updated ${bulkFetcher.data.updated} variants. Skipped ${bulkFetcher.data.skipped}. Failed ${bulkFetcher.data.failed}${bulkFetcher.data.failedProducts ? ` across ${bulkFetcher.data.failedProducts} products` : ""}.${bulkFetcher.data.userErrors?.length ? ` Errors: ${bulkFetcher.data.userErrors.join(" | ")}` : ""}`
               : `✗ ${bulkFetcher.data.error}`}
           </p>
         ) : null}
