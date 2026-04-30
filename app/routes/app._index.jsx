@@ -89,6 +89,18 @@ function getModelReference(model) {
   return macronReferenceMap[model.toLowerCase()] ?? null;
 }
 
+// Words that are club/venue/team names — never a Macron model even if they
+// happen to collide with one in the reference. Extends the parser's
+// `removableWords` list with locally-known clubs.
+const NEVER_A_MODEL_LOCAL = new Set(
+  [
+    ...["FC", "AFC", "UNITED", "COACHES", "PLAYERS", "GIRLS", "CONNECT",
+        "PIRATES", "EASTBOURNE", "HASTINGS", "FOREST", "ROW",
+        "HILLCREST", "WESTHILL", "BC", "ABC", "CLUB", "GAME", "DAY",
+        "WATER", "BOTTLE"], // club words + ambiguous product-type words
+  ].map((w) => w.toLowerCase()),
+);
+
 // Try to find a multi-word Macron model in the title (e.g. "ROUND EVO", "RIGEL HERO")
 function detectMacronModelFromTitle(words) {
   if (!words || words.length === 0) return null;
@@ -98,6 +110,10 @@ function detectMacronModelFromTitle(words) {
     for (let i = 0; i <= lowerTokens.length - span; i += 1) {
       const slice = lowerTokens.slice(i, i + span).filter(Boolean);
       if (slice.length === 0) continue;
+      // Reject candidates whose tokens are all club/team words
+      if (slice.every((t) => NEVER_A_MODEL_LOCAL.has(t))) continue;
+      // Reject single-word candidates that ARE a club/team word
+      if (span === 1 && NEVER_A_MODEL_LOCAL.has(slice[0])) continue;
       const candidates = [
         slice.join("-"),
         slice.join(" "),
@@ -106,7 +122,6 @@ function detectMacronModelFromTitle(words) {
       for (const candidate of candidates) {
         const ref = macronReferenceMap[candidate];
         if (ref) {
-          // Return the original-cased word(s) so display stays nice
           const original = words.slice(i, i + span).join(" ");
           return { model: original, modelIndices: Array.from({ length: span }, (_, k) => i + k), reference: ref };
         }
@@ -580,9 +595,10 @@ export default function Index() {
                           <p style={{ margin: 0, fontSize: "0.875rem" }}>
                             🔍 Auto-detected from image:{" "}
                             <strong>{product.suggestion.colour}</strong>{" "}
-                            <span style={{ color: product.suggestion.isStrong ? "#1f8a4c" : "#a06600" }}>
+                            <span style={{ color: product.suggestion.isStrong && product.suggestion.validatedAgainstAllowed ? "#1f8a4c" : "#a06600" }}>
                               ({Math.round(product.suggestion.confidence * 100)}% confidence
-                              {product.suggestion.scopedToExpectedProduct ? "" : ", different model"})
+                              {product.suggestion.scopedToExpectedProduct ? "" : ", different model"}
+                              {!product.suggestion.validatedAgainstAllowed ? ", NOT in allowed colours — override below" : ""})
                             </span>
                           </p>
                         ) : (
@@ -596,7 +612,11 @@ export default function Index() {
                             {product.suggestion ? "Accept or override:" : "Assign colour:"}
                             <select
                               name="colour"
-                              defaultValue={product.suggestion?.colour ?? product.assignedColour ?? ""}
+                              defaultValue={
+                                (product.suggestion?.validatedAgainstAllowed ? product.suggestion.colour : null)
+                                ?? product.assignedColour
+                                ?? ""
+                              }
                               style={{ marginLeft: "0.5rem", padding: "0.25rem" }}
                             >
                               <option value="">— pick —</option>

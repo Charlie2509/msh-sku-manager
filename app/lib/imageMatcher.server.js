@@ -111,26 +111,69 @@ export async function matchImage(imageUrl, { topN = 5 } = {}) {
 }
 
 /**
+ * Cleans the raw colour slug from PIM (which can be multi-tone like "black-black"
+ * or "neon-green-green") into a normalised colour string.
+ * Then maps it to one of the model's allowedColours if possible.
+ */
+function resolveColourFromSlug(colourSlug, allowedColours) {
+  if (!colourSlug) return { colour: null, validatedAgainstAllowed: false };
+  // Split, dedupe consecutive identical words ("black-black" -> "black")
+  const parts = colourSlug.split("-").filter(Boolean);
+  const deduped = [];
+  for (const p of parts) {
+    if (deduped[deduped.length - 1] !== p) deduped.push(p);
+  }
+  // Final dedupe — remove any remaining duplicate tokens
+  const uniqueParts = [...new Set(deduped)];
+  const cleanedSlug = uniqueParts.join("-");
+
+  if (allowedColours?.length) {
+    const allowedSlugs = allowedColours.map((c) => ({
+      raw: c,
+      slug: c.toLowerCase().replace(/\s+/g, "-"),
+    }));
+    // 1) Exact slug match (cleaned)
+    let hit = allowedSlugs.find((a) => a.slug === cleanedSlug);
+    if (hit) return { colour: hit.raw, validatedAgainstAllowed: true };
+    // 2) Allowed colour fully contained in cleanedSlug
+    hit = allowedSlugs
+      .sort((a, b) => b.slug.length - a.slug.length) // prefer longer/more specific matches
+      .find((a) => cleanedSlug.split("-").join("-").includes(a.slug));
+    if (hit) return { colour: hit.raw, validatedAgainstAllowed: true };
+    // 3) Any cleanedSlug part matches an allowed colour
+    for (const part of uniqueParts) {
+      hit = allowedSlugs.find((a) => a.slug === part);
+      if (hit) return { colour: hit.raw, validatedAgainstAllowed: true };
+    }
+  }
+
+  // No allowedColour match — return the cleaned slug, capitalised, but mark unvalidated
+  const display = cleanedSlug
+    .split("-")
+    .filter(Boolean)
+    .map((w) => w.toUpperCase())
+    .join(" ");
+  return { colour: display, validatedAgainstAllowed: false };
+}
+
+/**
  * Same as matchImage but biases results to the model we already know
- * (from the parsed product title), and returns the most likely COLOUR slug
+ * (from the parsed product title), and returns the most likely COLOUR
  * that's in the allowedColours list.
  */
 export async function suggestColourFromImage(imageUrl, expectedProductSlug, allowedColours) {
   const matches = await matchImage(imageUrl, { topN: 50 });
   if (matches.length === 0) return null;
 
-  const allowedSet = new Set((allowedColours ?? []).map((c) => c.toLowerCase().replace(/\s+/g, "-")));
-
   // 1) Within matches whose productSlug == expectedProductSlug, pick the closest
   if (expectedProductSlug) {
     const sameProduct = matches.filter((m) => m.productSlug === expectedProductSlug);
     if (sameProduct.length > 0) {
       const top = sameProduct[0];
-      const colourGuess = (allowedColours ?? []).find(
-        (c) => c.toLowerCase().replace(/\s+/g, "-") === top.colourSlug,
-      );
+      const { colour, validatedAgainstAllowed } = resolveColourFromSlug(top.colourSlug, allowedColours);
       return {
-        colour: colourGuess ?? top.colourSlug.toUpperCase().replace(/-/g, " "),
+        colour,
+        validatedAgainstAllowed,
         productSlugMatched: top.productSlug,
         distance: top.distance,
         confidence: top.confidence,
@@ -141,11 +184,10 @@ export async function suggestColourFromImage(imageUrl, expectedProductSlug, allo
 
   // 2) Otherwise just take the absolute closest match
   const top = matches[0];
-  const colourGuess = allowedColours?.find(
-    (c) => c.toLowerCase().replace(/\s+/g, "-") === top.colourSlug,
-  );
+  const { colour, validatedAgainstAllowed } = resolveColourFromSlug(top.colourSlug, allowedColours);
   return {
-    colour: colourGuess ?? top.colourSlug.toUpperCase().replace(/-/g, " "),
+    colour,
+    validatedAgainstAllowed,
     productSlugMatched: top.productSlug,
     distance: top.distance,
     confidence: top.confidence,
