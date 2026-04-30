@@ -21,30 +21,22 @@ const colours = [
   "GRAY",
 ];
 const types = [
-  "JACKET",
-  "COAT",
-  "BENCHCOAT",
-  "SHOWERJACKET",
-  "HOODY",
-  "HOODIE",
+  "JACKET","PADDED JACKET","WINTER THERMAL JACKET","TRAINING JACKET","RAIN JACKET","SHOWER JACKET",
+  "COAT","WINTER COAT","LONG COAT","BENCHCOAT","BENCH COAT","LONG BENCHCOAT","SHOWERJACKET",
+  "HOODY","HOODIE","HOODED TRACKSUIT TOP",
   "GLOVES",
-  "CAP",
-  "HAT",
-  "SOCKS",
-  "BACKPACK",
-  "RUCKSACK",
-  "POM",
-  "POM POM",
-  "POLO SHIRT",
-  "BODY WARMER",
-  "TRAVEL RUCKSACK",
-  "BASEBALL CAP",
-  "BOBBLE HAT",
-  "BOBBLE",
-  "MATCH SOCKS",
-  "NECKWARMER",
-  "TARGET SOCK",
-  "SOCK",
+  "CAP","BASEBALL CAP","TRUCKER CAP",
+  "HAT","BOBBLE HAT","WINTER BOBBLE HAT","BOBBLE","BUCKET HAT",
+  "SOCKS","MATCH SOCKS","SHORT SOCKS","TRAINING SOCKS","ANKLE SOCK","FIXED ANKLE SOCK","TARGET SOCK","SOCK",
+  "BACKPACK","RUCKSACK","TRAVEL RUCKSACK","HOLDALL","GYM KIT BAG","KIT BAG","SHOULDER BAG","BAG",
+  "POM","POM POM","NECKWARMER","BEANIE",
+  "POLO SHIRT","SHIRT","TEE","T-SHIRT","COTTON TEE","TRAINING TEE","TRAINING SWEATER",
+  "BODY WARMER","BODYWARMER","GILET",
+  "TRAINING SHORTS","TRAINING TOP","TRAINING PANTS","TRAINING BOTTOMS","SHORTS",
+  "TRACKSUIT","TRACKSUIT TOP","TRACKSUIT BOTTOMS","TRACKSUIT BOTTOM","TRACK PANTS","TROUSERS","PANTS",
+  "WATER BOTTLE","BOTTLE",
+  "1/4 ZIP TOP","FULL ZIP TOP","SWEATSHIRT","SWEATER",
+  "TOP","BOTTOMS",
 ];
 const modelStopWords = ["WINTER", "BOBBLE", "GAME", "DAY", "TARGET", "3D", "EMBROIDERED", "LONG"];
 const removableWords = [
@@ -451,10 +443,20 @@ export default function Index() {
                 .map(({ node }) => detectColourFromVariant(node, parsed.allowedColours))
                 .filter(Boolean);
               const effectiveColour = parsed.colour ?? variantColours[0] ?? null;
-              const effectiveStatus =
-                parsed.model && parsed.type && effectiveColour
-                  ? "matched"
-                  : parsed.status;
+              // Detect whether the product has a Color option at all (not just per variant)
+              const hasColorOption = (product.options ?? []).some((o) =>
+                ["color", "colour"].includes((o.name || "").toLowerCase()),
+              );
+              let effectiveStatus = parsed.status;
+              let effectiveReason = parsed.partialReason;
+              if (parsed.model && parsed.type && effectiveColour) {
+                effectiveStatus = "matched";
+                effectiveReason = null;
+              } else if (parsed.model && parsed.type && !effectiveColour && !hasColorOption) {
+                // Single-colour club product — colour needs to be manually assigned
+                effectiveStatus = "needs-colour";
+                effectiveReason = "single-colour product, assign colour manually";
+              }
 
               return (
                 <div key={product.id}>
@@ -468,10 +470,10 @@ export default function Index() {
                     <p style={{ margin: 0 }}>→ Type: {parsed.type ?? ""}</p>
                     {effectiveColour ? <p style={{ margin: 0 }}>→ Colour: {effectiveColour}{!parsed.colour && variantColours.length ? " (from variants)" : ""}</p> : null}
                     <p style={{ margin: 0 }}>→ Status: {effectiveStatus}</p>
-                    {["partial", "review"].includes(effectiveStatus) && parsed.partialReason ? (
-                      <p style={{ margin: 0 }}>→ Reason: {parsed.partialReason}</p>
+                    {["partial", "review", "needs-colour"].includes(effectiveStatus) && effectiveReason ? (
+                      <p style={{ margin: 0 }}>→ Reason: {effectiveReason}</p>
                     ) : null}
-                    {effectiveStatus === "partial" && parsed.partialReason === "missing colour" ? (
+                    {(effectiveStatus === "partial" || effectiveStatus === "needs-colour") && parsed.modelReference ? (
                       <p style={{ margin: 0 }}>
                         → Allowed colours: {getAllowedColoursMessage(parsed)}
                       </p>
@@ -511,4 +513,38 @@ export default function Index() {
       </div>
     </div>
   );
+}
+                        // Prefer Shopify variant options over title parsing
+                        const variantColour = detectColourFromVariant(variant, parsed.allowedColours);
+                        const variantSize = detectSizeFromVariant(variant);
+                        const finalColour = effectiveColour ?? variantColour;
+                        const generatedSku = generateVariantSku({
+                          model: parsed.model,
+                          colour: finalColour,
+                          size: variantSize,
+                        });
+                        // Dedupe identical SKUs (e.g. variants 's' and 'Small' both normalise to '-s')
+                        const dedupeKey = generatedSku;
+                        const isDuplicate = seen.has(dedupeKey);
+                        seen.add(dedupeKey);
+                        return (
+                          <p key={variant.id} style={{ margin: 0, opacity: isDuplicate ? 0.45 : 1 }}>
+                            - Size: {variantSize}{variantColour ? ` · Colour: ${variantColour}` : ""} → SKU: {generatedSku}{isDuplicate ? " (dup)" : ""}
+                          </p>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+  );
+}
+
 }
