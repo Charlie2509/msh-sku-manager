@@ -2,6 +2,7 @@ import { Form, useLoaderData, useFetcher } from "react-router";
 import { authenticate } from "../shopify.server";
 import { macronReferenceMap } from "../data/macronReference";
 import { suggestColourFromImage } from "../lib/imageMatcher.server";
+import { classifyColourWithClaude, isVisionLlmEnabled } from "../lib/visionLlm.server";
 
 const ASSIGNED_COLOUR_NAMESPACE = "msh";
 const ASSIGNED_COLOUR_KEY = "assigned_colour";
@@ -454,16 +455,10 @@ export const loader = async ({ request }) => {
   return { products };
 };
 
-export const action = async ({ request }) => {
-  const { admin } = await authenticate.admin(request);
-  const formData = await request.formData();
-  const productId = formData.get("productId");
-  const colour = (formData.get("colour") ?? "").toString().trim();
-
-  if (!productId || !colour) {
-    return { ok: false, error: "Missing productId or colour" };
-  }
-
+/**
+ * Helper: write a single product's assigned-colour metafield.
+ */
+async function writeAssignedColour(admin, productId, colour) {
   const response = await admin.graphql(
     `#graphql
     mutation SetAssignedColour($metafields: [MetafieldsSetInput!]!) {
@@ -486,17 +481,144 @@ export const action = async ({ request }) => {
       },
     },
   );
-
   const json = await response.json();
   const errors = json?.data?.metafieldsSet?.userErrors ?? [];
-  if (errors.length > 0) {
-    return { ok: false, error: errors.map((e) => e.message).join("; ") };
+  return errors.length > 0
+    ? { ok: false, error: errors.map((e) => e.message).join("; ") }
+    : { ok: true };
+}
+
+/**
+ * Helper: re-fetch every product (id, title, handle, image, allowed colours,
+ * existing assigned colour) so a bulk action can iterate over them.
+ */
+async function fetchAllProductsForBulk(admin) {
+  const r = await admin.graphql(`
+    #graphql
+    query AllProducts {
+      products(first: 250) {
+        edges {
+          node {
+            id
+            title
+            handle
+            featuredImage { url }
+            options { name }
+            assignedColour: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_COLOUR_KEY}") { value }
+          }
+        }
+      }
+    }
+  `);
+  const json = await r.json();
+  return json.data.products.edges.map(({ node }) => ({
+    ...node,
+    assignedColour: node.assignedColour?.value ?? null,
+  }));
+}
+
+export const action = async ({ request }) => {
+  const { admin } = await authenticate.admin(request);
+  const formData = await request.formData();
+  const bulk = formData.get("bulk")?.toString();
+
+  // ─── BULK: auto-assign all confident dHash matches ────────────────────────
+  if (bulk === "autoAssignConfident") {
+    const products = await fetchAllProductsForBulk(admin);
+    let saved = 0;
+    let skipped = 0;
+    await Promise.all(
+      products.map(async (p) => {
+        if (p.assignedColour) return; // already assigned, leave alone
+        const parsed = parseProductTitle(p.title, p.handle);
+        if (!parsed.model || !parsed.allowedColours?.length) return;
+        const hasColorOption = (p.options ?? []).some((o) =>
+          ["color", "colour"].includes((o.name || "").toLowerCase()),
+        );
+        const titleColour = detectColour(p.title.split(/\s+/), p.handle);
+        if (titleColour || hasColorOption) return;
+        if (!p.featuredImage?.url) return;
+        const suggestion = await suggestColourFromImage(
+          p.featuredImage.url,
+          parsed.modelReference?.slug ?? null,
+          parsed.allowedColours,
+        );
+        if (
+          suggestion?.validatedAgainstAllowed &&
+          suggestion.distance <= STRONG_MATCH_DISTANCE &&
+          suggestion.scopedToExpectedProduct
+        ) {
+          const r = await writeAssignedColour(admin, p.id, suggestion.colour);
+          if (r.ok) saved += 1;
+        } else {
+          skipped += 1;
+        }
+      }),
+    );
+    return { ok: true, bulk, saved, skipped, total: products.length };
   }
+
+  // ─── BULK: vision-LLM second-stage pass for low-confidence items ──────────
+  if (bulk === "visionPass") {
+    if (!isVisionLlmEnabled()) {
+      return { ok: false, error: "ANTHROPIC_API_KEY not set in environment" };
+    }
+    const products = await fetchAllProductsForBulk(admin);
+    let saved = 0;
+    let unknown = 0;
+    let skipped = 0;
+    // Run sequentially — Claude calls are slow and we want polite rate
+    for (const p of products) {
+      if (p.assignedColour) { skipped += 1; continue; }
+      const parsed = parseProductTitle(p.title, p.handle);
+      if (!parsed.model || !parsed.allowedColours?.length) { skipped += 1; continue; }
+      if (!p.featuredImage?.url) { skipped += 1; continue; }
+      const llmColour = await classifyColourWithClaude(
+        p.featuredImage.url,
+        parsed.allowedColours,
+        parsed.model,
+      );
+      if (llmColour) {
+        const r = await writeAssignedColour(admin, p.id, llmColour);
+        if (r.ok) saved += 1;
+      } else {
+        unknown += 1;
+      }
+    }
+    return { ok: true, bulk, saved, unknown, skipped, total: products.length };
+  }
+
+  // ─── SINGLE: save one product's colour (the existing dropdown form) ───────
+  const productId = formData.get("productId");
+  const colour = (formData.get("colour") ?? "").toString().trim();
+  if (!productId || !colour) {
+    return { ok: false, error: "Missing productId or colour" };
+  }
+  const r = await writeAssignedColour(admin, productId, colour);
+  if (!r.ok) return r;
   return { ok: true, productId, colour };
 };
 
 export default function Index() {
   const { products } = useLoaderData();
+  const bulkFetcher = useFetcher();
+
+  // Quick stats for the dashboard summary
+  const stats = products.reduce(
+    (acc, p) => {
+      const parsed = parseProductTitle(p.title, p.handle);
+      const variantColour = (p.variants?.edges ?? [])
+        .map(({ node }) => detectColourFromVariant(node, parsed.allowedColours))
+        .find(Boolean);
+      const titleColour = parsed.colour;
+      const hasColour = Boolean(titleColour || variantColour || p.assignedColour);
+      if (parsed.model && parsed.type && hasColour) acc.matched += 1;
+      else if (!parsed.model) acc.review += 1;
+      else acc.needsColour += 1;
+      return acc;
+    },
+    { matched: 0, needsColour: 0, review: 0 },
+  );
 
   return (
     <div style={{ padding: "1.6rem" }}>
@@ -514,12 +636,38 @@ export default function Index() {
           SKU Dashboard
         </h2>
         <p style={{ marginTop: 0, marginBottom: "1rem", color: "#616161" }}>
-          App connected successfully
+          ✅ {stats.matched} matched · ⚠ {stats.needsColour} need colour · 🔍 {stats.review} need review
         </p>
-        <div style={{ display: "flex", gap: "0.75rem" }}>
-          <button type="button">Scan catalogue</button>
-          <button type="button">Review queue</button>
+        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+          <bulkFetcher.Form method="post">
+            <input type="hidden" name="bulk" value="autoAssignConfident" />
+            <button type="submit" disabled={bulkFetcher.state !== "idle"} style={{ padding: "0.5rem 1rem" }}>
+              {bulkFetcher.state !== "idle" && bulkFetcher.formData?.get("bulk") === "autoAssignConfident"
+                ? "Working…"
+                : "Auto-assign confident matches"}
+            </button>
+          </bulkFetcher.Form>
+          <bulkFetcher.Form method="post">
+            <input type="hidden" name="bulk" value="visionPass" />
+            <button type="submit" disabled={bulkFetcher.state !== "idle"} style={{ padding: "0.5rem 1rem" }}>
+              {bulkFetcher.state !== "idle" && bulkFetcher.formData?.get("bulk") === "visionPass"
+                ? "Asking Claude…"
+                : "Run vision pass (Claude)"}
+            </button>
+          </bulkFetcher.Form>
         </div>
+        {bulkFetcher.data?.bulk === "autoAssignConfident" ? (
+          <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: "#1f8a4c" }}>
+            ✓ Auto-assigned {bulkFetcher.data.saved} of {bulkFetcher.data.total} (skipped {bulkFetcher.data.skipped})
+          </p>
+        ) : null}
+        {bulkFetcher.data?.bulk === "visionPass" ? (
+          <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: bulkFetcher.data.ok ? "#1f8a4c" : "#a00" }}>
+            {bulkFetcher.data.ok
+              ? `✓ Claude assigned ${bulkFetcher.data.saved} (${bulkFetcher.data.unknown} unknown, ${bulkFetcher.data.skipped} skipped)`
+              : `✗ ${bulkFetcher.data.error}`}
+          </p>
+        ) : null}
       </div>
 
       <div style={{ marginTop: "1rem", maxWidth: "640px" }}>
