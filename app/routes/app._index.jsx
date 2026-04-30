@@ -231,7 +231,26 @@ export default function Index() {
       variantRows.push({ id: variant.id, variantColour, variantSize, generatedSku });
     }
     const hasDuplicateGeneratedSkus = [...counts.values()].some((n) => n > 1);
-    return { parsed, normalizedAssignedColour, effectiveColour, colourSource, hasColorOption, effectiveStatus, effectiveReason, variantRows, hasDuplicateGeneratedSkus };
+    const hasNaGeneratedSku = variantRows.some((row) => row.generatedSku?.toLowerCase().includes("na"));
+    const isSafeForSkuWrite = (
+      effectiveStatus === "matched"
+      && Boolean(parsed.model)
+      && Boolean(effectiveColour)
+      && !hasDuplicateGeneratedSkus
+      && !hasNaGeneratedSku
+    );
+    return {
+      parsed,
+      normalizedAssignedColour,
+      effectiveColour,
+      colourSource,
+      hasColorOption,
+      effectiveStatus,
+      effectiveReason,
+      variantRows,
+      hasDuplicateGeneratedSkus,
+      isSafeForSkuWrite,
+    };
   }
 
   // Quick stats for the dashboard summary
@@ -317,6 +336,7 @@ export default function Index() {
                 effectiveReason,
                 variantRows,
                 hasDuplicateGeneratedSkus,
+                isSafeForSkuWrite,
               } = getProductPresentation(product);
 
               return (
@@ -336,6 +356,7 @@ export default function Index() {
                       </p>
                     ) : null}
                     <p style={{ margin: 0 }}>→ Status: {effectiveStatus}</p>
+                    <p style={{ margin: 0 }}>→ Safe for SKU write: {isSafeForSkuWrite ? "yes" : "no"}</p>
                     {hasDuplicateGeneratedSkus ? <p style={{ margin: 0, color: "#a00" }}>→ duplicate-sku-warning: {DUPLICATE_SKU_WARNING}</p> : null}
                     {["partial", "review", "needs-colour"].includes(effectiveStatus) && effectiveReason ? (
                       <p style={{ margin: 0 }}>→ Reason: {effectiveReason}</p>
@@ -396,9 +417,16 @@ export default function Index() {
                       return variantRows.map((row) => {
                         const isDuplicate = seen.has(row.generatedSku);
                         seen.add(row.generatedSku);
+                        const shouldHideGeneratedSku = (
+                          effectiveStatus === "review"
+                          || (effectiveStatus === "needs-colour" && row.generatedSku?.toLowerCase().includes("na"))
+                        );
+                        const skuMessage = effectiveStatus === "review"
+                          ? "SKU: not generated — review required"
+                          : "SKU: pending colour assignment";
                         return (
                           <p key={row.id} style={{ margin: 0, opacity: isDuplicate ? 0.45 : 1 }}>
-                            - Size: {formatSizeLabel(row.variantSize)}{row.variantColour ? ` · Colour: ${row.variantColour}` : ""} → SKU: {row.generatedSku}{isDuplicate ? " (dup)" : ""}
+                            - Size: {formatSizeLabel(row.variantSize)}{row.variantColour ? ` · Colour: ${row.variantColour}` : ""} → {shouldHideGeneratedSku ? skuMessage : `SKU: ${row.generatedSku}`}{isDuplicate ? " (dup)" : ""}
                           </p>
                         );
                       });
