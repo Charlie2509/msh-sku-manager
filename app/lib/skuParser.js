@@ -10,13 +10,59 @@ const NEVER_A_MODEL_LOCAL = new Set([...removableWords,"HILLCREST","WESTHILL","B
 
 function isStrongModelWord(word){const t=word?.trim(); return Boolean(t && /[A-Z]/i.test(t) && /^[A-Z0-9-]+$/i.test(t));}
 function toComparableToken(value){return value?.toUpperCase().replace(/[^A-Z0-9]/g,"") ?? "";}
+const MULTI_WORD_COLOUR_PHRASES = ["ROYAL BLUE","LIGHT NAVY","DARK GREY","DARK GRAY","STONE GREY","STONE GRAY","GUN METAL","BOTTLE GREEN","NEON GREEN","NEON YELLOW","OFF WHITE","SKY BLUE","COLUMBIA"];
+function tokeniseColour(value){
+  if(!value) return [];
+  return String(value).toUpperCase().trim().replace(/\s+/g," ").replace(/\//g," /").replace(/\s+\//g,"/").replace(/\/\s+/g,"/").split(/\s+|\//).filter(Boolean);
+}
+function normaliseColourTokens(tokens){
+  if(!tokens.length) return [];
+  const sortedPhrases=[...MULTI_WORD_COLOUR_PHRASES].sort((a,b)=>b.split(" ").length-a.split(" ").length);
+  const parts=[];
+  for(let i=0;i<tokens.length;i+=1){
+    let matched=null;
+    for(const phrase of sortedPhrases){
+      const phraseTokens=phrase.split(" ");
+      if(phraseTokens.every((t,idx)=>tokens[i+idx]===t)){ matched=phrase; break; }
+    }
+    if(matched){ parts.push(matched); i += matched.split(" ").length-1; continue; }
+    parts.push(tokens[i]);
+  }
+  return parts;
+}
+export function normalizeColourDisplay(value){
+  const tokens=tokeniseColour(value);
+  if(!tokens.length) return null;
+  const parts=normaliseColourTokens(tokens);
+  return parts.join("/");
+}
+function toNormalisedColourSlug(value){
+  const display=normalizeColourDisplay(value);
+  return display?display.toLowerCase().replace(/\//g,"-").replace(/\s+/g,"-"):null;
+}
+export function normalizeAllowedColours(coloursList){
+  if(!Array.isArray(coloursList)) return [];
+  // Macron data can contain both space and slash versions of multi-tone colours; slash display is canonical.
+  const bySlug=new Map();
+  for(const colour of coloursList){
+    const display=normalizeColourDisplay(colour);
+    if(!display) continue;
+    const slug=toNormalisedColourSlug(display);
+    if(!slug) continue;
+    const hasSlash=display.includes("/");
+    const existing=bySlug.get(slug);
+    if(!existing){ bySlug.set(slug,{display,hasSlash}); continue; }
+    if(hasSlash&&!existing.hasSlash) bySlug.set(slug,{display,hasSlash});
+  }
+  return [...bySlug.values()].map((entry)=>entry.display);
+}
 export function detectColour(words, handle=""){const upper=words.map((w)=>toComparableToken(w)); const fromTitle=upper.find((w)=>colours.includes(w)); if(fromTitle) return fromTitle; const fromHandle=handle.split("-").map((p)=>toComparableToken(p)).filter(Boolean).find((p)=>colours.includes(p)); return fromHandle ?? null;}
 function getModelReference(model){if(!model) return null; return macronReferenceMap[model.toLowerCase()] ?? null;}
 function detectMacronModelFromTitle(words){if(!words?.length) return null; const lower=words.map((w)=>w.toLowerCase().replace(/[^a-z0-9]/g,"")); for(const span of [3,2,1]) for(let i=0;i<=lower.length-span;i+=1){const slice=lower.slice(i,i+span).filter(Boolean); if(!slice.length) continue; if(slice.every((t)=>NEVER_A_MODEL_LOCAL.has(t))) continue; if(span===1&&NEVER_A_MODEL_LOCAL.has(slice[0])) continue; for(const c of [slice.join("-"),slice.join(" "),slice.join("")]){const ref=macronReferenceMap[c]; if(ref) return {model: words.slice(i,i+span).join(" "), modelIndices:Array.from({length:span},(_,k)=>i+k), reference:ref};}} return null;}
-export function detectColourFromVariant(variant, allowedColours){if(!variant?.selectedOptions) return null; for(const opt of variant.selectedOptions){const n=(opt.name||"").toLowerCase(); if(n.includes("color")||n.includes("colour")){const v=(opt.value||"").trim().toUpperCase(); if(!v) continue; if(allowedColours?.length){const m=allowedColours.find((c)=>c.toUpperCase()===v||v.includes(c.toUpperCase())); if(m) return m;} return v;}} return null;}
+export function detectColourFromVariant(variant, allowedColours){if(!variant?.selectedOptions) return null; const normalizedAllowed=normalizeAllowedColours(allowedColours ?? []); for(const opt of variant.selectedOptions){const n=(opt.name||"").toLowerCase(); if(n.includes("color")||n.includes("colour")){const normalizedVariant=normalizeColourDisplay(opt.value||""); if(!normalizedVariant) continue; if(normalizedAllowed.length){const m=normalizedAllowed.find((c)=>c===normalizedVariant||normalizedVariant.includes(c)||c.includes(normalizedVariant)); if(m) return m;} return normalizedVariant;}} return null;}
 export function detectSizeFromVariant(variant){if(variant?.selectedOptions){for(const opt of variant.selectedOptions){if((opt.name||"").toLowerCase()==="size"&&opt.value) return opt.value;}} return variant?.title ?? null;}
-function attachModelReference(parsed){if(!parsed.model) return parsed; const mr=getModelReference(parsed.model); return {...parsed, modelReference: mr, allowedColours: mr?.allowedColours ?? null};}
-export function getAllowedColoursMessage(parsed){if(!parsed.modelReference) return "unknown"; if(!parsed.allowedColours?.length) return "pending catalogue import"; return parsed.allowedColours.join(", ");}
+function attachModelReference(parsed){if(!parsed.model) return parsed; const mr=getModelReference(parsed.model); const allowedColours=normalizeAllowedColours(mr?.allowedColours ?? []); return {...parsed, modelReference: mr, allowedColours: allowedColours.length?allowedColours:null};}
+export function getAllowedColoursMessage(parsed){if(!parsed.modelReference) return "unknown"; const allowedColours=normalizeAllowedColours(parsed.allowedColours ?? []); if(!allowedColours.length) return "pending catalogue import"; return allowedColours.join(", ");}
 function deriveParseMeta({model,type,colour}){const up=model?.toUpperCase()??null; const bad=up ? suspiciousModelWords.has(up):false; if(!model) return {status:"review", partialReason:"missing model"}; if(bad) return {status:"review", partialReason:"generic/review item"}; if(type&&colour) return {status:"matched", partialReason:null}; if(type&&!colour) return {status:"partial", partialReason:"missing colour"}; return {status:"partial", partialReason:null};}
 function detectType(words){const upper=words.map((w)=>w.toUpperCase()); const sorted=[...types].sort((a,b)=>b.length-a.length); for(const candidateType of sorted){const tw=candidateType.split(/\s+/); for(let i=0;i<=upper.length-tw.length;i+=1){if(tw.every((t,o)=>upper[i+o]===t)){const idx=tw.map((_,o)=>i+o); return {type:candidateType,typeWords:tw,typeWordIndices:idx};}}} return {type:null,typeWords:[],typeWordIndices:[]};}
 function parseFallbackProductTitle(words, handle="", typeInfo=null){const upper=words.map((w)=>toComparableToken(w)); const colour=detectColour(words,handle); const {type:detectedType,typeWords,typeWordIndices}=typeInfo??detectType(words); const idxSet=new Set(typeWordIndices); const hasBobbleAndSnow=upper.includes("BOBBLE")&&upper.includes("SNOW"); const removable=new Set([...removableWords,...genders,...(colour?[colour]:[]),...typeWords,...modelStopWords]); const model=words.find((w,i)=>{const u=w.toUpperCase(); if(idxSet.has(i)) return false; return isStrongModelWord(w)&&!removable.has(u);})??null; const preferred=hasBobbleAndSnow?words.find((w)=>w.toUpperCase()==="SNOW"):null; const resolvedModel=preferred??model; const resolvedType=detectedType ?? (upper.includes("BOBBLE")?"BOBBLE HAT":null); const meta=deriveParseMeta({model:resolvedModel,type:resolvedType,colour}); return attachModelReference({club:null,model:resolvedModel,type:resolvedType,colour,status:meta.status,partialReason:meta.partialReason});}
