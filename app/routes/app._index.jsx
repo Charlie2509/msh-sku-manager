@@ -645,9 +645,6 @@ export default function Index() {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
                               defaultValue={product.suggestion?.colour ?? product.assignedColour ?? ""}
                               style={{ marginLeft: "0.5rem", padding: "0.25rem" }}
                             >
@@ -694,25 +691,6 @@ export default function Index() {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-KU: {generatedSku}{isDuplicate ? " (dup)" : ""}
-                          </p>
-                        );
-                      });
-                    })()}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-div>
     </div>
   );
 }
