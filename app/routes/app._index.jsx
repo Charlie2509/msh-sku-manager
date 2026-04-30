@@ -9,6 +9,67 @@ import { generateVariantSku } from "../lib/skuGenerator";
 // dHash distance threshold (out of 64 bits). Below this we trust the suggestion enough
 // to display it boldly; above, we mark it low-confidence.
 const STRONG_MATCH_DISTANCE = 12;
+const DUPLICATE_SKU_WARNING = "Duplicate generated SKUs detected — do not auto-write until variants are cleaned.";
+
+function getProductPresentation(product) {
+  const parsed = parseProductTitle(product.title, product.handle);
+  const normalizedAssignedColour = normalizeColourDisplay(product.assignedColour);
+  const variantColours = (product.variants?.edges ?? [])
+    .map(({ node }) => detectColourFromVariant(node, parsed.allowedColours))
+    .filter(Boolean);
+  const effectiveColour = parsed.colour ?? variantColours[0] ?? normalizedAssignedColour ?? null;
+  const colourSource = parsed.colour ? "title" : variantColours.length ? "variant" : normalizedAssignedColour ? "assigned" : null;
+  const hasColorOption = (product.options ?? []).some((o) =>
+    ["color", "colour"].includes((o.name || "").toLowerCase()),
+  );
+
+  let effectiveStatus = parsed.status;
+  let effectiveReason = parsed.partialReason;
+  if (parsed.model && parsed.type && effectiveColour) {
+    effectiveStatus = "matched";
+    effectiveReason = null;
+  } else if (parsed.model && parsed.type && !effectiveColour && !hasColorOption) {
+    effectiveStatus = "needs-colour";
+    effectiveReason = "single-colour product, assign colour manually";
+  } else if (!parsed.model) {
+    effectiveStatus = "review";
+    effectiveReason = "missing model / possible non-Macron product";
+  }
+
+  const variantRows = [];
+  const counts = new Map();
+  for (const { node: variant } of (product.variants?.edges ?? [])) {
+    const variantColour = detectColourFromVariant(variant, parsed.allowedColours);
+    const variantSize = detectSizeFromVariant(variant);
+    const finalColour = variantColour ?? effectiveColour;
+    const generatedSku = generateVariantSku({ model: parsed.model, colour: finalColour, size: variantSize });
+    counts.set(generatedSku, (counts.get(generatedSku) ?? 0) + 1);
+    variantRows.push({ id: variant.id, variantColour, variantSize, generatedSku, existingSku: variant.sku ?? "" });
+  }
+  const hasDuplicateGeneratedSkus = [...counts.values()].some((n) => n > 1);
+  const hasNaGeneratedSku = variantRows.some((row) => row.generatedSku?.toLowerCase().includes("na"));
+  const hasEmptyGeneratedSku = variantRows.some((row) => !row.generatedSku?.trim());
+  const isSafeForSkuWrite = (
+    effectiveStatus === "matched"
+    && Boolean(parsed.model)
+    && Boolean(effectiveColour)
+    && !hasDuplicateGeneratedSkus
+    && !hasNaGeneratedSku
+    && !hasEmptyGeneratedSku
+  );
+  return {
+    parsed,
+    normalizedAssignedColour,
+    effectiveColour,
+    colourSource,
+    hasColorOption,
+    effectiveStatus,
+    effectiveReason,
+    variantRows,
+    hasDuplicateGeneratedSkus,
+    isSafeForSkuWrite,
+  };
+}
 
 export const loader = async ({ request }) => {
   const { admin } = await authenticate.admin(request);
@@ -96,6 +157,16 @@ async function fetchAllProductsForBulk(admin) {
             featuredImage { url }
             options { name }
             assignedColour: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_COLOUR_KEY}") { value }
+            variants(first: 50) {
+              edges {
+                node {
+                  id
+                  title
+                  sku
+                  selectedOptions { name value }
+                }
+              }
+            }
           }
         }
       }
@@ -179,6 +250,50 @@ export const action = async ({ request }) => {
     return { ok: true, bulk, saved, unknown, skipped, total: products.length };
   }
 
+  if (bulk === "writeSafeSkus") {
+    const products = await fetchAllProductsForBulk(admin);
+    let updated = 0;
+    let skipped = 0;
+    let failed = 0;
+
+    for (const product of products) {
+      const presentation = getProductPresentation(product);
+      if (!presentation.isSafeForSkuWrite) continue;
+      for (const row of presentation.variantRows) {
+        if (row.existingSku === row.generatedSku) {
+          skipped += 1;
+          continue;
+        }
+        const resp = await admin.graphql(
+          `#graphql
+          mutation UpdateVariantSku($input: ProductVariantInput!) {
+            productVariantUpdate(input: $input) {
+              productVariant { id sku }
+              userErrors { field message }
+            }
+          }
+          `,
+          {
+            variables: {
+              input: {
+                id: row.id,
+                sku: row.generatedSku,
+              },
+            },
+          },
+        );
+        const json = await resp.json();
+        const errors = json?.data?.productVariantUpdate?.userErrors ?? [];
+        if (errors.length) {
+          failed += 1;
+        } else {
+          updated += 1;
+        }
+      }
+    }
+    return { ok: true, bulk, updated, skipped, failed };
+  }
+
   // ─── SINGLE: save one product's colour (the existing dropdown form) ───────
   const productId = formData.get("productId");
   const colour = (formData.get("colour") ?? "").toString().trim();
@@ -193,65 +308,6 @@ export const action = async ({ request }) => {
 export default function Index() {
   const { products } = useLoaderData();
   const bulkFetcher = useFetcher();
-  const DUPLICATE_SKU_WARNING = "Duplicate generated SKUs detected — do not auto-write until variants are cleaned.";
-
-  function getProductPresentation(product) {
-    const parsed = parseProductTitle(product.title, product.handle);
-    const normalizedAssignedColour = normalizeColourDisplay(product.assignedColour);
-    const variantColours = (product.variants?.edges ?? [])
-      .map(({ node }) => detectColourFromVariant(node, parsed.allowedColours))
-      .filter(Boolean);
-    const effectiveColour = parsed.colour ?? variantColours[0] ?? normalizedAssignedColour ?? null;
-    const colourSource = parsed.colour ? "title" : variantColours.length ? "variant" : normalizedAssignedColour ? "assigned" : null;
-    const hasColorOption = (product.options ?? []).some((o) =>
-      ["color", "colour"].includes((o.name || "").toLowerCase()),
-    );
-
-    let effectiveStatus = parsed.status;
-    let effectiveReason = parsed.partialReason;
-    if (parsed.model && parsed.type && effectiveColour) {
-      effectiveStatus = "matched";
-      effectiveReason = null;
-    } else if (parsed.model && parsed.type && !effectiveColour && !hasColorOption) {
-      effectiveStatus = "needs-colour";
-      effectiveReason = "single-colour product, assign colour manually";
-    } else if (!parsed.model) {
-      effectiveStatus = "review";
-      effectiveReason = "missing model / possible non-Macron product";
-    }
-
-    const variantRows = [];
-    const counts = new Map();
-    for (const { node: variant } of (product.variants?.edges ?? [])) {
-      const variantColour = detectColourFromVariant(variant, parsed.allowedColours);
-      const variantSize = detectSizeFromVariant(variant);
-      const finalColour = variantColour ?? effectiveColour;
-      const generatedSku = generateVariantSku({ model: parsed.model, colour: finalColour, size: variantSize });
-      counts.set(generatedSku, (counts.get(generatedSku) ?? 0) + 1);
-      variantRows.push({ id: variant.id, variantColour, variantSize, generatedSku });
-    }
-    const hasDuplicateGeneratedSkus = [...counts.values()].some((n) => n > 1);
-    const hasNaGeneratedSku = variantRows.some((row) => row.generatedSku?.toLowerCase().includes("na"));
-    const isSafeForSkuWrite = (
-      effectiveStatus === "matched"
-      && Boolean(parsed.model)
-      && Boolean(effectiveColour)
-      && !hasDuplicateGeneratedSkus
-      && !hasNaGeneratedSku
-    );
-    return {
-      parsed,
-      normalizedAssignedColour,
-      effectiveColour,
-      colourSource,
-      hasColorOption,
-      effectiveStatus,
-      effectiveReason,
-      variantRows,
-      hasDuplicateGeneratedSkus,
-      isSafeForSkuWrite,
-    };
-  }
 
   // Quick stats for the dashboard summary
   const stats = products.reduce(
@@ -301,7 +357,18 @@ export default function Index() {
                 : "Run vision pass (OpenAI)"}
             </button>
           </bulkFetcher.Form>
+          <bulkFetcher.Form method="post">
+            <input type="hidden" name="bulk" value="writeSafeSkus" />
+            <button type="submit" disabled={bulkFetcher.state !== "idle"} style={{ padding: "0.5rem 1rem" }}>
+              {bulkFetcher.state !== "idle" && bulkFetcher.formData?.get("bulk") === "writeSafeSkus"
+                ? "Writing SKUs…"
+                : "Write safe SKUs to Shopify"}
+            </button>
+          </bulkFetcher.Form>
         </div>
+        <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: "#a06600" }}>
+          Only matched products without duplicate warnings will be updated.
+        </p>
         {bulkFetcher.data?.bulk === "autoAssignConfident" ? (
           <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: "#1f8a4c" }}>
             ✓ Auto-assigned {bulkFetcher.data.saved} of {bulkFetcher.data.total} (skipped {bulkFetcher.data.skipped})
@@ -311,6 +378,13 @@ export default function Index() {
           <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: bulkFetcher.data.ok ? "#1f8a4c" : "#a00" }}>
             {bulkFetcher.data.ok
               ? `✓ OpenAI assigned ${bulkFetcher.data.saved} (${bulkFetcher.data.unknown} unknown, ${bulkFetcher.data.skipped} skipped)`
+              : `✗ ${bulkFetcher.data.error}`}
+          </p>
+        ) : null}
+        {bulkFetcher.data?.bulk === "writeSafeSkus" ? (
+          <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: bulkFetcher.data.ok ? "#1f8a4c" : "#a00" }}>
+            {bulkFetcher.data.ok
+              ? `Updated ${bulkFetcher.data.updated} variants. Skipped ${bulkFetcher.data.skipped}. Failed ${bulkFetcher.data.failed}.`
               : `✗ ${bulkFetcher.data.error}`}
           </p>
         ) : null}
