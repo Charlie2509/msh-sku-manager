@@ -3,7 +3,7 @@ import { authenticate } from "../shopify.server";
 import { suggestColourFromImage } from "../lib/imageMatcher.server";
 import { isVisionLlmEnabled, classifyColourWithVision } from "../lib/visionLlm.server";
 import { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, writeAssignedColour } from "../lib/assignedColour.server";
-import { detectColour, detectColourFromVariant, detectSizeFromVariant, getAllowedColoursMessage, parseProductTitle } from "../lib/skuParser";
+import { detectColour, detectColourFromVariant, detectSizeFromVariant, getAllowedColoursMessage, normalizeColourDisplay, parseProductTitle } from "../lib/skuParser";
 import { generateVariantSku } from "../lib/skuGenerator";
 
 // dHash distance threshold (out of 64 bits). Below this we trust the suggestion enough
@@ -193,22 +193,58 @@ export const action = async ({ request }) => {
 export default function Index() {
   const { products } = useLoaderData();
   const bulkFetcher = useFetcher();
+  const DUPLICATE_SKU_WARNING = "Duplicate generated SKUs detected — do not auto-write until variants are cleaned.";
+
+  function getProductPresentation(product) {
+    const parsed = parseProductTitle(product.title, product.handle);
+    const normalizedAssignedColour = normalizeColourDisplay(product.assignedColour);
+    const variantColours = (product.variants?.edges ?? [])
+      .map(({ node }) => detectColourFromVariant(node, parsed.allowedColours))
+      .filter(Boolean);
+    const effectiveColour = parsed.colour ?? variantColours[0] ?? normalizedAssignedColour ?? null;
+    const colourSource = parsed.colour ? "title" : variantColours.length ? "variant" : normalizedAssignedColour ? "assigned" : null;
+    const hasColorOption = (product.options ?? []).some((o) =>
+      ["color", "colour"].includes((o.name || "").toLowerCase()),
+    );
+
+    let effectiveStatus = parsed.status;
+    let effectiveReason = parsed.partialReason;
+    if (parsed.model && parsed.type && effectiveColour) {
+      effectiveStatus = "matched";
+      effectiveReason = null;
+    } else if (parsed.model && parsed.type && !effectiveColour && !hasColorOption) {
+      effectiveStatus = "needs-colour";
+      effectiveReason = "single-colour product, assign colour manually";
+    } else if (!parsed.model) {
+      effectiveStatus = "review";
+      effectiveReason = "missing model / possible non-Macron product";
+    }
+
+    const variantRows = [];
+    const counts = new Map();
+    for (const { node: variant } of (product.variants?.edges ?? [])) {
+      const variantColour = detectColourFromVariant(variant, parsed.allowedColours);
+      const variantSize = detectSizeFromVariant(variant);
+      const finalColour = variantColour ?? effectiveColour;
+      const generatedSku = generateVariantSku({ model: parsed.model, colour: finalColour, size: variantSize });
+      counts.set(generatedSku, (counts.get(generatedSku) ?? 0) + 1);
+      variantRows.push({ id: variant.id, variantColour, variantSize, generatedSku });
+    }
+    const hasDuplicateGeneratedSkus = [...counts.values()].some((n) => n > 1);
+    return { parsed, normalizedAssignedColour, effectiveColour, colourSource, hasColorOption, effectiveStatus, effectiveReason, variantRows, hasDuplicateGeneratedSkus };
+  }
 
   // Quick stats for the dashboard summary
   const stats = products.reduce(
     (acc, p) => {
-      const parsed = parseProductTitle(p.title, p.handle);
-      const variantColour = (p.variants?.edges ?? [])
-        .map(({ node }) => detectColourFromVariant(node, parsed.allowedColours))
-        .find(Boolean);
-      const titleColour = parsed.colour;
-      const hasColour = Boolean(titleColour || variantColour || p.assignedColour);
-      if (parsed.model && parsed.type && hasColour) acc.matched += 1;
-      else if (!parsed.model) acc.review += 1;
+      const presentation = getProductPresentation(p);
+      if (presentation.effectiveStatus === "matched") acc.matched += 1;
+      else if (presentation.effectiveStatus === "review") acc.review += 1;
       else acc.needsColour += 1;
+      if (presentation.hasDuplicateGeneratedSkus) acc.duplicateSkuWarning += 1;
       return acc;
     },
-    { matched: 0, needsColour: 0, review: 0 },
+    { matched: 0, needsColour: 0, review: 0, duplicateSkuWarning: 0 },
   );
 
   return (
@@ -227,7 +263,7 @@ export default function Index() {
           SKU Dashboard
         </h2>
         <p style={{ marginTop: 0, marginBottom: "1rem", color: "#616161" }}>
-          ✅ {stats.matched} matched · ⚠ {stats.needsColour} need colour · 🔍 {stats.review} need review
+          ✅ {stats.matched} matched · ⚠ {stats.needsColour} need colour · 🔍 {stats.review} review · ⚠ {stats.duplicateSkuWarning} duplicate SKU warnings
         </p>
         <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
           <bulkFetcher.Form method="post">
@@ -272,35 +308,16 @@ export default function Index() {
         >
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             {products.map((product) => {
-              const parsed = parseProductTitle(product.title, product.handle);
-
-              // If title didn't yield a colour but variants have a Color option, treat as matched
-              const variantColours = (product.variants?.edges ?? [])
-                .map(({ node }) => detectColourFromVariant(node, parsed.allowedColours))
-                .filter(Boolean);
-              // Priority: title-detected colour > variant Color option > assigned-colour metafield
-              const effectiveColour =
-                parsed.colour ?? variantColours[0] ?? product.assignedColour ?? null;
-              const colourSource = parsed.colour
-                ? "title"
-                : variantColours.length
-                  ? "variant"
-                  : product.assignedColour
-                    ? "assigned"
-                    : null;
-              // Detect whether the product has a Color option at all (not just per variant)
-              const hasColorOption = (product.options ?? []).some((o) =>
-                ["color", "colour"].includes((o.name || "").toLowerCase()),
-              );
-              let effectiveStatus = parsed.status;
-              let effectiveReason = parsed.partialReason;
-              if (parsed.model && parsed.type && effectiveColour) {
-                effectiveStatus = "matched";
-                effectiveReason = null;
-              } else if (parsed.model && parsed.type && !effectiveColour && !hasColorOption) {
-                effectiveStatus = "needs-colour";
-                effectiveReason = "single-colour product, assign colour manually";
-              }
+              const {
+                parsed,
+                normalizedAssignedColour,
+                effectiveColour,
+                colourSource,
+                effectiveStatus,
+                effectiveReason,
+                variantRows,
+                hasDuplicateGeneratedSkus,
+              } = getProductPresentation(product);
 
               return (
                 <div key={product.id}>
@@ -319,6 +336,7 @@ export default function Index() {
                       </p>
                     ) : null}
                     <p style={{ margin: 0 }}>→ Status: {effectiveStatus}</p>
+                    {hasDuplicateGeneratedSkus ? <p style={{ margin: 0, color: "#a00" }}>→ duplicate-sku-warning: {DUPLICATE_SKU_WARNING}</p> : null}
                     {["partial", "review", "needs-colour"].includes(effectiveStatus) && effectiveReason ? (
                       <p style={{ margin: 0 }}>→ Reason: {effectiveReason}</p>
                     ) : null}
@@ -353,7 +371,7 @@ export default function Index() {
                               name="colour"
                               defaultValue={
                                 (product.suggestion?.validatedAgainstAllowed ? product.suggestion.colour : null)
-                                ?? product.assignedColour
+                                ?? normalizedAssignedColour
                                 ?? ""
                               }
                               style={{ marginLeft: "0.5rem", padding: "0.25rem" }}
@@ -375,24 +393,12 @@ export default function Index() {
                     <p style={{ margin: 0, fontWeight: 600 }}>Variants:</p>
                     {(() => {
                       const seen = new Set();
-                      return product.variants.edges.map(({ node: variant }) => {
-                        // Prefer Shopify variant options over title parsing,
-                        // then fall back to assigned-colour metafield (effectiveColour).
-                        const variantColour = detectColourFromVariant(variant, parsed.allowedColours);
-                        const variantSize = detectSizeFromVariant(variant);
-                        const finalColour = variantColour ?? effectiveColour;
-                        const generatedSku = generateVariantSku({
-                          model: parsed.model,
-                          colour: finalColour,
-                          size: variantSize,
-                        });
-                        // Dedupe identical SKUs (e.g. variants 's' and 'Small' both normalise to '-s')
-                        const dedupeKey = generatedSku;
-                        const isDuplicate = seen.has(dedupeKey);
-                        seen.add(dedupeKey);
+                      return variantRows.map((row) => {
+                        const isDuplicate = seen.has(row.generatedSku);
+                        seen.add(row.generatedSku);
                         return (
-                          <p key={variant.id} style={{ margin: 0, opacity: isDuplicate ? 0.45 : 1 }}>
-                            - Size: {variantSize}{variantColour ? ` · Colour: ${variantColour}` : ""} → SKU: {generatedSku}{isDuplicate ? " (dup)" : ""}
+                          <p key={row.id} style={{ margin: 0, opacity: isDuplicate ? 0.45 : 1 }}>
+                            - Size: {row.variantSize}{row.variantColour ? ` · Colour: ${row.variantColour}` : ""} → SKU: {row.generatedSku}{isDuplicate ? " (dup)" : ""}
                           </p>
                         );
                       });
