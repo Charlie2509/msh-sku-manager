@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Form, useLoaderData, useFetcher } from "react-router";
 import { authenticate } from "../shopify.server";
 import { suggestColourFromImage } from "../lib/imageMatcher.server";
@@ -158,13 +158,19 @@ export const loader = async ({ request }) => {
       }
     }`;
 
+  // Dashboard view: ONE PAGE only (100 products). The bulk action buttons
+  // operate over the entire catalogue independently, so the dashboard
+  // doesn't need to render thousands of cards (which would crash the browser
+  // and time out Cloudflare).
+  const url = new URL(request.url);
+  const pageCursor = url.searchParams.get("cursor") || null;
   const products = [];
-  let cursor = null;
-  for (let page = 0; page < 50; page += 1) {
-    const r = await admin.graphql(QUERY, { variables: { cursor } });
-    const j = await r.json();
-    const pp = j?.data?.products;
-    if (!pp) break;
+  let nextCursor = null;
+  let hasMore = false;
+  const r = await admin.graphql(QUERY, { variables: { cursor: pageCursor } });
+  const j = await r.json();
+  const pp = j?.data?.products;
+  if (pp) {
     for (const { node } of pp.edges) {
       products.push({
         ...node,
@@ -172,8 +178,8 @@ export const loader = async ({ request }) => {
         assignedModel: node.assignedModel?.value ?? null,
       });
     }
-    if (!pp.pageInfo?.hasNextPage) break;
-    cursor = pp.pageInfo.endCursor;
+    hasMore = Boolean(pp.pageInfo?.hasNextPage);
+    nextCursor = pp.pageInfo?.endCursor ?? null;
   }
 
   // dHash auto-suggestions in the loader are only useful when the user is
@@ -209,7 +215,7 @@ export const loader = async ({ request }) => {
     }),
   );
 
-  return { products };
+  return { products, pagination: { hasMore, nextCursor, currentCursor: pageCursor } };
 };
 
 /**
@@ -268,27 +274,37 @@ async function fetchAllProductsForBulk(admin) {
 }
 
 
+// Each batched action processes at most this many eligible products per request.
+// Cloudflare drops connections after ~100s — keep batches well inside that.
+const BATCH_SIZE_FAST = 25;   // dHash-only (fast, ~1s each)
+const BATCH_SIZE_SLOW = 12;   // OpenAI (~3-5s each)
+
 export const action = async ({ request }) => {
   const { admin } = await authenticate.admin(request);
   const formData = await request.formData();
   const bulk = formData.get("bulk")?.toString();
+  const startIdx = Number.parseInt(formData.get("start") ?? "0", 10) || 0;
 
   // ─── BULK: auto-assign all confident dHash matches ────────────────────────
   if (bulk === "autoAssignConfident") {
-    const products = await fetchAllProductsForBulk(admin);
+    const all = await fetchAllProductsForBulk(admin);
+    const eligible = all.filter((p) => {
+      if (p.assignedColour) return false;
+      const parsed = parseProductTitle(p.title, p.handle);
+      if (!parsed.model || !parsed.allowedColours?.length) return false;
+      const hasColorOption = (p.options ?? []).some((o) =>
+        ["color", "colour"].includes((o.name || "").toLowerCase()),
+      );
+      const titleColour = detectColour(p.title.split(/\s+/), p.handle);
+      if (titleColour || hasColorOption) return false;
+      return Boolean(p.featuredImage?.url);
+    });
+    const slice = eligible.slice(startIdx, startIdx + BATCH_SIZE_FAST);
     let saved = 0;
     let skipped = 0;
     await Promise.all(
-      products.map(async (p) => {
-        if (p.assignedColour) return; // already assigned, leave alone
+      slice.map(async (p) => {
         const parsed = parseProductTitle(p.title, p.handle);
-        if (!parsed.model || !parsed.allowedColours?.length) return;
-        const hasColorOption = (p.options ?? []).some((o) =>
-          ["color", "colour"].includes((o.name || "").toLowerCase()),
-        );
-        const titleColour = detectColour(p.title.split(/\s+/), p.handle);
-        if (titleColour || hasColorOption) return;
-        if (!p.featuredImage?.url) return;
         const suggestion = await suggestColourFromImage(
           p.featuredImage.url,
           parsed.modelReference?.slug ?? null,
@@ -306,7 +322,17 @@ export const action = async ({ request }) => {
         }
       }),
     );
-    return { ok: true, bulk, saved, skipped, total: products.length };
+    const nextStart = startIdx + slice.length;
+    return {
+      ok: true,
+      bulk,
+      saved,
+      skipped,
+      processedThisBatch: slice.length,
+      totalEligible: eligible.length,
+      nextStart,
+      hasMore: nextStart < eligible.length,
+    };
   }
 
   // ─── BULK: vision-LLM second-stage pass for low-confidence items ──────────
@@ -314,16 +340,17 @@ export const action = async ({ request }) => {
     if (!isVisionLlmEnabled()) {
       return { ok: false, error: "OPENAI_API_KEY not set in environment" };
     }
-    const products = await fetchAllProductsForBulk(admin);
+    const all = await fetchAllProductsForBulk(admin);
+    const eligible = all.filter((p) => {
+      if (p.assignedColour) return false;
+      const parsed = parseProductTitle(p.title, p.handle);
+      return parsed.model && parsed.allowedColours?.length && p.featuredImage?.url;
+    });
+    const slice = eligible.slice(startIdx, startIdx + BATCH_SIZE_SLOW);
     let saved = 0;
     let unknown = 0;
-    let skipped = 0;
-    // Run sequentially — OpenAI calls are slow and we want polite rate
-    for (const p of products) {
-      if (p.assignedColour) { skipped += 1; continue; }
+    for (const p of slice) {
       const parsed = parseProductTitle(p.title, p.handle);
-      if (!parsed.model || !parsed.allowedColours?.length) { skipped += 1; continue; }
-      if (!p.featuredImage?.url) { skipped += 1; continue; }
       const llmColour = await classifyColourWithVision(
         p.featuredImage.url,
         parsed.allowedColours,
@@ -336,7 +363,17 @@ export const action = async ({ request }) => {
         unknown += 1;
       }
     }
-    return { ok: true, bulk, saved, unknown, skipped, total: products.length };
+    const nextStart = startIdx + slice.length;
+    return {
+      ok: true,
+      bulk,
+      saved,
+      unknown,
+      processedThisBatch: slice.length,
+      totalEligible: eligible.length,
+      nextStart,
+      hasMore: nextStart < eligible.length,
+    };
   }
 
   // ─── BULK: vision-LLM second-stage pass for MODEL identification ──────────
@@ -347,16 +384,18 @@ export const action = async ({ request }) => {
     if (!isVisionLlmEnabled()) {
       return { ok: false, error: "OPENAI_API_KEY not set in environment" };
     }
-    const products = await fetchAllProductsForBulk(admin);
+    const all = await fetchAllProductsForBulk(admin);
+    const eligible = all.filter((p) => {
+      if (p.assignedModel) return false;
+      const parsed = parseProductTitle(p.title, p.handle);
+      return !parsed.model && Boolean(p.featuredImage?.url);
+    });
+    // Multi-image vision calls are slower than colour calls — smaller batch.
+    const slice = eligible.slice(startIdx, startIdx + 6);
     let saved = 0;
     let unknown = 0;
-    let skipped = 0;
-    for (const p of products) {
-      // Only run on review-status products that don't already have an assigned model
-      if (p.assignedModel) { skipped += 1; continue; }
+    for (const p of slice) {
       const parsed = parseProductTitle(p.title, p.handle);
-      if (parsed.model) { skipped += 1; continue; }
-      if (!p.featuredImage?.url) { skipped += 1; continue; }
       const candidates = await buildCandidateModels(parsed.type, p.featuredImage.url, { topN: 8 });
       if (!candidates.length) { unknown += 1; continue; }
       const chosen = await classifyModelWithVision(p.featuredImage.url, candidates, parsed.type);
@@ -367,18 +406,33 @@ export const action = async ({ request }) => {
         unknown += 1;
       }
     }
-    return { ok: true, bulk, saved, unknown, skipped, total: products.length };
+    const nextStart = startIdx + slice.length;
+    return {
+      ok: true,
+      bulk,
+      saved,
+      unknown,
+      processedThisBatch: slice.length,
+      totalEligible: eligible.length,
+      nextStart,
+      hasMore: nextStart < eligible.length,
+    };
   }
 
   if (bulk === "writeSafeSkus") {
-    const products = await fetchAllProductsForBulk(admin);
+    const all = await fetchAllProductsForBulk(admin);
+    const eligible = all.filter((product) => {
+      const p = getProductPresentation(product);
+      return p.isWriteable;
+    });
+    const slice = eligible.slice(startIdx, startIdx + 25);
     let updated = 0;
     let skipped = 0;
     let failed = 0;
     let failedProducts = 0;
     const userErrorMessages = [];
 
-    for (const product of products) {
+    for (const product of slice) {
       const presentation = getProductPresentation(product);
       if (!presentation.isWriteable) continue;
 
@@ -460,6 +514,7 @@ export const action = async ({ request }) => {
       }
     }
 
+    const nextStart = startIdx + slice.length;
     return {
       ok: true,
       bulk,
@@ -468,6 +523,71 @@ export const action = async ({ request }) => {
       failed,
       failedProducts,
       userErrors: userErrorMessages.slice(0, 5),
+      processedThisBatch: slice.length,
+      totalEligible: eligible.length,
+      nextStart,
+      hasMore: nextStart < eligible.length,
+    };
+  }
+
+  // ─── BULK: clean up duplicate variants per product ────────────────────────
+  // Variants like "S" and "Small" produce the same generated SKU. Keep the
+  // first variant per SKU, delete the duplicates. Inventory is moved by
+  // Shopify automatically (orders that reference the deleted variant become
+  // historical records).
+  if (bulk === "mergeDuplicateVariants") {
+    const all = await fetchAllProductsForBulk(admin);
+    const productsWithDupes = all.filter((product) => {
+      return getProductPresentation(product).hasDuplicateGeneratedSkus;
+    });
+    const slice = productsWithDupes.slice(startIdx, startIdx + 10);
+    let merged = 0;
+    let failed = 0;
+    const userErrorMessages = [];
+    for (const product of slice) {
+      const presentation = getProductPresentation(product);
+      if (!presentation.hasDuplicateGeneratedSkus) continue;
+      // The keepers are presentation.writableVariantRows; everything else in
+      // variantRows with a matching generated SKU is a duplicate to delete.
+      const keepIds = new Set(presentation.writableVariantRows.map((r) => r.id));
+      const toDelete = presentation.variantRows
+        .filter((r) => !keepIds.has(r.id))
+        .map((r) => r.id);
+      if (!toDelete.length) continue;
+      try {
+        const resp = await admin.graphql(
+          `#graphql
+          mutation productVariantsBulkDelete($productId: ID!, $variantsIds: [ID!]!) {
+            productVariantsBulkDelete(productId: $productId, variantsIds: $variantsIds) {
+              userErrors { field message }
+            }
+          }`,
+          { variables: { productId: product.id, variantsIds: toDelete } },
+        );
+        const json = await resp.json();
+        const errs = json?.data?.productVariantsBulkDelete?.userErrors ?? [];
+        if (errs.length) {
+          failed += 1;
+          userErrorMessages.push(`${product.title}: ${errs.map((e) => e.message).join("; ")}`);
+        } else {
+          merged += toDelete.length;
+        }
+      } catch (err) {
+        failed += 1;
+        userErrorMessages.push(`${product.title}: ${err?.message ?? "unknown"}`);
+      }
+    }
+    const nextStart = startIdx + slice.length;
+    return {
+      ok: true,
+      bulk,
+      merged,
+      failed,
+      processedThisBatch: slice.length,
+      totalEligible: productsWithDupes.length,
+      userErrors: userErrorMessages.slice(0, 5),
+      nextStart,
+      hasMore: nextStart < productsWithDupes.length,
     };
   }
 
@@ -489,8 +609,9 @@ export const action = async ({ request }) => {
   return { ok: true, productId, colour: colour || null, model: model || null };
 };
 
+
 export default function Index() {
-  const { products } = useLoaderData();
+  const { products, pagination } = useLoaderData();
   const bulkFetcher = useFetcher();
   const [activeFilter, setActiveFilter] = useState("all");
 
@@ -499,7 +620,6 @@ export default function Index() {
     [products],
   );
 
-  // Quick stats for the dashboard summary
   const stats = productPresentations.reduce(
     (acc, { presentation }) => {
       if (presentation.effectiveStatus === "matched") acc.matched += 1;
@@ -513,26 +633,10 @@ export default function Index() {
 
   const filterDefinitions = [
     { key: "all", label: "All", count: productPresentations.length },
-    {
-      key: "safe-to-write",
-      label: "Safe to write",
-      count: productPresentations.filter(({ presentation }) => presentation.isSafeForSkuWrite).length,
-    },
-    {
-      key: "needs-colour",
-      label: "Needs colour",
-      count: productPresentations.filter(({ presentation }) => presentation.effectiveStatus === "needs-colour").length,
-    },
-    {
-      key: "review",
-      label: "Review",
-      count: productPresentations.filter(({ presentation }) => presentation.effectiveStatus === "review").length,
-    },
-    {
-      key: "duplicate-sku-warnings",
-      label: "Duplicate SKU warnings",
-      count: productPresentations.filter(({ presentation }) => presentation.hasDuplicateGeneratedSkus).length,
-    },
+    { key: "safe-to-write", label: "Safe to write", count: productPresentations.filter(({ presentation }) => presentation.isSafeForSkuWrite).length },
+    { key: "needs-colour", label: "Needs colour", count: productPresentations.filter(({ presentation }) => presentation.effectiveStatus === "needs-colour").length },
+    { key: "review", label: "Review", count: productPresentations.filter(({ presentation }) => presentation.effectiveStatus === "review").length },
+    { key: "duplicate-sku-warnings", label: "Duplicate variants", count: productPresentations.filter(({ presentation }) => presentation.hasDuplicateGeneratedSkus).length },
   ];
 
   const filteredProducts = productPresentations.filter(({ presentation }) => {
@@ -543,96 +647,76 @@ export default function Index() {
     return true;
   });
 
+  const data = bulkFetcher.data;
+  const isBusy = bulkFetcher.state !== "idle";
+
+  // Auto-continue batched bulk actions until done.
+  useEffect(() => {
+    if (!data?.hasMore || isBusy) return;
+    const fd = new FormData();
+    fd.set("bulk", data.bulk);
+    fd.set("start", String(data.nextStart));
+    bulkFetcher.submit(fd, { method: "post" });
+  }, [data?.hasMore, data?.nextStart, data?.bulk, isBusy]);
+
+  function startBulk(name) {
+    const fd = new FormData();
+    fd.set("bulk", name);
+    fd.set("start", "0");
+    bulkFetcher.submit(fd, { method: "post" });
+  }
+
   return (
     <div style={{ padding: "1.6rem" }}>
-      {/* Shared list of all known Macron models, referenced by every model-assign input */}
       <datalist id="macron-models-list">
         {macronModelReferences.map((ref) => (
           <option key={ref.slug} value={ref.displayName} />
         ))}
       </datalist>
       <h1 style={{ fontSize: "1.75rem", marginBottom: "1rem" }}>MSH SKU Manager</h1>
-      <div
-        style={{
-          background: "white",
-          border: "1px solid #dfe3e8",
-          borderRadius: "12px",
-          padding: "1.25rem",
-          maxWidth: "640px",
-        }}
-      >
-        <h2 style={{ fontSize: "1.25rem", marginTop: 0, marginBottom: "0.5rem" }}>
-          SKU Dashboard
-        </h2>
-        <p style={{ marginTop: 0, marginBottom: "1rem", color: "#616161" }}>
-          ✅ {stats.matched} matched · ⚠ {stats.needsColour} need colour · 🔍 {stats.review} review · ⚠ {stats.duplicateSkuWarning} duplicate SKU warnings
+
+      <div style={{ background: "white", border: "1px solid #dfe3e8", borderRadius: "12px", padding: "1.25rem", maxWidth: "780px" }}>
+        <h2 style={{ fontSize: "1.25rem", marginTop: 0, marginBottom: "0.5rem" }}>SKU Dashboard</h2>
+        <p style={{ marginTop: 0, marginBottom: "0.5rem", color: "#616161", fontSize: "0.875rem" }}>
+          This page: {productPresentations.length} products · {stats.matched} matched · {stats.needsColour} need colour · {stats.review} need review · {stats.duplicateSkuWarning} have duplicate variants
         </p>
-        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-          <bulkFetcher.Form method="post">
-            <input type="hidden" name="bulk" value="autoAssignConfident" />
-            <button type="submit" disabled={bulkFetcher.state !== "idle"} style={{ padding: "0.5rem 1rem" }}>
-              {bulkFetcher.state !== "idle" && bulkFetcher.formData?.get("bulk") === "autoAssignConfident"
-                ? "Working…"
-                : "Auto-assign confident matches"}
-            </button>
-          </bulkFetcher.Form>
-          <bulkFetcher.Form method="post">
-            <input type="hidden" name="bulk" value="visionPass" />
-            <button type="submit" disabled={bulkFetcher.state !== "idle"} style={{ padding: "0.5rem 1rem" }}>
-              {bulkFetcher.state !== "idle" && bulkFetcher.formData?.get("bulk") === "visionPass"
-                ? "Asking OpenAI (colours)…"
-                : "Vision pass: COLOURS"}
-            </button>
-          </bulkFetcher.Form>
-          <bulkFetcher.Form method="post">
-            <input type="hidden" name="bulk" value="visionPassModels" />
-            <button type="submit" disabled={bulkFetcher.state !== "idle"} style={{ padding: "0.5rem 1rem" }}>
-              {bulkFetcher.state !== "idle" && bulkFetcher.formData?.get("bulk") === "visionPassModels"
-                ? "Asking OpenAI (models)…"
-                : "Vision pass: MODELS"}
-            </button>
-          </bulkFetcher.Form>
-          <bulkFetcher.Form method="post">
-            <input type="hidden" name="bulk" value="writeSafeSkus" />
-            <button type="submit" disabled={bulkFetcher.state !== "idle"} style={{ padding: "0.5rem 1rem" }}>
-              {bulkFetcher.state !== "idle" && bulkFetcher.formData?.get("bulk") === "writeSafeSkus"
-                ? "Writing SKUs…"
-                : "Write safe SKUs to Shopify"}
-            </button>
-          </bulkFetcher.Form>
+
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.75rem" }}>
+          <button type="button" disabled={isBusy} onClick={() => startBulk("autoAssignConfident")} style={{ padding: "0.5rem 1rem" }}>
+            1. Auto-assign confident matches
+          </button>
+          <button type="button" disabled={isBusy} onClick={() => startBulk("visionPassModels")} style={{ padding: "0.5rem 1rem" }}>
+            2. Vision: identify MODELS (OpenAI)
+          </button>
+          <button type="button" disabled={isBusy} onClick={() => startBulk("visionPass")} style={{ padding: "0.5rem 1rem" }}>
+            3. Vision: identify COLOURS (OpenAI)
+          </button>
+          <button type="button" disabled={isBusy} onClick={() => startBulk("mergeDuplicateVariants")} style={{ padding: "0.5rem 1rem" }}>
+            4. Merge duplicate size variants
+          </button>
+          <button type="button" disabled={isBusy} onClick={() => startBulk("writeSafeSkus")} style={{ padding: "0.5rem 1rem", background: "#1f8a4c", color: "white", border: "none", borderRadius: "6px" }}>
+            5. Write safe SKUs to Shopify
+          </button>
         </div>
-        <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: "#a06600" }}>
-          Matched products are updated. For products with duplicate variants, only the first occurrence of each SKU is written — clean up duplicates in Shopify afterwards.
+
+        {data ? (
+          <div style={{ marginTop: "0.75rem", padding: "0.5rem 0.75rem", background: "#eef6ff", borderRadius: "6px", fontSize: "0.875rem" }}>
+            {data.ok === false ? <span style={{ color: "#a00" }}>✗ {data.error}</span> :
+             data.bulk === "autoAssignConfident" ? <span>dHash colour-assign: {data.nextStart ?? 0} of {data.totalEligible} done · saved {data.saved} {data.hasMore ? "· continuing…" : "✓"}</span> :
+             data.bulk === "visionPass" ? <span>OpenAI colour pass: {data.nextStart ?? 0} of {data.totalEligible} done · saved {data.saved} · unknown {data.unknown} {data.hasMore ? "· continuing…" : "✓"}</span> :
+             data.bulk === "visionPassModels" ? <span>OpenAI model pass: {data.nextStart ?? 0} of {data.totalEligible} done · saved {data.saved} · unknown {data.unknown} {data.hasMore ? "· continuing…" : "✓"}</span> :
+             data.bulk === "mergeDuplicateVariants" ? <span>Merge duplicates: {data.nextStart ?? 0} of {data.totalEligible} products done · {data.merged} variants deleted · {data.failed} failed {data.hasMore ? "· continuing…" : "✓"}</span> :
+             data.bulk === "writeSafeSkus" ? <span>SKU write: {data.nextStart ?? 0} of {data.totalEligible} products done · {data.updated} variants updated {data.hasMore ? "· continuing…" : "✓"}{data.userErrors?.length ? ` · errors: ${data.userErrors.join(" | ")}` : ""}</span> :
+             null}
+          </div>
+        ) : null}
+
+        <p style={{ margin: "0.75rem 0 0", fontSize: "0.8rem", color: "#a06600" }}>
+          Run buttons in order 1 → 5. Each runs across the entire catalogue and continues automatically in batches until done.
         </p>
-        {bulkFetcher.data?.bulk === "autoAssignConfident" ? (
-          <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: "#1f8a4c" }}>
-            ✓ Auto-assigned {bulkFetcher.data.saved} of {bulkFetcher.data.total} (skipped {bulkFetcher.data.skipped})
-          </p>
-        ) : null}
-        {bulkFetcher.data?.bulk === "visionPass" ? (
-          <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: bulkFetcher.data.ok ? "#1f8a4c" : "#a00" }}>
-            {bulkFetcher.data.ok
-              ? `✓ OpenAI colour pass: ${bulkFetcher.data.saved} assigned, ${bulkFetcher.data.unknown} unknown, ${bulkFetcher.data.skipped} skipped`
-              : `✗ ${bulkFetcher.data.error}`}
-          </p>
-        ) : null}
-        {bulkFetcher.data?.bulk === "visionPassModels" ? (
-          <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: bulkFetcher.data.ok ? "#1f8a4c" : "#a00" }}>
-            {bulkFetcher.data.ok
-              ? `✓ OpenAI model pass: ${bulkFetcher.data.saved} assigned, ${bulkFetcher.data.unknown} unknown, ${bulkFetcher.data.skipped} skipped`
-              : `✗ ${bulkFetcher.data.error}`}
-          </p>
-        ) : null}
-        {bulkFetcher.data?.bulk === "writeSafeSkus" ? (
-          <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: bulkFetcher.data.ok ? "#1f8a4c" : "#a00" }}>
-            {bulkFetcher.data.ok
-              ? `Updated ${bulkFetcher.data.updated} variants. Skipped ${bulkFetcher.data.skipped}. Failed ${bulkFetcher.data.failed}${bulkFetcher.data.failedProducts ? ` across ${bulkFetcher.data.failedProducts} products` : ""}.${bulkFetcher.data.userErrors?.length ? ` Errors: ${bulkFetcher.data.userErrors.join(" | ")}` : ""}`
-              : `✗ ${bulkFetcher.data.error}`}
-          </p>
-        ) : null}
       </div>
 
-      <div style={{ marginTop: "1rem", maxWidth: "640px" }}>
+      <div style={{ marginTop: "1rem", maxWidth: "780px" }}>
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
           {filterDefinitions.map((filter) => {
             const isActive = activeFilter === filter.key;
@@ -656,151 +740,69 @@ export default function Index() {
             );
           })}
         </div>
-        <div
-          style={{
-            background: "white",
-            border: "1px solid #dfe3e8",
-            borderRadius: "12px",
-            padding: "1rem",
-          }}
-        >
+
+        {pagination ? (
+          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem", fontSize: "0.875rem" }}>
+            {pagination.currentCursor ? (
+              <a href="/app" style={{ padding: "0.4rem 0.7rem", borderRadius: "6px", border: "1px solid #dfe3e8", textDecoration: "none", color: "#303030" }}>← First page</a>
+            ) : null}
+            {pagination.hasMore ? (
+              <a href={`/app?cursor=${encodeURIComponent(pagination.nextCursor)}`} style={{ padding: "0.4rem 0.7rem", borderRadius: "6px", border: "1px solid #dfe3e8", textDecoration: "none", color: "#303030" }}>Next page →</a>
+            ) : null}
+          </div>
+        ) : null}
+
+        <div style={{ background: "white", border: "1px solid #dfe3e8", borderRadius: "12px", padding: "1rem" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             {filteredProducts.map(({ product, presentation }) => {
-              const {
-                parsed,
-                normalizedAssignedColour,
-                effectiveColour,
-                colourSource,
-                effectiveStatus,
-                effectiveReason,
-                variantRows,
-                hasDuplicateGeneratedSkus,
-                isSafeForSkuWrite,
-              } = presentation;
-
+              const { parsed, effectiveColour, colourSource, effectiveStatus, effectiveReason, variantRows, hasDuplicateGeneratedSkus, isSafeForSkuWrite } = presentation;
+              const statusColour = effectiveStatus === "matched" ? "#1f8a4c" : effectiveStatus === "review" ? "#a00" : "#a06600";
               return (
-                <div key={product.id}>
+                <div key={product.id} style={{ borderTop: "1px solid #f0f0f0", paddingTop: "0.6rem" }}>
                   <p style={{ margin: 0, fontWeight: 700 }}>{product.title}</p>
-                  <p style={{ margin: 0, fontSize: "0.875rem", color: "#616161" }}>
-                    {product.handle}
-                  </p>
-                  <div style={{ marginTop: "0.25rem", fontSize: "0.875rem", color: "#303030" }}>
-                    {parsed.club ? <p style={{ margin: 0 }}>→ Club: {parsed.club}</p> : null}
-                    {parsed.model ? (
-                      <p style={{ margin: 0 }}>
-                        → Model: {parsed.model}
-                        {presentation.modelSource === "assigned" ? " (from assigned)" : ""}
-                      </p>
-                    ) : null}
-                    <p style={{ margin: 0 }}>→ Type: {parsed.type ?? ""}</p>
-                    {effectiveColour ? (
-                      <p style={{ margin: 0 }}>
-                        → Colour: {effectiveColour}
-                        {colourSource && colourSource !== "title" ? ` (from ${colourSource})` : ""}
-                      </p>
-                    ) : null}
-                    <p style={{ margin: 0 }}>→ Status: {effectiveStatus}</p>
-                    <p style={{ margin: 0 }}>→ Safe for SKU write: {isSafeForSkuWrite ? "yes" : "no"}</p>
-                    {hasDuplicateGeneratedSkus ? <p style={{ margin: 0, color: "#a00" }}>→ duplicate-sku-warning: {DUPLICATE_SKU_WARNING}</p> : null}
-                    {["partial", "review", "needs-colour"].includes(effectiveStatus) && effectiveReason ? (
-                      <p style={{ margin: 0 }}>→ Reason: {effectiveReason}</p>
-                    ) : null}
-                    {(effectiveStatus === "partial" || effectiveStatus === "needs-colour") && parsed.modelReference ? (
-                      <p style={{ margin: 0 }}>
-                        → Allowed colours: {getAllowedColoursMessage(parsed)}
-                      </p>
-                    ) : null}
-
-                    {effectiveStatus === "review" ? (
-                      <div style={{ marginTop: "0.5rem", padding: "0.5rem", background: "#fff8e6", borderRadius: "6px" }}>
-                        <p style={{ margin: 0, fontSize: "0.875rem" }}>
-                          Pick a Macron base model for this product:
-                        </p>
-                        <Form method="post" style={{ marginTop: "0.4rem", display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
-                          <input type="hidden" name="productId" value={product.id} />
-                          <input
-                            list="macron-models-list"
-                            name="model"
-                            placeholder="Type to search models…"
-                            defaultValue={product.assignedModel ?? ""}
-                            style={{ padding: "0.25rem", minWidth: "200px" }}
-                            autoComplete="off"
-                          />
-                          <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>
-                            Save model
-                          </button>
-                        </Form>
-                      </div>
-                    ) : null}
-
-                    {effectiveStatus === "needs-colour" && parsed.allowedColours?.length > 0 ? (
-                      <div style={{ marginTop: "0.5rem", padding: "0.5rem", background: "#f6f6f6", borderRadius: "6px" }}>
-                        {product.suggestion ? (
-                          <p style={{ margin: 0, fontSize: "0.875rem" }}>
-                            🔍 Auto-detected from image:{" "}
-                            <strong>{product.suggestion.colour}</strong>{" "}
-                            <span style={{ color: product.suggestion.isStrong && product.suggestion.validatedAgainstAllowed ? "#1f8a4c" : "#a06600" }}>
-                              ({Math.round(product.suggestion.confidence * 100)}% confidence
-                              {product.suggestion.scopedToExpectedProduct ? "" : ", different model"}
-                              {!product.suggestion.validatedAgainstAllowed ? ", NOT in allowed colours — override below" : ""})
-                            </span>
-                          </p>
-                        ) : (
-                          <p style={{ margin: 0, fontSize: "0.875rem", color: "#a06600" }}>
-                            ⚠ No image suggestion (run scripts/index-pim-images.mjs first, or no featured image on product)
-                          </p>
-                        )}
-                        <Form method="post" style={{ marginTop: "0.4rem", display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                          <input type="hidden" name="productId" value={product.id} />
-                          <label style={{ fontSize: "0.875rem", color: "#303030" }}>
-                            {product.suggestion ? "Accept or override:" : "Assign colour:"}
-                            <select
-                              name="colour"
-                              defaultValue={
-                                (product.suggestion?.validatedAgainstAllowed ? product.suggestion.colour : null)
-                                ?? normalizedAssignedColour
-                                ?? ""
-                              }
-                              style={{ marginLeft: "0.5rem", padding: "0.25rem" }}
-                            >
-                              <option value="">— pick —</option>
-                              {parsed.allowedColours.map((c) => (
-                                <option key={c} value={c}>{c}</option>
-                              ))}
-                            </select>
-                          </label>
-                          <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>
-                            Save
-                          </button>
-                        </Form>
-                      </div>
-                    ) : null}
+                  <p style={{ margin: 0, fontSize: "0.8rem", color: "#888" }}>{product.handle}</p>
+                  <div style={{ marginTop: "0.25rem", fontSize: "0.85rem", color: "#303030", lineHeight: 1.5 }}>
+                    {parsed.club ? <span>Club: <strong>{parsed.club}</strong> · </span> : null}
+                    {parsed.model ? <span>Model: <strong>{parsed.model}</strong>{presentation.modelSource === "assigned" ? " (assigned)" : ""} · </span> : null}
+                    <span>Type: <strong>{parsed.type ?? "—"}</strong> · </span>
+                    {effectiveColour ? <span>Colour: <strong>{effectiveColour}</strong>{colourSource && colourSource !== "title" ? ` (${colourSource})` : ""} · </span> : null}
+                    <span style={{ color: statusColour }}>Status: <strong>{effectiveStatus}</strong></span>
+                    {hasDuplicateGeneratedSkus ? <span style={{ color: "#a00" }}> · ⚠ duplicate variants</span> : null}
+                    {isSafeForSkuWrite ? <span style={{ color: "#1f8a4c" }}> · ✓ safe to write</span> : null}
                   </div>
-                  <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", color: "#303030" }}>
-                    <p style={{ margin: 0, fontWeight: 600 }}>Variants:</p>
-                    {(() => {
-                      const seen = new Set();
-                      return variantRows.map((row) => {
-                        const isDuplicate = seen.has(row.generatedSku);
-                        seen.add(row.generatedSku);
-                        const shouldHideGeneratedSku = (
-                          effectiveStatus === "review"
-                          || (effectiveStatus === "needs-colour" && row.generatedSku?.toLowerCase().includes("na"))
-                        );
-                        const skuMessage = effectiveStatus === "review"
-                          ? "SKU: not generated — review required"
-                          : "SKU: pending colour assignment";
-                        return (
-                          <p key={row.id} style={{ margin: 0, opacity: isDuplicate ? 0.45 : 1 }}>
-                            - Size: {formatSizeLabel(row.variantSize)}{row.variantColour ? ` · Colour: ${row.variantColour}` : ""} → {shouldHideGeneratedSku ? skuMessage : `SKU: ${row.generatedSku}`}{isDuplicate ? " (dup)" : ""}
-                          </p>
-                        );
-                      });
-                    })()}
-                  </div>
+                  {effectiveReason ? <p style={{ margin: "0.2rem 0 0", fontSize: "0.8rem", color: "#888" }}>{effectiveReason}</p> : null}
+                  {effectiveStatus === "review" ? (
+                    <Form method="post" style={{ marginTop: "0.4rem", display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+                      <input type="hidden" name="productId" value={product.id} />
+                      <input list="macron-models-list" name="model" placeholder="Type Macron model…" defaultValue={product.assignedModel ?? ""} style={{ padding: "0.25rem", minWidth: "200px" }} autoComplete="off" />
+                      <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>Save model</button>
+                    </Form>
+                  ) : null}
+                  {effectiveStatus === "needs-colour" && parsed.allowedColours?.length > 0 ? (
+                    <Form method="post" style={{ marginTop: "0.4rem", display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+                      <input type="hidden" name="productId" value={product.id} />
+                      <select name="colour" defaultValue={product.assignedColour ?? ""} style={{ padding: "0.25rem" }}>
+                        <option value="">— pick colour —</option>
+                        {parsed.allowedColours.map((c) => (<option key={c} value={c}>{c}</option>))}
+                      </select>
+                      <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>Save colour</button>
+                    </Form>
+                  ) : null}
+                  <details style={{ marginTop: "0.4rem", fontSize: "0.8rem", color: "#555" }}>
+                    <summary style={{ cursor: "pointer" }}>{variantRows.length} variants</summary>
+                    {variantRows.map((row, i) => {
+                      const isDup = i > 0 && variantRows.slice(0, i).some((r) => r.generatedSku === row.generatedSku);
+                      return (
+                        <div key={row.id} style={{ paddingLeft: "1rem", opacity: isDup ? 0.5 : 1 }}>
+                          {formatSizeLabel(row.variantSize)} → <code>{row.generatedSku}</code>{isDup ? " (dup)" : ""}
+                        </div>
+                      );
+                    })}
+                  </details>
                 </div>
               );
             })}
+            {filteredProducts.length === 0 ? <p style={{ color: "#888", margin: 0 }}>No products in this filter.</p> : null}
           </div>
         </div>
       </div>
