@@ -127,10 +127,13 @@ function getProductPresentation(product) {
 export const loader = async ({ request }) => {
   const { admin } = await authenticate.admin(request);
 
-  const response = await admin.graphql(`
-    #graphql
-    query DashboardProducts {
-      products(first: 50) {
+  // Cursor-paginate the dashboard view across the entire catalogue.
+  // We deliberately fetch ALL products so bulk actions, stats, and tabs
+  // reflect the real state of the store (not just the first page).
+  const QUERY = `#graphql
+    query DashboardProducts($cursor: String) {
+      products(first: 100, after: $cursor) {
+        pageInfo { hasNextPage endCursor }
         edges {
           node {
             id
@@ -138,12 +141,8 @@ export const loader = async ({ request }) => {
             handle
             featuredImage { url altText }
             options { name values }
-            assignedColour: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_COLOUR_KEY}") {
-              value
-            }
-            assignedModel: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_MODEL_KEY}") {
-              value
-            }
+            assignedColour: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_COLOUR_KEY}") { value }
+            assignedModel:  metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_MODEL_KEY}")  { value }
             variants(first: 50) {
               edges {
                 node {
@@ -157,33 +156,49 @@ export const loader = async ({ request }) => {
           }
         }
       }
+    }`;
+
+  const products = [];
+  let cursor = null;
+  for (let page = 0; page < 50; page += 1) {
+    const r = await admin.graphql(QUERY, { variables: { cursor } });
+    const j = await r.json();
+    const pp = j?.data?.products;
+    if (!pp) break;
+    for (const { node } of pp.edges) {
+      products.push({
+        ...node,
+        assignedColour: node.assignedColour?.value ?? null,
+        assignedModel: node.assignedModel?.value ?? null,
+      });
     }
-  `);
+    if (!pp.pageInfo?.hasNextPage) break;
+    cursor = pp.pageInfo.endCursor;
+  }
 
-  const responseJson = await response.json();
-  const products = responseJson.data.products.edges.map(({ node }) => ({
-    ...node,
-    assignedColour: node.assignedColour?.value ?? null,
-    assignedModel: node.assignedModel?.value ?? null,
-  }));
+  // dHash auto-suggestions in the loader are only useful when the user is
+  // actively reviewing individual cards. For a multi-hundred catalogue we
+  // skip them on render (each is a network image fetch) and rely on the
+  // explicit "Auto-assign confident matches" button to do the bulk work.
+  // Cap at first SUGGESTION_LIMIT eligible products so small dev stores still
+  // see suggestions on first load.
+  const SUGGESTION_LIMIT = 30;
+  const eligible = products.filter((p) => {
+    if (p.assignedColour) return false;
+    const parsed = parseProductTitle(p.title, p.handle);
+    if (!parsed.model || !parsed.allowedColours?.length) return false;
+    const hasColorOption = (p.options ?? []).some((o) =>
+      ["color", "colour"].includes((o.name || "").toLowerCase()),
+    );
+    const titleColour = detectColour(p.title.split(/\s+/), p.handle);
+    return !titleColour && !hasColorOption && Boolean(p.featuredImage?.url);
+  }).slice(0, SUGGESTION_LIMIT);
 
-  // For each product, auto-run dHash visual matching against the PIM image library.
-  // Runs in parallel; gracefully no-ops if the index isn't built yet.
   await Promise.all(
-    products.map(async (p) => {
-      if (p.assignedColour) return; // already assigned by user — nothing to do
+    eligible.map(async (p) => {
       const parsed = parseProductTitle(p.title, p.handle);
-      if (!parsed.model || !parsed.allowedColours?.length) return;
-      // Only auto-match for products that look like they need a colour assigned
-      const hasColorOption = (p.options ?? []).some((o) =>
-        ["color", "colour"].includes((o.name || "").toLowerCase()),
-      );
-      const titleColour = detectColour(p.title.split(/\s+/), p.handle);
-      if (titleColour || hasColorOption) return;
-      const imageUrl = p.featuredImage?.url;
-      if (!imageUrl) return;
       const suggestion = await suggestColourFromImage(
-        imageUrl,
+        p.featuredImage.url,
         parsed.modelReference?.slug ?? null,
         parsed.allowedColours,
       );
