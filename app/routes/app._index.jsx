@@ -3,8 +3,9 @@ import { Form, useLoaderData, useFetcher } from "react-router";
 import { authenticate } from "../shopify.server";
 import { suggestColourFromImage } from "../lib/imageMatcher.server";
 import { isVisionLlmEnabled, classifyColourWithVision } from "../lib/visionLlm.server";
-import { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, writeAssignedColour } from "../lib/assignedColour.server";
+import { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, ASSIGNED_MODEL_KEY, writeAssignedColour, writeAssignedModel } from "../lib/assignedColour.server";
 import { detectColour, detectColourFromVariant, detectSizeFromVariant, formatSizeLabel, getAllowedColoursMessage, normalizeColourDisplay, parseProductTitle } from "../lib/skuParser";
+import { macronModelReferences, macronReferenceMap } from "../data/macronReference";
 import { generateVariantSku } from "../lib/skuGenerator";
 
 // dHash distance threshold (out of 64 bits). Below this we trust the suggestion enough
@@ -13,7 +14,27 @@ const STRONG_MATCH_DISTANCE = 12;
 const DUPLICATE_SKU_WARNING = "Duplicate generated SKUs detected — do not auto-write until variants are cleaned.";
 
 function getProductPresentation(product) {
-  const parsed = parseProductTitle(product.title, product.handle);
+  const titleParsed = parseProductTitle(product.title, product.handle);
+
+  // If a model has been manually assigned via metafield AND the title parser
+  // didn't already find one, use the assignment to look up the reference and
+  // overlay it onto the parse result. This unblocks "review" products that
+  // genuinely don't have a Macron model name in the title.
+  let parsed = titleParsed;
+  let modelSource = titleParsed.model ? "title" : null;
+  if (!titleParsed.model && product.assignedModel) {
+    const ref = macronReferenceMap[product.assignedModel.toLowerCase()];
+    if (ref) {
+      parsed = {
+        ...titleParsed,
+        model: ref.displayName,
+        modelReference: ref,
+        allowedColours: ref.allowedColours ?? null,
+      };
+      modelSource = "assigned";
+    }
+  }
+
   const normalizedAssignedColour = normalizeColourDisplay(product.assignedColour);
   const variantColours = (product.variants?.edges ?? [])
     .map(({ node }) => detectColourFromVariant(node, parsed.allowedColours))
@@ -34,7 +55,7 @@ function getProductPresentation(product) {
     effectiveReason = "single-colour product, assign colour manually";
   } else if (!parsed.model) {
     effectiveStatus = "review";
-    effectiveReason = "missing model / possible non-Macron product";
+    effectiveReason = "missing model — assign one below or rename product in Shopify";
   }
 
   const variantRows = [];
