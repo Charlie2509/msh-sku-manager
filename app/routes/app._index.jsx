@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { Form, useLoaderData, useFetcher } from "react-router";
 import { authenticate } from "../shopify.server";
 import { suggestColourFromImage } from "../lib/imageMatcher.server";
-import { isVisionLlmEnabled, classifyColourWithVision } from "../lib/visionLlm.server";
+import { isVisionLlmEnabled, classifyColourWithVision, classifyModelWithVision } from "../lib/visionLlm.server";
+import { buildCandidateModels } from "../lib/modelMatcher.server";
 import { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, ASSIGNED_MODEL_KEY, writeAssignedColour, writeAssignedModel } from "../lib/assignedColour.server";
 import { detectColour, detectColourFromVariant, detectSizeFromVariant, formatSizeLabel, getAllowedColoursMessage, normalizeColourDisplay, parseProductTitle } from "../lib/skuParser";
 import { macronModelReferences, macronReferenceMap } from "../data/macronReference";
@@ -79,6 +80,17 @@ function getProductPresentation(product) {
   const hasDuplicateGeneratedSkus = [...counts.values()].some((n) => n > 1);
   const hasNaGeneratedSku = variantRows.some((row) => row.generatedSku?.toLowerCase().includes("na"));
   const hasEmptyGeneratedSku = variantRows.some((row) => !row.generatedSku?.trim());
+  // Writable subset: keep first occurrence of each generated SKU. Subsequent
+  // duplicates are flagged so the user can clean them up in Shopify, but the
+  // first variants still get their SKUs written.
+  const seenSkus = new Set();
+  const writableVariantRows = variantRows.filter((row) => {
+    if (!row.generatedSku?.trim()) return false;
+    if (row.generatedSku.toLowerCase().includes("na")) return false;
+    if (seenSkus.has(row.generatedSku)) return false;
+    seenSkus.add(row.generatedSku);
+    return true;
+  });
   const isSafeForSkuWrite = (
     effectiveStatus === "matched"
     && Boolean(parsed.model)
@@ -87,8 +99,17 @@ function getProductPresentation(product) {
     && !hasNaGeneratedSku
     && !hasEmptyGeneratedSku
   );
+  // Looser gate used by the bulk writer: allow products with duplicate variants
+  // through, but only write to the first occurrence of each SKU.
+  const isWriteable = (
+    effectiveStatus === "matched"
+    && Boolean(parsed.model)
+    && Boolean(effectiveColour)
+    && writableVariantRows.length > 0
+  );
   return {
     parsed,
+    modelSource,
     normalizedAssignedColour,
     effectiveColour,
     colourSource,
@@ -96,8 +117,10 @@ function getProductPresentation(product) {
     effectiveStatus,
     effectiveReason,
     variantRows,
+    writableVariantRows,
     hasDuplicateGeneratedSkus,
     isSafeForSkuWrite,
+    isWriteable,
   };
 }
 
@@ -116,6 +139,9 @@ export const loader = async ({ request }) => {
             featuredImage { url altText }
             options { name values }
             assignedColour: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_COLOUR_KEY}") {
+              value
+            }
+            assignedModel: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_MODEL_KEY}") {
               value
             }
             variants(first: 50) {
@@ -138,6 +164,7 @@ export const loader = async ({ request }) => {
   const products = responseJson.data.products.edges.map(({ node }) => ({
     ...node,
     assignedColour: node.assignedColour?.value ?? null,
+    assignedModel: node.assignedModel?.value ?? null,
   }));
 
   // For each product, auto-run dHash visual matching against the PIM image library.
@@ -175,10 +202,11 @@ export const loader = async ({ request }) => {
  * existing assigned colour) so a bulk action can iterate over them.
  */
 async function fetchAllProductsForBulk(admin) {
-  const r = await admin.graphql(`
-    #graphql
-    query AllProducts {
-      products(first: 250) {
+  // Cursor-paginate the full catalogue. Stops at hasNextPage=false.
+  const QUERY = `#graphql
+    query AllProducts($cursor: String) {
+      products(first: 100, after: $cursor) {
+        pageInfo { hasNextPage endCursor }
         edges {
           node {
             id
@@ -187,6 +215,7 @@ async function fetchAllProductsForBulk(admin) {
             featuredImage { url }
             options { name }
             assignedColour: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_COLOUR_KEY}") { value }
+            assignedModel:  metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_MODEL_KEY}")  { value }
             variants(first: 50) {
               edges {
                 node {
@@ -194,20 +223,35 @@ async function fetchAllProductsForBulk(admin) {
                   title
                   sku
                   selectedOptions { name value }
+                  inventoryItem { id sku }
                 }
               }
             }
           }
         }
       }
+    }`;
+  const out = [];
+  let cursor = null;
+  // Hard cap at 50 pages (5,000 products) as a runaway guard.
+  for (let page = 0; page < 50; page += 1) {
+    const r = await admin.graphql(QUERY, { variables: { cursor } });
+    const json = await r.json();
+    const products = json?.data?.products;
+    if (!products) break;
+    for (const { node } of products.edges) {
+      out.push({
+        ...node,
+        assignedColour: node.assignedColour?.value ?? null,
+        assignedModel: node.assignedModel?.value ?? null,
+      });
     }
-  `);
-  const json = await r.json();
-  return json.data.products.edges.map(({ node }) => ({
-    ...node,
-    assignedColour: node.assignedColour?.value ?? null,
-  }));
+    if (!products.pageInfo?.hasNextPage) break;
+    cursor = products.pageInfo.endCursor;
+  }
+  return out;
 }
+
 
 export const action = async ({ request }) => {
   const { admin } = await authenticate.admin(request);
@@ -280,6 +324,37 @@ export const action = async ({ request }) => {
     return { ok: true, bulk, saved, unknown, skipped, total: products.length };
   }
 
+  // ─── BULK: vision-LLM second-stage pass for MODEL identification ──────────
+  // Targets products where the parser found no Macron model (review status).
+  // Uses dHash + type-aware filtering to assemble a small candidate set, then
+  // OpenAI vision picks the right base model from the candidates.
+  if (bulk === "visionPassModels") {
+    if (!isVisionLlmEnabled()) {
+      return { ok: false, error: "OPENAI_API_KEY not set in environment" };
+    }
+    const products = await fetchAllProductsForBulk(admin);
+    let saved = 0;
+    let unknown = 0;
+    let skipped = 0;
+    for (const p of products) {
+      // Only run on review-status products that don't already have an assigned model
+      if (p.assignedModel) { skipped += 1; continue; }
+      const parsed = parseProductTitle(p.title, p.handle);
+      if (parsed.model) { skipped += 1; continue; }
+      if (!p.featuredImage?.url) { skipped += 1; continue; }
+      const candidates = await buildCandidateModels(parsed.type, p.featuredImage.url, { topN: 8 });
+      if (!candidates.length) { unknown += 1; continue; }
+      const chosen = await classifyModelWithVision(p.featuredImage.url, candidates, parsed.type);
+      if (chosen?.displayName) {
+        const r = await writeAssignedModel(admin, p.id, chosen.displayName);
+        if (r.ok) saved += 1;
+      } else {
+        unknown += 1;
+      }
+    }
+    return { ok: true, bulk, saved, unknown, skipped, total: products.length };
+  }
+
   if (bulk === "writeSafeSkus") {
     const products = await fetchAllProductsForBulk(admin);
     let updated = 0;
@@ -290,17 +365,19 @@ export const action = async ({ request }) => {
 
     for (const product of products) {
       const presentation = getProductPresentation(product);
-      if (!presentation.isSafeForSkuWrite) continue;
+      if (!presentation.isWriteable) continue;
 
-      const variants = presentation.variantRows
+      const variants = presentation.writableVariantRows
         .filter((row) => row.existingSku !== row.generatedSku)
         .map((row) => ({
           id: row.id,
           inventoryItem: { sku: row.generatedSku },
         }));
 
-      const unchangedCount = presentation.variantRows.length - variants.length;
-      skipped += unchangedCount;
+      // Anything in variantRows but not writableVariantRows is a duplicate we skipped
+      const duplicatesSkipped = presentation.variantRows.length - presentation.writableVariantRows.length;
+      const unchangedCount = presentation.writableVariantRows.length - variants.length;
+      skipped += unchangedCount + duplicatesSkipped;
 
       if (!variants.length) {
         continue;
@@ -379,15 +456,22 @@ export const action = async ({ request }) => {
     };
   }
 
-  // ─── SINGLE: save one product's colour (the existing dropdown form) ───────
+  // ─── SINGLE: save one product's colour AND/OR model (the dropdown forms) ──
   const productId = formData.get("productId");
   const colour = (formData.get("colour") ?? "").toString().trim();
-  if (!productId || !colour) {
-    return { ok: false, error: "Missing productId or colour" };
+  const model = (formData.get("model") ?? "").toString().trim();
+  if (!productId || (!colour && !model)) {
+    return { ok: false, error: "Missing productId / colour / model" };
   }
-  const r = await writeAssignedColour(admin, productId, colour);
-  if (!r.ok) return r;
-  return { ok: true, productId, colour };
+  if (model) {
+    const r = await writeAssignedModel(admin, productId, model);
+    if (!r.ok) return r;
+  }
+  if (colour) {
+    const r = await writeAssignedColour(admin, productId, colour);
+    if (!r.ok) return r;
+  }
+  return { ok: true, productId, colour: colour || null, model: model || null };
 };
 
 export default function Index() {
@@ -446,6 +530,12 @@ export default function Index() {
 
   return (
     <div style={{ padding: "1.6rem" }}>
+      {/* Shared list of all known Macron models, referenced by every model-assign input */}
+      <datalist id="macron-models-list">
+        {macronModelReferences.map((ref) => (
+          <option key={ref.slug} value={ref.displayName} />
+        ))}
+      </datalist>
       <h1 style={{ fontSize: "1.75rem", marginBottom: "1rem" }}>MSH SKU Manager</h1>
       <div
         style={{
@@ -475,8 +565,16 @@ export default function Index() {
             <input type="hidden" name="bulk" value="visionPass" />
             <button type="submit" disabled={bulkFetcher.state !== "idle"} style={{ padding: "0.5rem 1rem" }}>
               {bulkFetcher.state !== "idle" && bulkFetcher.formData?.get("bulk") === "visionPass"
-                ? "Asking OpenAI…"
-                : "Run vision pass (OpenAI)"}
+                ? "Asking OpenAI (colours)…"
+                : "Vision pass: COLOURS"}
+            </button>
+          </bulkFetcher.Form>
+          <bulkFetcher.Form method="post">
+            <input type="hidden" name="bulk" value="visionPassModels" />
+            <button type="submit" disabled={bulkFetcher.state !== "idle"} style={{ padding: "0.5rem 1rem" }}>
+              {bulkFetcher.state !== "idle" && bulkFetcher.formData?.get("bulk") === "visionPassModels"
+                ? "Asking OpenAI (models)…"
+                : "Vision pass: MODELS"}
             </button>
           </bulkFetcher.Form>
           <bulkFetcher.Form method="post">
@@ -489,7 +587,7 @@ export default function Index() {
           </bulkFetcher.Form>
         </div>
         <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: "#a06600" }}>
-          Only matched products without duplicate warnings will be updated.
+          Matched products are updated. For products with duplicate variants, only the first occurrence of each SKU is written — clean up duplicates in Shopify afterwards.
         </p>
         {bulkFetcher.data?.bulk === "autoAssignConfident" ? (
           <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: "#1f8a4c" }}>
@@ -499,7 +597,14 @@ export default function Index() {
         {bulkFetcher.data?.bulk === "visionPass" ? (
           <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: bulkFetcher.data.ok ? "#1f8a4c" : "#a00" }}>
             {bulkFetcher.data.ok
-              ? `✓ OpenAI assigned ${bulkFetcher.data.saved} (${bulkFetcher.data.unknown} unknown, ${bulkFetcher.data.skipped} skipped)`
+              ? `✓ OpenAI colour pass: ${bulkFetcher.data.saved} assigned, ${bulkFetcher.data.unknown} unknown, ${bulkFetcher.data.skipped} skipped`
+              : `✗ ${bulkFetcher.data.error}`}
+          </p>
+        ) : null}
+        {bulkFetcher.data?.bulk === "visionPassModels" ? (
+          <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: bulkFetcher.data.ok ? "#1f8a4c" : "#a00" }}>
+            {bulkFetcher.data.ok
+              ? `✓ OpenAI model pass: ${bulkFetcher.data.saved} assigned, ${bulkFetcher.data.unknown} unknown, ${bulkFetcher.data.skipped} skipped`
               : `✗ ${bulkFetcher.data.error}`}
           </p>
         ) : null}
@@ -566,7 +671,12 @@ export default function Index() {
                   </p>
                   <div style={{ marginTop: "0.25rem", fontSize: "0.875rem", color: "#303030" }}>
                     {parsed.club ? <p style={{ margin: 0 }}>→ Club: {parsed.club}</p> : null}
-                    {parsed.model ? <p style={{ margin: 0 }}>→ Model: {parsed.model}</p> : null}
+                    {parsed.model ? (
+                      <p style={{ margin: 0 }}>
+                        → Model: {parsed.model}
+                        {presentation.modelSource === "assigned" ? " (from assigned)" : ""}
+                      </p>
+                    ) : null}
                     <p style={{ margin: 0 }}>→ Type: {parsed.type ?? ""}</p>
                     {effectiveColour ? (
                       <p style={{ margin: 0 }}>
@@ -584,6 +694,28 @@ export default function Index() {
                       <p style={{ margin: 0 }}>
                         → Allowed colours: {getAllowedColoursMessage(parsed)}
                       </p>
+                    ) : null}
+
+                    {effectiveStatus === "review" ? (
+                      <div style={{ marginTop: "0.5rem", padding: "0.5rem", background: "#fff8e6", borderRadius: "6px" }}>
+                        <p style={{ margin: 0, fontSize: "0.875rem" }}>
+                          Pick a Macron base model for this product:
+                        </p>
+                        <Form method="post" style={{ marginTop: "0.4rem", display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+                          <input type="hidden" name="productId" value={product.id} />
+                          <input
+                            list="macron-models-list"
+                            name="model"
+                            placeholder="Type to search models…"
+                            defaultValue={product.assignedModel ?? ""}
+                            style={{ padding: "0.25rem", minWidth: "200px" }}
+                            autoComplete="off"
+                          />
+                          <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>
+                            Save model
+                          </button>
+                        </Form>
+                      </div>
                     ) : null}
 
                     {effectiveStatus === "needs-colour" && parsed.allowedColours?.length > 0 ? (
