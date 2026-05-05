@@ -1,6 +1,6 @@
 // Re-export the constants from the non-server file so existing imports keep working.
-export { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, ASSIGNED_MODEL_KEY } from "./assignedColour.constants";
-import { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, ASSIGNED_MODEL_KEY } from "./assignedColour.constants";
+export { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, ASSIGNED_MODEL_KEY, ASSIGNED_SKU_STEM_KEY } from "./assignedColour.constants";
+import { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, ASSIGNED_MODEL_KEY, ASSIGNED_SKU_STEM_KEY } from "./assignedColour.constants";
 
 async function setMetafield(admin, productId, key, value) {
   const response = await admin.graphql(
@@ -36,4 +36,8 @@ export async function writeAssignedColour(admin, productId, colour) {
 
 export async function writeAssignedModel(admin, productId, model) {
   return setMetafield(admin, productId, ASSIGNED_MODEL_KEY, model);
+}
+
+export async function writeAssignedSkuStem(admin, productId, stem) {
+  return setMetafield(admin, productId, ASSIGNED_SKU_STEM_KEY, stem);
 }

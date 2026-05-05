@@ -15,7 +15,14 @@ export function normalizeSize(sizeValue) {
   const rawSize = sizeValue.toString().trim();
   if (!rawSize) return "na";
   const normalizedKey = rawSize.toLowerCase().replace(/\s+/g, " ").trim();
-  const directMap = { small: "s", s: "s", medium: "m", m: "m", large: "l", l: "l", xl: "xl", "2xl": "2xl", "3xl": "3xl", "4xl": "4xl", "5xl": "5xl", default: "one", jnr: "jnr", snr: "snr" };
+  const directMap = {
+    small: "s", s: "s", medium: "m", m: "m", large: "l", l: "l",
+    xl: "xl", "2xl": "2xl", "3xl": "3xl", "4xl": "4xl", "5xl": "5xl",
+    "3xs": "3xs", "2xs": "2xs", xs: "xs",
+    default: "one", "default title": "one", "one size": "one",
+    onesize: "one", "one-size": "one",
+    jnr: "jnr", snr: "snr",
+  };
   if (directMap[normalizedKey]) return directMap[normalizedKey];
   let working = normalizedKey;
   [{ from: "small", to: "s" }, { from: "medium", to: "m" }, { from: "large", to: "l" }].forEach(({ from, to }) => {

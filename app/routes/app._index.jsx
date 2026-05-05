@@ -4,8 +4,9 @@ import { authenticate } from "../shopify.server";
 import { suggestColourFromImage } from "../lib/imageMatcher.server";
 import { isVisionLlmEnabled, classifyColourWithVision, classifyModelWithVision } from "../lib/visionLlm.server";
 import { buildCandidateModels } from "../lib/modelMatcher.server";
-import { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, ASSIGNED_MODEL_KEY } from "../lib/assignedColour.constants";
-import { writeAssignedColour, writeAssignedModel } from "../lib/assignedColour.server";
+import { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, ASSIGNED_MODEL_KEY, ASSIGNED_SKU_STEM_KEY } from "../lib/assignedColour.constants";
+import { writeAssignedColour, writeAssignedModel, writeAssignedSkuStem } from "../lib/assignedColour.server";
+import { listOverrides } from "../lib/referenceOverrides.server";
 import { detectColour, detectColourFromVariant, detectSizeFromVariant, formatSizeLabel, getAllowedColoursMessage, normalizeColourDisplay, parseProductTitle } from "../lib/skuParser";
 import { macronModelReferences, macronReferenceMap } from "../data/macronReference";
 import { generateVariantSku } from "../lib/skuGenerator";
@@ -24,8 +25,24 @@ function getProductPresentation(product) {
   // genuinely don't have a Macron model name in the title.
   let parsed = titleParsed;
   let modelSource = titleParsed.model ? "title" : null;
-  if (!titleParsed.model && product.assignedModel) {
-    const ref = macronReferenceMap[product.assignedModel.toLowerCase()];
+  // User overrides take priority over the static reference map
+  const lookupRef = (key) => {
+    if (!key) return null;
+    const k = key.toLowerCase();
+    return (product.__userOverrides && product.__userOverrides[k]) || macronReferenceMap[k] || null;
+  };
+  // If the title parser found a model that has been overridden, swap in the override
+  if (titleParsed.model) {
+    const userRef = product.__userOverrides && product.__userOverrides[titleParsed.model.toLowerCase()];
+    if (userRef) {
+      parsed = {
+        ...titleParsed,
+        modelReference: userRef,
+        allowedColours: userRef.allowedColours ?? titleParsed.allowedColours,
+      };
+    }
+  } else if (product.assignedModel) {
+    const ref = lookupRef(product.assignedModel);
     if (ref) {
       parsed = {
         ...titleParsed,
@@ -60,13 +77,25 @@ function getProductPresentation(product) {
     effectiveReason = "missing model — assign one below or rename product in Shopify";
   }
 
+  // Custom SKU stem (for non-Macron / shop-branded items) takes precedence over
+  // the model+colour pipeline. When set, SKU = `${stem}-${size}`.
+  const customStem = (product.assignedSkuStem || "").trim();
+  const useCustomStem = customStem.length > 0;
+
   const variantRows = [];
   const counts = new Map();
   for (const { node: variant } of (product.variants?.edges ?? [])) {
     const variantColour = detectColourFromVariant(variant, parsed.allowedColours);
     const variantSize = detectSizeFromVariant(variant);
     const finalColour = variantColour ?? effectiveColour;
-    const generatedSku = generateVariantSku({ model: parsed.model, colour: finalColour, size: variantSize });
+    let generatedSku;
+    if (useCustomStem) {
+      // For non-Macron items: skip colour entirely, just use stem-size
+      generatedSku = generateVariantSku({ model: customStem, colour: "x", size: variantSize })
+        .replace(/-x-/, "-"); // strip the "x" placeholder so result is stem-size
+    } else {
+      generatedSku = generateVariantSku({ model: parsed.model, colour: finalColour, size: variantSize });
+    }
     counts.set(generatedSku, (counts.get(generatedSku) ?? 0) + 1);
     variantRows.push({
       id: variant.id,
@@ -92,22 +121,36 @@ function getProductPresentation(product) {
     seenSkus.add(row.generatedSku);
     return true;
   });
-  const isSafeForSkuWrite = (
-    effectiveStatus === "matched"
-    && Boolean(parsed.model)
-    && Boolean(effectiveColour)
-    && !hasDuplicateGeneratedSkus
-    && !hasNaGeneratedSku
-    && !hasEmptyGeneratedSku
-  );
+  const isSafeForSkuWrite = useCustomStem
+    ? (writableVariantRows.length > 0 && !hasDuplicateGeneratedSkus && !hasNaGeneratedSku && !hasEmptyGeneratedSku)
+    : (
+        effectiveStatus === "matched"
+        && Boolean(parsed.model)
+        && Boolean(effectiveColour)
+        && !hasDuplicateGeneratedSkus
+        && !hasNaGeneratedSku
+        && !hasEmptyGeneratedSku
+      );
   // Looser gate used by the bulk writer: allow products with duplicate variants
   // through, but only write to the first occurrence of each SKU.
-  const isWriteable = (
-    effectiveStatus === "matched"
-    && Boolean(parsed.model)
-    && Boolean(effectiveColour)
-    && writableVariantRows.length > 0
-  );
+  const isWriteable = useCustomStem
+    ? writableVariantRows.length > 0
+    : (
+        effectiveStatus === "matched"
+        && Boolean(parsed.model)
+        && Boolean(effectiveColour)
+        && writableVariantRows.length > 0
+      );
+  // For the "Missing SKU" tab — products where any variant still has no SKU in
+  // Shopify, OR the existing Shopify SKU differs from what we'd generate.
+  const missingShopifySku = variantRows.some((row) => !row.existingSku?.trim());
+
+  // If a custom SKU stem is set, override the displayed status to "matched"
+  // (the user has explicitly assigned this as a non-Macron item).
+  if (useCustomStem) {
+    effectiveStatus = "matched";
+    effectiveReason = `custom non-Macron stem: ${customStem}`;
+  }
   return {
     parsed,
     modelSource,
@@ -122,6 +165,9 @@ function getProductPresentation(product) {
     hasDuplicateGeneratedSkus,
     isSafeForSkuWrite,
     isWriteable,
+    useCustomStem,
+    customStem,
+    missingShopifySku,
   };
 }
 
@@ -144,6 +190,7 @@ export const loader = async ({ request }) => {
             options { name values }
             assignedColour: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_COLOUR_KEY}") { value }
             assignedModel:  metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_MODEL_KEY}")  { value }
+            assignedSkuStem: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_SKU_STEM_KEY}") { value }
             variants(first: 50) {
               edges {
                 node {
@@ -168,6 +215,7 @@ export const loader = async ({ request }) => {
   const products = [];
   let nextCursor = null;
   let hasMore = false;
+  const userOverrides = await listOverrides();
   const r = await admin.graphql(QUERY, { variables: { cursor: pageCursor } });
   const j = await r.json();
   const pp = j?.data?.products;
@@ -177,6 +225,8 @@ export const loader = async ({ request }) => {
         ...node,
         assignedColour: node.assignedColour?.value ?? null,
         assignedModel: node.assignedModel?.value ?? null,
+        assignedSkuStem: node.assignedSkuStem?.value ?? null,
+        __userOverrides: userOverrides,
       });
     }
     hasMore = Boolean(pp.pageInfo?.hasNextPage);
@@ -258,6 +308,7 @@ async function fetchOnePageForBulk(admin, cursor = null, pageSize = 100) {
             options { name }
             assignedColour: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_COLOUR_KEY}") { value }
             assignedModel:  metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_MODEL_KEY}")  { value }
+            assignedSkuStem: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_SKU_STEM_KEY}") { value }
             variants(first: 50) {
               edges {
                 node {
@@ -303,6 +354,7 @@ async function fetchAllProductsForBulk(admin) {
             options { name }
             assignedColour: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_COLOUR_KEY}") { value }
             assignedModel:  metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_MODEL_KEY}")  { value }
+            assignedSkuStem: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_SKU_STEM_KEY}") { value }
             variants(first: 50) {
               edges {
                 node {
@@ -331,6 +383,7 @@ async function fetchAllProductsForBulk(admin) {
         ...node,
         assignedColour: node.assignedColour?.value ?? null,
         assignedModel: node.assignedModel?.value ?? null,
+        assignedSkuStem: node.assignedSkuStem?.value ?? null,
       });
     }
     if (!products.pageInfo?.hasNextPage) break;
@@ -697,12 +750,13 @@ export const action = async ({ request }) => {
     };
   }
 
-  // ─── SINGLE: save one product's colour AND/OR model (the dropdown forms) ──
+  // ─── SINGLE: save one product's colour, model, OR custom SKU stem ─────────
   const productId = formData.get("productId");
   const colour = (formData.get("colour") ?? "").toString().trim();
   const model = (formData.get("model") ?? "").toString().trim();
-  if (!productId || (!colour && !model)) {
-    return { ok: false, error: "Missing productId / colour / model" };
+  const skuStem = (formData.get("skuStem") ?? "").toString().trim();
+  if (!productId || (!colour && !model && !skuStem)) {
+    return { ok: false, error: "Missing productId / colour / model / skuStem" };
   }
   if (model) {
     const r = await writeAssignedModel(admin, productId, model);
@@ -712,7 +766,13 @@ export const action = async ({ request }) => {
     const r = await writeAssignedColour(admin, productId, colour);
     if (!r.ok) return r;
   }
-  return { ok: true, productId, colour: colour || null, model: model || null };
+  if (skuStem) {
+    // Slugify the user-entered stem so it's URL/SKU-safe
+    const slug = skuStem.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    const r = await writeAssignedSkuStem(admin, productId, slug);
+    if (!r.ok) return r;
+  }
+  return { ok: true, productId, colour: colour || null, model: model || null, skuStem: skuStem || null };
 };
 
 
@@ -743,6 +803,7 @@ export default function Index() {
     { key: "safe-to-write", label: "Safe to write", count: productPresentations.filter(({ presentation }) => presentation.isSafeForSkuWrite).length },
     { key: "needs-colour", label: "Needs colour", count: productPresentations.filter(({ presentation }) => presentation.effectiveStatus === "needs-colour").length },
     { key: "review", label: "Review", count: productPresentations.filter(({ presentation }) => presentation.effectiveStatus === "review").length },
+    { key: "missing-sku", label: "⚠ Missing SKU", count: productPresentations.filter(({ presentation }) => presentation.missingShopifySku).length },
     { key: "duplicate-sku-warnings", label: "Duplicate variants", count: productPresentations.filter(({ presentation }) => presentation.hasDuplicateGeneratedSkus).length },
   ];
 
@@ -750,6 +811,7 @@ export default function Index() {
     if (activeFilter === "safe-to-write") return presentation.isSafeForSkuWrite;
     if (activeFilter === "needs-colour") return presentation.effectiveStatus === "needs-colour";
     if (activeFilter === "review") return presentation.effectiveStatus === "review";
+    if (activeFilter === "missing-sku") return presentation.missingShopifySku;
     if (activeFilter === "duplicate-sku-warnings") return presentation.hasDuplicateGeneratedSkus;
     return true;
   });
@@ -945,11 +1007,20 @@ export default function Index() {
                   </div>
                   {effectiveReason ? <p style={{ margin: "0.2rem 0 0", fontSize: "0.8rem", color: "#888" }}>{effectiveReason}</p> : null}
                   {effectiveStatus === "review" ? (
-                    <Form method="post" style={{ marginTop: "0.4rem", display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
-                      <input type="hidden" name="productId" value={product.id} />
-                      <input list="macron-models-list" name="model" placeholder="Type Macron model..." defaultValue={product.assignedModel ?? ""} style={{ padding: "0.25rem", minWidth: "200px" }} autoComplete="off" />
-                      <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>Save model</button>
-                    </Form>
+                    <div style={{ marginTop: "0.4rem", padding: "0.5rem", background: "#fff8e6", borderRadius: "6px", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                      <Form method="post" style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+                        <input type="hidden" name="productId" value={product.id} />
+                        <span style={{ fontSize: "0.85rem", minWidth: "150px" }}>Macron model:</span>
+                        <input list="macron-models-list" name="model" placeholder="Type Macron model..." defaultValue={product.assignedModel ?? ""} style={{ padding: "0.25rem", minWidth: "200px" }} autoComplete="off" />
+                        <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>Save model</button>
+                      </Form>
+                      <Form method="post" style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+                        <input type="hidden" name="productId" value={product.id} />
+                        <span style={{ fontSize: "0.85rem", minWidth: "150px" }}>Or non-Macron stem:</span>
+                        <input name="skuStem" placeholder="e.g. pirates-cap-3d" defaultValue={product.assignedSkuStem ?? ""} style={{ padding: "0.25rem", minWidth: "200px" }} autoComplete="off" />
+                        <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>Save stem</button>
+                      </Form>
+                    </div>
                   ) : null}
                   {effectiveStatus === "needs-colour" && parsed.allowedColours?.length > 0 ? (
                     <Form method="post" style={{ marginTop: "0.4rem", display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
