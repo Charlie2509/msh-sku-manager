@@ -1,6 +1,6 @@
-export const ASSIGNED_COLOUR_NAMESPACE = "msh";
-export const ASSIGNED_COLOUR_KEY = "assigned_colour";
-export const ASSIGNED_MODEL_KEY = "assigned_model";
+// Re-export the constants from the non-server file so existing imports keep working.
+export { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, ASSIGNED_MODEL_KEY } from "./assignedColour.constants";
+import { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, ASSIGNED_MODEL_KEY } from "./assignedColour.constants";
 
 async function setMetafield(admin, productId, key, value) {
   const response = await admin.graphql(

@@ -4,7 +4,8 @@ import { authenticate } from "../shopify.server";
 import { suggestColourFromImage } from "../lib/imageMatcher.server";
 import { isVisionLlmEnabled, classifyColourWithVision, classifyModelWithVision } from "../lib/visionLlm.server";
 import { buildCandidateModels } from "../lib/modelMatcher.server";
-import { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, ASSIGNED_MODEL_KEY, writeAssignedColour, writeAssignedModel } from "../lib/assignedColour.server";
+import { ASSIGNED_COLOUR_NAMESPACE, ASSIGNED_COLOUR_KEY, ASSIGNED_MODEL_KEY } from "../lib/assignedColour.constants";
+import { writeAssignedColour, writeAssignedModel } from "../lib/assignedColour.server";
 import { detectColour, detectColourFromVariant, detectSizeFromVariant, formatSizeLabel, getAllowedColoursMessage, normalizeColourDisplay, parseProductTitle } from "../lib/skuParser";
 import { macronModelReferences, macronReferenceMap } from "../data/macronReference";
 import { generateVariantSku } from "../lib/skuGenerator";
@@ -785,21 +786,20 @@ export default function Index() {
     }
   }, [data?.hasMore, data?.nextCursor, data?.pageNumber, data?.bulk, isBusy, pipeline]);
 
-  function startBulk(name) {
-    setPipeline(null);
+  // Programmatic submit used by the auto-continue effect (NOT for first click)
+  function continueBulk(name, extra = {}) {
     const fd = new FormData();
     fd.set("bulk", name);
     fd.set("pageNumber", "0");
-    bulkFetcher.submit(fd, { method: "post" });
+    Object.entries(extra).forEach(([k, v]) => fd.set(k, String(v)));
+    bulkFetcher.submit(fd, { method: "post", action: "." });
   }
-
+  // Buttons use the Form below, but we still need these for the auto-chain
+  function startBulk(name) { setPipeline(null); continueBulk(name); }
   function startPipeline() {
     const steps = ["autoAssignConfident", "visionPassModels", "visionPass", "mergeDuplicateVariants"];
     setPipeline({ steps, idx: 0 });
-    const fd = new FormData();
-    fd.set("bulk", steps[0]);
-    fd.set("pageNumber", "0");
-    bulkFetcher.submit(fd, { method: "post" });
+    continueBulk(steps[0]);
   }
 
   const stepLabels = {
@@ -826,12 +826,20 @@ export default function Index() {
         </p>
 
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.75rem" }}>
-          <button type="button" disabled={isBusy} onClick={startPipeline} style={{ padding: "0.6rem 1.25rem", background: "#1a73e8", color: "white", border: "none", borderRadius: "6px", fontWeight: 600 }}>
-            Run all (steps 1-4)
-          </button>
-          <button type="button" disabled={isBusy} onClick={() => startBulk("writeSafeSkus")} style={{ padding: "0.6rem 1.25rem", background: "#1f8a4c", color: "white", border: "none", borderRadius: "6px", fontWeight: 600 }}>
-            Confirm and write SKUs to Shopify
-          </button>
+          <bulkFetcher.Form method="post" onSubmit={() => setPipeline({ steps: ["autoAssignConfident", "visionPassModels", "visionPass", "mergeDuplicateVariants"], idx: 0 })}>
+            <input type="hidden" name="bulk" value="autoAssignConfident" />
+            <input type="hidden" name="pageNumber" value="0" />
+            <button type="submit" disabled={isBusy} style={{ padding: "0.6rem 1.25rem", background: "#1a73e8", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: isBusy ? "not-allowed" : "pointer" }}>
+              Run all (steps 1-4)
+            </button>
+          </bulkFetcher.Form>
+          <bulkFetcher.Form method="post" onSubmit={() => setPipeline(null)}>
+            <input type="hidden" name="bulk" value="writeSafeSkus" />
+            <input type="hidden" name="pageNumber" value="0" />
+            <button type="submit" disabled={isBusy} style={{ padding: "0.6rem 1.25rem", background: "#1f8a4c", color: "white", border: "none", borderRadius: "6px", fontWeight: 600, cursor: isBusy ? "not-allowed" : "pointer" }}>
+              Confirm and write SKUs to Shopify
+            </button>
+          </bulkFetcher.Form>
         </div>
 
         {data && data.totalProducts ? (() => {
@@ -867,10 +875,20 @@ export default function Index() {
         <details style={{ marginTop: "0.75rem" }}>
           <summary style={{ cursor: "pointer", fontSize: "0.85rem", color: "#555" }}>Run individual steps</summary>
           <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
-            <button type="button" disabled={isBusy} onClick={() => startBulk("autoAssignConfident")} style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>1. dHash colour-assign</button>
-            <button type="button" disabled={isBusy} onClick={() => startBulk("visionPassModels")} style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>2. Vision MODELS</button>
-            <button type="button" disabled={isBusy} onClick={() => startBulk("visionPass")} style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>3. Vision COLOURS</button>
-            <button type="button" disabled={isBusy} onClick={() => startBulk("mergeDuplicateVariants")} style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>4. Merge duplicates</button>
+            {[
+              { name: "autoAssignConfident", label: "1. dHash colour-assign" },
+              { name: "visionPassModels", label: "2. Vision MODELS" },
+              { name: "visionPass", label: "3. Vision COLOURS" },
+              { name: "mergeDuplicateVariants", label: "4. Merge duplicates" },
+            ].map((step) => (
+              <bulkFetcher.Form key={step.name} method="post" onSubmit={() => setPipeline(null)}>
+                <input type="hidden" name="bulk" value={step.name} />
+                <input type="hidden" name="pageNumber" value="0" />
+                <button type="submit" disabled={isBusy} style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem", cursor: isBusy ? "not-allowed" : "pointer" }}>
+                  {step.label}
+                </button>
+              </bulkFetcher.Form>
+            ))}
           </div>
         </details>
 
