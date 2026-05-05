@@ -222,6 +222,56 @@ export const loader = async ({ request }) => {
  * Helper: re-fetch every product (id, title, handle, image, allowed colours,
  * existing assigned colour) so a bulk action can iterate over them.
  */
+/**
+ * Fetch ONE page of products from Shopify (default 100). Returns the products
+ * and the cursor for the next page. Each batched bulk action calls this once
+ * per request, instead of fetching the entire catalogue every batch (which
+ * Shopify rate-limits).
+ */
+async function fetchOnePageForBulk(admin, cursor = null, pageSize = 100) {
+  const QUERY = `#graphql
+    query OnePage($cursor: String, $pageSize: Int!) {
+      products(first: $pageSize, after: $cursor) {
+        pageInfo { hasNextPage endCursor }
+        edges {
+          node {
+            id
+            title
+            handle
+            featuredImage { url }
+            options { name }
+            assignedColour: metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_COLOUR_KEY}") { value }
+            assignedModel:  metafield(namespace: "${ASSIGNED_COLOUR_NAMESPACE}", key: "${ASSIGNED_MODEL_KEY}")  { value }
+            variants(first: 50) {
+              edges {
+                node {
+                  id
+                  title
+                  sku
+                  selectedOptions { name value }
+                  inventoryItem { id sku }
+                }
+              }
+            }
+          }
+        }
+      }
+    }`;
+  const r = await admin.graphql(QUERY, { variables: { cursor, pageSize } });
+  const j = await r.json();
+  const pp = j?.data?.products;
+  if (!pp) return { products: [], hasNextPage: false, endCursor: null };
+  return {
+    products: pp.edges.map(({ node }) => ({
+      ...node,
+      assignedColour: node.assignedColour?.value ?? null,
+      assignedModel: node.assignedModel?.value ?? null,
+    })),
+    hasNextPage: Boolean(pp.pageInfo?.hasNextPage),
+    endCursor: pp.pageInfo?.endCursor ?? null,
+  };
+}
+
 async function fetchAllProductsForBulk(admin) {
   // Cursor-paginate the full catalogue. Stops at hasNextPage=false.
   const QUERY = `#graphql
@@ -283,12 +333,15 @@ export const action = async ({ request }) => {
   const { admin } = await authenticate.admin(request);
   const formData = await request.formData();
   const bulk = formData.get("bulk")?.toString();
-  const startIdx = Number.parseInt(formData.get("start") ?? "0", 10) || 0;
+  // Each batch processes one Shopify page (~100 products). The `cursor` field
+  // is the Shopify endCursor returned by the previous batch; null = first page.
+  const inCursor = formData.get("cursor")?.toString() || null;
+  const pageNumber = Number.parseInt(formData.get("pageNumber") ?? "0", 10) || 0;
 
   // ─── BULK: auto-assign all confident dHash matches ────────────────────────
   if (bulk === "autoAssignConfident") {
-    const all = await fetchAllProductsForBulk(admin);
-    const eligible = all.filter((p) => {
+    const { products, hasNextPage, endCursor } = await fetchOnePageForBulk(admin, inCursor);
+    const eligible = products.filter((p) => {
       if (p.assignedColour) return false;
       const parsed = parseProductTitle(p.title, p.handle);
       if (!parsed.model || !parsed.allowedColours?.length) return false;
@@ -299,11 +352,10 @@ export const action = async ({ request }) => {
       if (titleColour || hasColorOption) return false;
       return Boolean(p.featuredImage?.url);
     });
-    const slice = eligible.slice(startIdx, startIdx + BATCH_SIZE_FAST);
     let saved = 0;
     let skipped = 0;
     await Promise.all(
-      slice.map(async (p) => {
+      eligible.map(async (p) => {
         const parsed = parseProductTitle(p.title, p.handle);
         const suggestion = await suggestColourFromImage(
           p.featuredImage.url,
@@ -322,16 +374,16 @@ export const action = async ({ request }) => {
         }
       }),
     );
-    const nextStart = startIdx + slice.length;
     return {
       ok: true,
       bulk,
       saved,
       skipped,
-      processedThisBatch: slice.length,
-      totalEligible: eligible.length,
-      nextStart,
-      hasMore: nextStart < eligible.length,
+      processedThisBatch: eligible.length,
+      pageProductsScanned: products.length,
+      nextCursor: endCursor,
+      pageNumber: pageNumber + 1,
+      hasMore: hasNextPage,
     };
   }
 
@@ -340,16 +392,16 @@ export const action = async ({ request }) => {
     if (!isVisionLlmEnabled()) {
       return { ok: false, error: "OPENAI_API_KEY not set in environment" };
     }
-    const all = await fetchAllProductsForBulk(admin);
-    const eligible = all.filter((p) => {
+    // Use a smaller page so OpenAI calls fit inside Cloudflare's window.
+    const { products, hasNextPage, endCursor } = await fetchOnePageForBulk(admin, inCursor, 25);
+    const eligible = products.filter((p) => {
       if (p.assignedColour) return false;
       const parsed = parseProductTitle(p.title, p.handle);
       return parsed.model && parsed.allowedColours?.length && p.featuredImage?.url;
     });
-    const slice = eligible.slice(startIdx, startIdx + BATCH_SIZE_SLOW);
     let saved = 0;
     let unknown = 0;
-    for (const p of slice) {
+    for (const p of eligible) {
       const parsed = parseProductTitle(p.title, p.handle);
       const llmColour = await classifyColourWithVision(
         p.featuredImage.url,
@@ -363,16 +415,16 @@ export const action = async ({ request }) => {
         unknown += 1;
       }
     }
-    const nextStart = startIdx + slice.length;
     return {
       ok: true,
       bulk,
       saved,
       unknown,
-      processedThisBatch: slice.length,
-      totalEligible: eligible.length,
-      nextStart,
-      hasMore: nextStart < eligible.length,
+      processedThisBatch: eligible.length,
+      pageProductsScanned: products.length,
+      nextCursor: endCursor,
+      pageNumber: pageNumber + 1,
+      hasMore: hasNextPage,
     };
   }
 
@@ -384,17 +436,16 @@ export const action = async ({ request }) => {
     if (!isVisionLlmEnabled()) {
       return { ok: false, error: "OPENAI_API_KEY not set in environment" };
     }
-    const all = await fetchAllProductsForBulk(admin);
-    const eligible = all.filter((p) => {
+    // Multi-image vision is slowest — fetch a small page (15 products).
+    const { products, hasNextPage, endCursor } = await fetchOnePageForBulk(admin, inCursor, 15);
+    const eligible = products.filter((p) => {
       if (p.assignedModel) return false;
       const parsed = parseProductTitle(p.title, p.handle);
       return !parsed.model && Boolean(p.featuredImage?.url);
     });
-    // Multi-image vision calls are slower than colour calls — smaller batch.
-    const slice = eligible.slice(startIdx, startIdx + 6);
     let saved = 0;
     let unknown = 0;
-    for (const p of slice) {
+    for (const p of eligible) {
       const parsed = parseProductTitle(p.title, p.handle);
       const candidates = await buildCandidateModels(parsed.type, p.featuredImage.url, { topN: 8 });
       if (!candidates.length) { unknown += 1; continue; }
@@ -406,33 +457,29 @@ export const action = async ({ request }) => {
         unknown += 1;
       }
     }
-    const nextStart = startIdx + slice.length;
     return {
       ok: true,
       bulk,
       saved,
       unknown,
-      processedThisBatch: slice.length,
-      totalEligible: eligible.length,
-      nextStart,
-      hasMore: nextStart < eligible.length,
+      processedThisBatch: eligible.length,
+      pageProductsScanned: products.length,
+      nextCursor: endCursor,
+      pageNumber: pageNumber + 1,
+      hasMore: hasNextPage,
     };
   }
 
   if (bulk === "writeSafeSkus") {
-    const all = await fetchAllProductsForBulk(admin);
-    const eligible = all.filter((product) => {
-      const p = getProductPresentation(product);
-      return p.isWriteable;
-    });
-    const slice = eligible.slice(startIdx, startIdx + 25);
+    const { products, hasNextPage, endCursor } = await fetchOnePageForBulk(admin, inCursor);
+    const eligible = products.filter((product) => getProductPresentation(product).isWriteable);
     let updated = 0;
     let skipped = 0;
     let failed = 0;
     let failedProducts = 0;
     const userErrorMessages = [];
 
-    for (const product of slice) {
+    for (const product of eligible) {
       const presentation = getProductPresentation(product);
       if (!presentation.isWriteable) continue;
 
@@ -514,7 +561,6 @@ export const action = async ({ request }) => {
       }
     }
 
-    const nextStart = startIdx + slice.length;
     return {
       ok: true,
       bulk,
@@ -523,10 +569,11 @@ export const action = async ({ request }) => {
       failed,
       failedProducts,
       userErrors: userErrorMessages.slice(0, 5),
-      processedThisBatch: slice.length,
-      totalEligible: eligible.length,
-      nextStart,
-      hasMore: nextStart < eligible.length,
+      processedThisBatch: eligible.length,
+      pageProductsScanned: products.length,
+      nextCursor: endCursor,
+      pageNumber: pageNumber + 1,
+      hasMore: hasNextPage,
     };
   }
 
@@ -536,15 +583,14 @@ export const action = async ({ request }) => {
   // Shopify automatically (orders that reference the deleted variant become
   // historical records).
   if (bulk === "mergeDuplicateVariants") {
-    const all = await fetchAllProductsForBulk(admin);
-    const productsWithDupes = all.filter((product) => {
-      return getProductPresentation(product).hasDuplicateGeneratedSkus;
-    });
-    const slice = productsWithDupes.slice(startIdx, startIdx + 10);
+    const { products, hasNextPage, endCursor } = await fetchOnePageForBulk(admin, inCursor);
+    const productsWithDupes = products.filter((product) =>
+      getProductPresentation(product).hasDuplicateGeneratedSkus,
+    );
     let merged = 0;
     let failed = 0;
     const userErrorMessages = [];
-    for (const product of slice) {
+    for (const product of productsWithDupes) {
       const presentation = getProductPresentation(product);
       if (!presentation.hasDuplicateGeneratedSkus) continue;
       // The keepers are presentation.writableVariantRows; everything else in
@@ -577,17 +623,17 @@ export const action = async ({ request }) => {
         userErrorMessages.push(`${product.title}: ${err?.message ?? "unknown"}`);
       }
     }
-    const nextStart = startIdx + slice.length;
     return {
       ok: true,
       bulk,
       merged,
       failed,
-      processedThisBatch: slice.length,
-      totalEligible: productsWithDupes.length,
+      processedThisBatch: productsWithDupes.length,
+      pageProductsScanned: products.length,
       userErrors: userErrorMessages.slice(0, 5),
-      nextStart,
-      hasMore: nextStart < productsWithDupes.length,
+      nextCursor: endCursor,
+      pageNumber: pageNumber + 1,
+      hasMore: hasNextPage,
     };
   }
 
@@ -650,19 +696,21 @@ export default function Index() {
   const data = bulkFetcher.data;
   const isBusy = bulkFetcher.state !== "idle";
 
-  // Auto-continue batched bulk actions until done.
+  // Auto-continue batched bulk actions until done. Each batch fetches ONE
+  // Shopify page (≤100 products) so we don't hit the GraphQL throttle.
   useEffect(() => {
     if (!data?.hasMore || isBusy) return;
     const fd = new FormData();
     fd.set("bulk", data.bulk);
-    fd.set("start", String(data.nextStart));
+    if (data.nextCursor) fd.set("cursor", data.nextCursor);
+    fd.set("pageNumber", String(data.pageNumber ?? 1));
     bulkFetcher.submit(fd, { method: "post" });
-  }, [data?.hasMore, data?.nextStart, data?.bulk, isBusy]);
+  }, [data?.hasMore, data?.nextCursor, data?.pageNumber, data?.bulk, isBusy]);
 
   function startBulk(name) {
     const fd = new FormData();
     fd.set("bulk", name);
-    fd.set("start", "0");
+    fd.set("pageNumber", "0");
     bulkFetcher.submit(fd, { method: "post" });
   }
 
@@ -702,11 +750,11 @@ export default function Index() {
         {data ? (
           <div style={{ marginTop: "0.75rem", padding: "0.5rem 0.75rem", background: "#eef6ff", borderRadius: "6px", fontSize: "0.875rem" }}>
             {data.ok === false ? <span style={{ color: "#a00" }}>✗ {data.error}</span> :
-             data.bulk === "autoAssignConfident" ? <span>dHash colour-assign: {data.nextStart ?? 0} of {data.totalEligible} done · saved {data.saved} {data.hasMore ? "· continuing…" : "✓"}</span> :
-             data.bulk === "visionPass" ? <span>OpenAI colour pass: {data.nextStart ?? 0} of {data.totalEligible} done · saved {data.saved} · unknown {data.unknown} {data.hasMore ? "· continuing…" : "✓"}</span> :
-             data.bulk === "visionPassModels" ? <span>OpenAI model pass: {data.nextStart ?? 0} of {data.totalEligible} done · saved {data.saved} · unknown {data.unknown} {data.hasMore ? "· continuing…" : "✓"}</span> :
-             data.bulk === "mergeDuplicateVariants" ? <span>Merge duplicates: {data.nextStart ?? 0} of {data.totalEligible} products done · {data.merged} variants deleted · {data.failed} failed {data.hasMore ? "· continuing…" : "✓"}</span> :
-             data.bulk === "writeSafeSkus" ? <span>SKU write: {data.nextStart ?? 0} of {data.totalEligible} products done · {data.updated} variants updated {data.hasMore ? "· continuing…" : "✓"}{data.userErrors?.length ? ` · errors: ${data.userErrors.join(" | ")}` : ""}</span> :
+             data.bulk === "autoAssignConfident" ? <span>dHash colour-assign · page {data.pageNumber} · scanned {data.pageProductsScanned} this page · saved {data.saved} {data.hasMore ? "· continuing…" : "✓ DONE"}</span> :
+             data.bulk === "visionPass" ? <span>OpenAI colour pass · page {data.pageNumber} · scanned {data.pageProductsScanned} this page · saved {data.saved} · unknown {data.unknown} {data.hasMore ? "· continuing…" : "✓ DONE"}</span> :
+             data.bulk === "visionPassModels" ? <span>OpenAI model pass · page {data.pageNumber} · scanned {data.pageProductsScanned} this page · saved {data.saved} · unknown {data.unknown} {data.hasMore ? "· continuing…" : "✓ DONE"}</span> :
+             data.bulk === "mergeDuplicateVariants" ? <span>Merge duplicates · page {data.pageNumber} · scanned {data.pageProductsScanned} this page · {data.merged} variants deleted · {data.failed} failed {data.hasMore ? "· continuing…" : "✓ DONE"}</span> :
+             data.bulk === "writeSafeSkus" ? <span>SKU write · page {data.pageNumber} · scanned {data.pageProductsScanned} this page · {data.updated} variants updated {data.hasMore ? "· continuing…" : "✓ DONE"}{data.userErrors?.length ? ` · errors: ${data.userErrors.join(" | ")}` : ""}</span> :
              null}
           </div>
         ) : null}
