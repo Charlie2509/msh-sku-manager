@@ -719,6 +719,7 @@ export default function Index() {
   const { products, pagination } = useLoaderData();
   const bulkFetcher = useFetcher();
   const [activeFilter, setActiveFilter] = useState("all");
+  const [pipeline, setPipeline] = useState(null);
 
   const productPresentations = useMemo(
     () => products.map((product) => ({ product, presentation: getProductPresentation(product) })),
@@ -755,16 +756,9 @@ export default function Index() {
   const data = bulkFetcher.data;
   const isBusy = bulkFetcher.state !== "idle";
 
-  // Pipeline state — when set, after the current bulk action finishes we
-  // auto-advance to the next step in the pipeline.
-  const [pipeline, setPipeline] = useState(null); // { steps: ["autoAssignConfident", "visionPassModels", ...], idx: 0 }
-
-  // Auto-continue batched bulk actions until done. Each batch fetches ONE
-  // Shopify page (≤100 products) so we don't hit the GraphQL throttle.
   useEffect(() => {
     if (!data || isBusy) return;
     if (data.hasMore) {
-      // More pages of the SAME bulk action — keep going
       const fd = new FormData();
       fd.set("bulk", data.bulk);
       if (data.nextCursor) fd.set("cursor", data.nextCursor);
@@ -779,7 +773,6 @@ export default function Index() {
       bulkFetcher.submit(fd, { method: "post" });
       return;
     }
-    // Current bulk done. If we're in a pipeline, advance.
     if (pipeline && pipeline.idx + 1 < pipeline.steps.length) {
       const next = pipeline.steps[pipeline.idx + 1];
       setPipeline({ ...pipeline, idx: pipeline.idx + 1 });
@@ -788,7 +781,6 @@ export default function Index() {
       fd.set("pageNumber", "0");
       bulkFetcher.submit(fd, { method: "post" });
     } else if (pipeline) {
-      // Pipeline finished
       setPipeline(null);
     }
   }, [data?.hasMore, data?.nextCursor, data?.pageNumber, data?.bulk, isBusy, pipeline]);
@@ -810,6 +802,14 @@ export default function Index() {
     bulkFetcher.submit(fd, { method: "post" });
   }
 
+  const stepLabels = {
+    autoAssignConfident: "1/4 dHash colour-assign",
+    visionPassModels: "2/4 OpenAI MODEL identification",
+    visionPass: "3/4 OpenAI COLOUR identification",
+    mergeDuplicateVariants: "4/4 merging duplicate variants",
+    writeSafeSkus: "Writing SKUs to Shopify",
+  };
+
   return (
     <div style={{ padding: "1.6rem" }}>
       <datalist id="macron-models-list">
@@ -822,55 +822,36 @@ export default function Index() {
       <div style={{ background: "white", border: "1px solid #dfe3e8", borderRadius: "12px", padding: "1.25rem", maxWidth: "780px" }}>
         <h2 style={{ fontSize: "1.25rem", marginTop: 0, marginBottom: "0.5rem" }}>SKU Dashboard</h2>
         <p style={{ marginTop: 0, marginBottom: "0.5rem", color: "#616161", fontSize: "0.875rem" }}>
-          This page: {productPresentations.length} products · {stats.matched} matched · {stats.needsColour} need colour · {stats.review} need review · {stats.duplicateSkuWarning} have duplicate variants
+          This page: {productPresentations.length} products . {stats.matched} matched . {stats.needsColour} need colour . {stats.review} review . {stats.duplicateSkuWarning} duplicate variants
         </p>
 
-        {/* Primary action: auto-run steps 1-4 */}
-        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.75rem", alignItems: "center" }}>
-          <button
-            type="button"
-            disabled={isBusy}
-            onClick={startPipeline}
-            style={{ padding: "0.6rem 1.25rem", background: "#1a73e8", color: "white", border: "none", borderRadius: "6px", fontWeight: 600 }}
-          >
-            ▶ Run all (steps 1–4)
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.75rem" }}>
+          <button type="button" disabled={isBusy} onClick={startPipeline} style={{ padding: "0.6rem 1.25rem", background: "#1a73e8", color: "white", border: "none", borderRadius: "6px", fontWeight: 600 }}>
+            Run all (steps 1-4)
           </button>
-          <button
-            type="button"
-            disabled={isBusy}
-            onClick={() => startBulk("writeSafeSkus")}
-            style={{ padding: "0.6rem 1.25rem", background: "#1f8a4c", color: "white", border: "none", borderRadius: "6px", fontWeight: 600 }}
-          >
-            ✓ Confirm & write SKUs to Shopify
+          <button type="button" disabled={isBusy} onClick={() => startBulk("writeSafeSkus")} style={{ padding: "0.6rem 1.25rem", background: "#1f8a4c", color: "white", border: "none", borderRadius: "6px", fontWeight: 600 }}>
+            Confirm and write SKUs to Shopify
           </button>
         </div>
 
-        {/* Progress bar */}
         {data && data.totalProducts ? (() => {
-          const stepLabels = {
-            autoAssignConfident: "1/4 dHash colour-assign",
-            visionPassModels: "2/4 OpenAI MODEL identification",
-            visionPass: "3/4 OpenAI COLOUR identification",
-            mergeDuplicateVariants: "4/4 merging duplicate variants",
-            writeSafeSkus: "Writing SKUs to Shopify",
-          };
           const pct = Math.min(100, Math.round((data.cumulativeScanned / data.totalProducts) * 100));
           const label = stepLabels[data.bulk] ?? data.bulk;
           const done = !data.hasMore && (!pipeline || pipeline.idx + 1 >= pipeline.steps.length);
           return (
             <div style={{ marginTop: "0.75rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", marginBottom: "0.25rem" }}>
-                <span><strong>{label}</strong> · {data.cumulativeScanned} of {data.totalProducts} products scanned</span>
-                <span>{pct}%{done ? " ✓" : pipeline ? ` · step ${pipeline.idx + 1}/${pipeline.steps.length}` : ""}</span>
+                <span><strong>{label}</strong> . {data.cumulativeScanned} of {data.totalProducts} scanned</span>
+                <span>{pct}%{done ? " done" : pipeline ? ` . step ${pipeline.idx + 1}/${pipeline.steps.length}` : ""}</span>
               </div>
               <div style={{ height: "10px", background: "#e8f0fe", borderRadius: "5px", overflow: "hidden" }}>
                 <div style={{ height: "100%", width: `${pct}%`, background: done ? "#1f8a4c" : "#1a73e8", transition: "width 0.3s" }} />
               </div>
               <div style={{ marginTop: "0.4rem", fontSize: "0.8rem", color: "#555" }}>
-                {data.cumulativeSaved ? <span>Saved: <strong>{data.cumulativeSaved}</strong> · </span> : null}
-                {data.cumulativeUnknown ? <span>Unknown: <strong>{data.cumulativeUnknown}</strong> · </span> : null}
-                {data.cumulativeUpdated ? <span>SKUs updated: <strong>{data.cumulativeUpdated}</strong> · </span> : null}
-                {data.cumulativeMerged ? <span>Variants merged: <strong>{data.cumulativeMerged}</strong> · </span> : null}
+                {data.cumulativeSaved ? <span>Saved: <strong>{data.cumulativeSaved}</strong> . </span> : null}
+                {data.cumulativeUnknown ? <span>Unknown: <strong>{data.cumulativeUnknown}</strong> . </span> : null}
+                {data.cumulativeUpdated ? <span>SKUs updated: <strong>{data.cumulativeUpdated}</strong> . </span> : null}
+                {data.cumulativeMerged ? <span>Variants merged: <strong>{data.cumulativeMerged}</strong> . </span> : null}
                 {data.cumulativeFailed ? <span style={{ color: "#a00" }}>Failed: <strong>{data.cumulativeFailed}</strong></span> : null}
               </div>
             </div>
@@ -879,11 +860,10 @@ export default function Index() {
 
         {data?.ok === false ? (
           <div style={{ marginTop: "0.75rem", padding: "0.5rem 0.75rem", background: "#fff0f0", color: "#a00", borderRadius: "6px", fontSize: "0.875rem" }}>
-            ✗ {data.error}
+            Error: {data.error}
           </div>
         ) : null}
 
-        {/* Individual step buttons (collapsible — for advanced/manual control) */}
         <details style={{ marginTop: "0.75rem" }}>
           <summary style={{ cursor: "pointer", fontSize: "0.85rem", color: "#555" }}>Run individual steps</summary>
           <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
@@ -895,7 +875,7 @@ export default function Index() {
         </details>
 
         <p style={{ margin: "0.75rem 0 0", fontSize: "0.8rem", color: "#a06600" }}>
-          Click <strong>Run all</strong> to identify models, colours and clean duplicates automatically. When that finishes, click <strong>Confirm & write SKUs</strong> to push them to Shopify.
+          Click <strong>Run all</strong> to identify models, colours and clean duplicates automatically. When that finishes, click <strong>Confirm and write SKUs</strong> to push them to Shopify.
         </p>
       </div>
 
@@ -908,15 +888,7 @@ export default function Index() {
                 key={filter.key}
                 type="button"
                 onClick={() => setActiveFilter(filter.key)}
-                style={{
-                  padding: "0.4rem 0.7rem",
-                  borderRadius: "999px",
-                  border: isActive ? "1px solid #1a73e8" : "1px solid #dfe3e8",
-                  background: isActive ? "#e8f0fe" : "white",
-                  color: "#303030",
-                  fontWeight: isActive ? 600 : 400,
-                  cursor: "pointer",
-                }}
+                style={{ padding: "0.4rem 0.7rem", borderRadius: "999px", border: isActive ? "1px solid #1a73e8" : "1px solid #dfe3e8", background: isActive ? "#e8f0fe" : "white", color: "#303030", fontWeight: isActive ? 600 : 400, cursor: "pointer" }}
               >
                 {filter.label} ({filter.count})
               </button>
@@ -927,10 +899,10 @@ export default function Index() {
         {pagination ? (
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem", fontSize: "0.875rem" }}>
             {pagination.currentCursor ? (
-              <a href="/app" style={{ padding: "0.4rem 0.7rem", borderRadius: "6px", border: "1px solid #dfe3e8", textDecoration: "none", color: "#303030" }}>← First page</a>
+              <a href="/app" style={{ padding: "0.4rem 0.7rem", borderRadius: "6px", border: "1px solid #dfe3e8", textDecoration: "none", color: "#303030" }}>First page</a>
             ) : null}
             {pagination.hasMore ? (
-              <a href={`/app?cursor=${encodeURIComponent(pagination.nextCursor)}`} style={{ padding: "0.4rem 0.7rem", borderRadius: "6px", border: "1px solid #dfe3e8", textDecoration: "none", color: "#303030" }}>Next page →</a>
+              <a href={`/app?cursor=${encodeURIComponent(pagination.nextCursor)}`} style={{ padding: "0.4rem 0.7rem", borderRadius: "6px", border: "1px solid #dfe3e8", textDecoration: "none", color: "#303030" }}>Next page</a>
             ) : null}
           </div>
         ) : null}
@@ -945,19 +917,19 @@ export default function Index() {
                   <p style={{ margin: 0, fontWeight: 700 }}>{product.title}</p>
                   <p style={{ margin: 0, fontSize: "0.8rem", color: "#888" }}>{product.handle}</p>
                   <div style={{ marginTop: "0.25rem", fontSize: "0.85rem", color: "#303030", lineHeight: 1.5 }}>
-                    {parsed.club ? <span>Club: <strong>{parsed.club}</strong> · </span> : null}
-                    {parsed.model ? <span>Model: <strong>{parsed.model}</strong>{presentation.modelSource === "assigned" ? " (assigned)" : ""} · </span> : null}
-                    <span>Type: <strong>{parsed.type ?? "—"}</strong> · </span>
-                    {effectiveColour ? <span>Colour: <strong>{effectiveColour}</strong>{colourSource && colourSource !== "title" ? ` (${colourSource})` : ""} · </span> : null}
+                    {parsed.club ? <span>Club: <strong>{parsed.club}</strong> | </span> : null}
+                    {parsed.model ? <span>Model: <strong>{parsed.model}</strong>{presentation.modelSource === "assigned" ? " (assigned)" : ""} | </span> : null}
+                    <span>Type: <strong>{parsed.type ?? "-"}</strong> | </span>
+                    {effectiveColour ? <span>Colour: <strong>{effectiveColour}</strong>{colourSource && colourSource !== "title" ? ` (${colourSource})` : ""} | </span> : null}
                     <span style={{ color: statusColour }}>Status: <strong>{effectiveStatus}</strong></span>
-                    {hasDuplicateGeneratedSkus ? <span style={{ color: "#a00" }}> · ⚠ duplicate variants</span> : null}
-                    {isSafeForSkuWrite ? <span style={{ color: "#1f8a4c" }}> · ✓ safe to write</span> : null}
+                    {hasDuplicateGeneratedSkus ? <span style={{ color: "#a00" }}> | duplicate variants</span> : null}
+                    {isSafeForSkuWrite ? <span style={{ color: "#1f8a4c" }}> | safe to write</span> : null}
                   </div>
                   {effectiveReason ? <p style={{ margin: "0.2rem 0 0", fontSize: "0.8rem", color: "#888" }}>{effectiveReason}</p> : null}
                   {effectiveStatus === "review" ? (
                     <Form method="post" style={{ marginTop: "0.4rem", display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
                       <input type="hidden" name="productId" value={product.id} />
-                      <input list="macron-models-list" name="model" placeholder="Type Macron model…" defaultValue={product.assignedModel ?? ""} style={{ padding: "0.25rem", minWidth: "200px" }} autoComplete="off" />
+                      <input list="macron-models-list" name="model" placeholder="Type Macron model..." defaultValue={product.assignedModel ?? ""} style={{ padding: "0.25rem", minWidth: "200px" }} autoComplete="off" />
                       <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>Save model</button>
                     </Form>
                   ) : null}
@@ -965,5 +937,30 @@ export default function Index() {
                     <Form method="post" style={{ marginTop: "0.4rem", display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
                       <input type="hidden" name="productId" value={product.id} />
                       <select name="colour" defaultValue={product.assignedColour ?? ""} style={{ padding: "0.25rem" }}>
-                        <option value="">— pick colour —</option>
-                        {parsed.allowedColours.map((c) => (<option key={c}
+                        <option value="">- pick colour -</option>
+                        {parsed.allowedColours.map((c) => (<option key={c} value={c}>{c}</option>))}
+                      </select>
+                      <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>Save colour</button>
+                    </Form>
+                  ) : null}
+                  <details style={{ marginTop: "0.4rem", fontSize: "0.8rem", color: "#555" }}>
+                    <summary style={{ cursor: "pointer" }}>{variantRows.length} variants</summary>
+                    {variantRows.map((row, i) => {
+                      const isDup = i > 0 && variantRows.slice(0, i).some((r) => r.generatedSku === row.generatedSku);
+                      return (
+                        <div key={row.id} style={{ paddingLeft: "1rem", opacity: isDup ? 0.5 : 1 }}>
+                          {formatSizeLabel(row.variantSize)} -&gt; <code>{row.generatedSku}</code>{isDup ? " (dup)" : ""}
+                        </div>
+                      );
+                    })}
+                  </details>
+                </div>
+              );
+            })}
+            {filteredProducts.length === 0 ? <p style={{ color: "#888", margin: 0 }}>No products in this filter.</p> : null}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
