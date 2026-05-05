@@ -228,6 +228,21 @@ export const loader = async ({ request }) => {
  * per request, instead of fetching the entire catalogue every batch (which
  * Shopify rate-limits).
  */
+/**
+ * Quick count of total products in the store. Used for progress percentages.
+ * One cheap GraphQL call.
+ */
+async function fetchProductsCount(admin) {
+  try {
+    const r = await admin.graphql(`#graphql
+      query ProductsCount { productsCount { count } }`);
+    const j = await r.json();
+    return j?.data?.productsCount?.count ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchOnePageForBulk(admin, cursor = null, pageSize = 100) {
   const QUERY = `#graphql
     query OnePage($cursor: String, $pageSize: Int!) {
@@ -337,6 +352,15 @@ export const action = async ({ request }) => {
   // is the Shopify endCursor returned by the previous batch; null = first page.
   const inCursor = formData.get("cursor")?.toString() || null;
   const pageNumber = Number.parseInt(formData.get("pageNumber") ?? "0", 10) || 0;
+  const cumulativeScannedIn = Number.parseInt(formData.get("cumulativeScanned") ?? "0", 10) || 0;
+  const cumulativeSavedIn = Number.parseInt(formData.get("cumulativeSaved") ?? "0", 10) || 0;
+  const cumulativeUnknownIn = Number.parseInt(formData.get("cumulativeUnknown") ?? "0", 10) || 0;
+  const cumulativeUpdatedIn = Number.parseInt(formData.get("cumulativeUpdated") ?? "0", 10) || 0;
+  const cumulativeMergedIn = Number.parseInt(formData.get("cumulativeMerged") ?? "0", 10) || 0;
+  const cumulativeFailedIn = Number.parseInt(formData.get("cumulativeFailed") ?? "0", 10) || 0;
+  // Get total once at start of chain so % progress is meaningful
+  const totalIn = Number.parseInt(formData.get("totalProducts") ?? "0", 10) || 0;
+  const totalProducts = totalIn > 0 ? totalIn : await fetchProductsCount(admin);
 
   // ─── BULK: auto-assign all confident dHash matches ────────────────────────
   if (bulk === "autoAssignConfident") {
@@ -381,6 +405,13 @@ export const action = async ({ request }) => {
       skipped,
       processedThisBatch: eligible.length,
       pageProductsScanned: products.length,
+      totalProducts,
+      cumulativeScanned: cumulativeScannedIn + products.length,
+      cumulativeSaved: cumulativeSavedIn + (typeof saved !== 'undefined' ? saved : 0),
+      cumulativeUnknown: cumulativeUnknownIn + (typeof unknown !== 'undefined' ? unknown : 0),
+      cumulativeUpdated: cumulativeUpdatedIn + (typeof updated !== 'undefined' ? updated : 0),
+      cumulativeMerged: cumulativeMergedIn + (typeof merged !== 'undefined' ? merged : 0),
+      cumulativeFailed: cumulativeFailedIn + (typeof failed !== 'undefined' ? failed : 0),
       nextCursor: endCursor,
       pageNumber: pageNumber + 1,
       hasMore: hasNextPage,
@@ -422,6 +453,13 @@ export const action = async ({ request }) => {
       unknown,
       processedThisBatch: eligible.length,
       pageProductsScanned: products.length,
+      totalProducts,
+      cumulativeScanned: cumulativeScannedIn + products.length,
+      cumulativeSaved: cumulativeSavedIn + (typeof saved !== 'undefined' ? saved : 0),
+      cumulativeUnknown: cumulativeUnknownIn + (typeof unknown !== 'undefined' ? unknown : 0),
+      cumulativeUpdated: cumulativeUpdatedIn + (typeof updated !== 'undefined' ? updated : 0),
+      cumulativeMerged: cumulativeMergedIn + (typeof merged !== 'undefined' ? merged : 0),
+      cumulativeFailed: cumulativeFailedIn + (typeof failed !== 'undefined' ? failed : 0),
       nextCursor: endCursor,
       pageNumber: pageNumber + 1,
       hasMore: hasNextPage,
@@ -464,6 +502,13 @@ export const action = async ({ request }) => {
       unknown,
       processedThisBatch: eligible.length,
       pageProductsScanned: products.length,
+      totalProducts,
+      cumulativeScanned: cumulativeScannedIn + products.length,
+      cumulativeSaved: cumulativeSavedIn + (typeof saved !== 'undefined' ? saved : 0),
+      cumulativeUnknown: cumulativeUnknownIn + (typeof unknown !== 'undefined' ? unknown : 0),
+      cumulativeUpdated: cumulativeUpdatedIn + (typeof updated !== 'undefined' ? updated : 0),
+      cumulativeMerged: cumulativeMergedIn + (typeof merged !== 'undefined' ? merged : 0),
+      cumulativeFailed: cumulativeFailedIn + (typeof failed !== 'undefined' ? failed : 0),
       nextCursor: endCursor,
       pageNumber: pageNumber + 1,
       hasMore: hasNextPage,
@@ -571,6 +616,13 @@ export const action = async ({ request }) => {
       userErrors: userErrorMessages.slice(0, 5),
       processedThisBatch: eligible.length,
       pageProductsScanned: products.length,
+      totalProducts,
+      cumulativeScanned: cumulativeScannedIn + products.length,
+      cumulativeSaved: cumulativeSavedIn + (typeof saved !== 'undefined' ? saved : 0),
+      cumulativeUnknown: cumulativeUnknownIn + (typeof unknown !== 'undefined' ? unknown : 0),
+      cumulativeUpdated: cumulativeUpdatedIn + (typeof updated !== 'undefined' ? updated : 0),
+      cumulativeMerged: cumulativeMergedIn + (typeof merged !== 'undefined' ? merged : 0),
+      cumulativeFailed: cumulativeFailedIn + (typeof failed !== 'undefined' ? failed : 0),
       nextCursor: endCursor,
       pageNumber: pageNumber + 1,
       hasMore: hasNextPage,
@@ -630,6 +682,13 @@ export const action = async ({ request }) => {
       failed,
       processedThisBatch: productsWithDupes.length,
       pageProductsScanned: products.length,
+      totalProducts,
+      cumulativeScanned: cumulativeScannedIn + products.length,
+      cumulativeSaved: cumulativeSavedIn + (typeof saved !== 'undefined' ? saved : 0),
+      cumulativeUnknown: cumulativeUnknownIn + (typeof unknown !== 'undefined' ? unknown : 0),
+      cumulativeUpdated: cumulativeUpdatedIn + (typeof updated !== 'undefined' ? updated : 0),
+      cumulativeMerged: cumulativeMergedIn + (typeof merged !== 'undefined' ? merged : 0),
+      cumulativeFailed: cumulativeFailedIn + (typeof failed !== 'undefined' ? failed : 0),
       userErrors: userErrorMessages.slice(0, 5),
       nextCursor: endCursor,
       pageNumber: pageNumber + 1,
@@ -696,20 +755,57 @@ export default function Index() {
   const data = bulkFetcher.data;
   const isBusy = bulkFetcher.state !== "idle";
 
+  // Pipeline state — when set, after the current bulk action finishes we
+  // auto-advance to the next step in the pipeline.
+  const [pipeline, setPipeline] = useState(null); // { steps: ["autoAssignConfident", "visionPassModels", ...], idx: 0 }
+
   // Auto-continue batched bulk actions until done. Each batch fetches ONE
   // Shopify page (≤100 products) so we don't hit the GraphQL throttle.
   useEffect(() => {
-    if (!data?.hasMore || isBusy) return;
-    const fd = new FormData();
-    fd.set("bulk", data.bulk);
-    if (data.nextCursor) fd.set("cursor", data.nextCursor);
-    fd.set("pageNumber", String(data.pageNumber ?? 1));
-    bulkFetcher.submit(fd, { method: "post" });
-  }, [data?.hasMore, data?.nextCursor, data?.pageNumber, data?.bulk, isBusy]);
+    if (!data || isBusy) return;
+    if (data.hasMore) {
+      // More pages of the SAME bulk action — keep going
+      const fd = new FormData();
+      fd.set("bulk", data.bulk);
+      if (data.nextCursor) fd.set("cursor", data.nextCursor);
+      fd.set("pageNumber", String(data.pageNumber ?? 1));
+      fd.set("totalProducts", String(data.totalProducts ?? 0));
+      fd.set("cumulativeScanned", String(data.cumulativeScanned ?? 0));
+      fd.set("cumulativeSaved", String(data.cumulativeSaved ?? 0));
+      fd.set("cumulativeUnknown", String(data.cumulativeUnknown ?? 0));
+      fd.set("cumulativeUpdated", String(data.cumulativeUpdated ?? 0));
+      fd.set("cumulativeMerged", String(data.cumulativeMerged ?? 0));
+      fd.set("cumulativeFailed", String(data.cumulativeFailed ?? 0));
+      bulkFetcher.submit(fd, { method: "post" });
+      return;
+    }
+    // Current bulk done. If we're in a pipeline, advance.
+    if (pipeline && pipeline.idx + 1 < pipeline.steps.length) {
+      const next = pipeline.steps[pipeline.idx + 1];
+      setPipeline({ ...pipeline, idx: pipeline.idx + 1 });
+      const fd = new FormData();
+      fd.set("bulk", next);
+      fd.set("pageNumber", "0");
+      bulkFetcher.submit(fd, { method: "post" });
+    } else if (pipeline) {
+      // Pipeline finished
+      setPipeline(null);
+    }
+  }, [data?.hasMore, data?.nextCursor, data?.pageNumber, data?.bulk, isBusy, pipeline]);
 
   function startBulk(name) {
+    setPipeline(null);
     const fd = new FormData();
     fd.set("bulk", name);
+    fd.set("pageNumber", "0");
+    bulkFetcher.submit(fd, { method: "post" });
+  }
+
+  function startPipeline() {
+    const steps = ["autoAssignConfident", "visionPassModels", "visionPass", "mergeDuplicateVariants"];
+    setPipeline({ steps, idx: 0 });
+    const fd = new FormData();
+    fd.set("bulk", steps[0]);
     fd.set("pageNumber", "0");
     bulkFetcher.submit(fd, { method: "post" });
   }
@@ -729,38 +825,77 @@ export default function Index() {
           This page: {productPresentations.length} products · {stats.matched} matched · {stats.needsColour} need colour · {stats.review} need review · {stats.duplicateSkuWarning} have duplicate variants
         </p>
 
-        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.75rem" }}>
-          <button type="button" disabled={isBusy} onClick={() => startBulk("autoAssignConfident")} style={{ padding: "0.5rem 1rem" }}>
-            1. Auto-assign confident matches
+        {/* Primary action: auto-run steps 1-4 */}
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.75rem", alignItems: "center" }}>
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={startPipeline}
+            style={{ padding: "0.6rem 1.25rem", background: "#1a73e8", color: "white", border: "none", borderRadius: "6px", fontWeight: 600 }}
+          >
+            ▶ Run all (steps 1–4)
           </button>
-          <button type="button" disabled={isBusy} onClick={() => startBulk("visionPassModels")} style={{ padding: "0.5rem 1rem" }}>
-            2. Vision: identify MODELS (OpenAI)
-          </button>
-          <button type="button" disabled={isBusy} onClick={() => startBulk("visionPass")} style={{ padding: "0.5rem 1rem" }}>
-            3. Vision: identify COLOURS (OpenAI)
-          </button>
-          <button type="button" disabled={isBusy} onClick={() => startBulk("mergeDuplicateVariants")} style={{ padding: "0.5rem 1rem" }}>
-            4. Merge duplicate size variants
-          </button>
-          <button type="button" disabled={isBusy} onClick={() => startBulk("writeSafeSkus")} style={{ padding: "0.5rem 1rem", background: "#1f8a4c", color: "white", border: "none", borderRadius: "6px" }}>
-            5. Write safe SKUs to Shopify
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={() => startBulk("writeSafeSkus")}
+            style={{ padding: "0.6rem 1.25rem", background: "#1f8a4c", color: "white", border: "none", borderRadius: "6px", fontWeight: 600 }}
+          >
+            ✓ Confirm & write SKUs to Shopify
           </button>
         </div>
 
-        {data ? (
-          <div style={{ marginTop: "0.75rem", padding: "0.5rem 0.75rem", background: "#eef6ff", borderRadius: "6px", fontSize: "0.875rem" }}>
-            {data.ok === false ? <span style={{ color: "#a00" }}>✗ {data.error}</span> :
-             data.bulk === "autoAssignConfident" ? <span>dHash colour-assign · page {data.pageNumber} · scanned {data.pageProductsScanned} this page · saved {data.saved} {data.hasMore ? "· continuing…" : "✓ DONE"}</span> :
-             data.bulk === "visionPass" ? <span>OpenAI colour pass · page {data.pageNumber} · scanned {data.pageProductsScanned} this page · saved {data.saved} · unknown {data.unknown} {data.hasMore ? "· continuing…" : "✓ DONE"}</span> :
-             data.bulk === "visionPassModels" ? <span>OpenAI model pass · page {data.pageNumber} · scanned {data.pageProductsScanned} this page · saved {data.saved} · unknown {data.unknown} {data.hasMore ? "· continuing…" : "✓ DONE"}</span> :
-             data.bulk === "mergeDuplicateVariants" ? <span>Merge duplicates · page {data.pageNumber} · scanned {data.pageProductsScanned} this page · {data.merged} variants deleted · {data.failed} failed {data.hasMore ? "· continuing…" : "✓ DONE"}</span> :
-             data.bulk === "writeSafeSkus" ? <span>SKU write · page {data.pageNumber} · scanned {data.pageProductsScanned} this page · {data.updated} variants updated {data.hasMore ? "· continuing…" : "✓ DONE"}{data.userErrors?.length ? ` · errors: ${data.userErrors.join(" | ")}` : ""}</span> :
-             null}
+        {/* Progress bar */}
+        {data && data.totalProducts ? (() => {
+          const stepLabels = {
+            autoAssignConfident: "1/4 dHash colour-assign",
+            visionPassModels: "2/4 OpenAI MODEL identification",
+            visionPass: "3/4 OpenAI COLOUR identification",
+            mergeDuplicateVariants: "4/4 merging duplicate variants",
+            writeSafeSkus: "Writing SKUs to Shopify",
+          };
+          const pct = Math.min(100, Math.round((data.cumulativeScanned / data.totalProducts) * 100));
+          const label = stepLabels[data.bulk] ?? data.bulk;
+          const done = !data.hasMore && (!pipeline || pipeline.idx + 1 >= pipeline.steps.length);
+          return (
+            <div style={{ marginTop: "0.75rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", marginBottom: "0.25rem" }}>
+                <span><strong>{label}</strong> · {data.cumulativeScanned} of {data.totalProducts} products scanned</span>
+                <span>{pct}%{done ? " ✓" : pipeline ? ` · step ${pipeline.idx + 1}/${pipeline.steps.length}` : ""}</span>
+              </div>
+              <div style={{ height: "10px", background: "#e8f0fe", borderRadius: "5px", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${pct}%`, background: done ? "#1f8a4c" : "#1a73e8", transition: "width 0.3s" }} />
+              </div>
+              <div style={{ marginTop: "0.4rem", fontSize: "0.8rem", color: "#555" }}>
+                {data.cumulativeSaved ? <span>Saved: <strong>{data.cumulativeSaved}</strong> · </span> : null}
+                {data.cumulativeUnknown ? <span>Unknown: <strong>{data.cumulativeUnknown}</strong> · </span> : null}
+                {data.cumulativeUpdated ? <span>SKUs updated: <strong>{data.cumulativeUpdated}</strong> · </span> : null}
+                {data.cumulativeMerged ? <span>Variants merged: <strong>{data.cumulativeMerged}</strong> · </span> : null}
+                {data.cumulativeFailed ? <span style={{ color: "#a00" }}>Failed: <strong>{data.cumulativeFailed}</strong></span> : null}
+              </div>
+            </div>
+          );
+        })() : null}
+
+        {data?.ok === false ? (
+          <div style={{ marginTop: "0.75rem", padding: "0.5rem 0.75rem", background: "#fff0f0", color: "#a00", borderRadius: "6px", fontSize: "0.875rem" }}>
+            ✗ {data.error}
           </div>
         ) : null}
 
+        {/* Individual step buttons (collapsible — for advanced/manual control) */}
+        <details style={{ marginTop: "0.75rem" }}>
+          <summary style={{ cursor: "pointer", fontSize: "0.85rem", color: "#555" }}>Run individual steps</summary>
+          <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
+            <button type="button" disabled={isBusy} onClick={() => startBulk("autoAssignConfident")} style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>1. dHash colour-assign</button>
+            <button type="button" disabled={isBusy} onClick={() => startBulk("visionPassModels")} style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>2. Vision MODELS</button>
+            <button type="button" disabled={isBusy} onClick={() => startBulk("visionPass")} style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>3. Vision COLOURS</button>
+            <button type="button" disabled={isBusy} onClick={() => startBulk("mergeDuplicateVariants")} style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>4. Merge duplicates</button>
+          </div>
+        </details>
+
         <p style={{ margin: "0.75rem 0 0", fontSize: "0.8rem", color: "#a06600" }}>
-          Run buttons in order 1 → 5. Each runs across the entire catalogue and continues automatically in batches until done.
+          Click <strong>Run all</strong> to identify models, colours and clean duplicates automatically. When that finishes, click <strong>Confirm & write SKUs</strong> to push them to Shopify.
         </p>
       </div>
 
@@ -831,29 +966,4 @@ export default function Index() {
                       <input type="hidden" name="productId" value={product.id} />
                       <select name="colour" defaultValue={product.assignedColour ?? ""} style={{ padding: "0.25rem" }}>
                         <option value="">— pick colour —</option>
-                        {parsed.allowedColours.map((c) => (<option key={c} value={c}>{c}</option>))}
-                      </select>
-                      <button type="submit" style={{ padding: "0.25rem 0.75rem" }}>Save colour</button>
-                    </Form>
-                  ) : null}
-                  <details style={{ marginTop: "0.4rem", fontSize: "0.8rem", color: "#555" }}>
-                    <summary style={{ cursor: "pointer" }}>{variantRows.length} variants</summary>
-                    {variantRows.map((row, i) => {
-                      const isDup = i > 0 && variantRows.slice(0, i).some((r) => r.generatedSku === row.generatedSku);
-                      return (
-                        <div key={row.id} style={{ paddingLeft: "1rem", opacity: isDup ? 0.5 : 1 }}>
-                          {formatSizeLabel(row.variantSize)} → <code>{row.generatedSku}</code>{isDup ? " (dup)" : ""}
-                        </div>
-                      );
-                    })}
-                  </details>
-                </div>
-              );
-            })}
-            {filteredProducts.length === 0 ? <p style={{ color: "#888", margin: 0 }}>No products in this filter.</p> : null}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+                        {parsed.allowedColours.map((c) => (<option key={c}
